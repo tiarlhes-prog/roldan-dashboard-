@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROLDAN – Relatórios</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header><div id="navbar" class="navbar"></div></header>
+
+  <main>
+    <div class="page-header">
+      <h1>Relatórios</h1>
+      <p>Consulte e exporte dados por período</p>
+    </div>
+
+    <!-- Filtros + Exportar -->
+    <div class="box">
+      <div class="box-header">Filtros</div>
+      <div class="box-body">
+        <div class="filter-bar">
+          <div class="form-group">
+            <label>Data Início</label>
+            <input type="date" id="f-inicio">
+          </div>
+          <div class="form-group">
+            <label>Data Fim</label>
+            <input type="date" id="f-fim">
+          </div>
+          <div class="form-group">
+            <label>Responsável</label>
+            <input type="text" id="f-resp" placeholder="Filtrar por nome">
+          </div>
+          <div class="form-group" style="justify-content:flex-end;">
+            <label>&nbsp;</label>
+            <button class="btn btn-primary" id="btn-filtrar">🔍 Filtrar</button>
+          </div>
+          <div class="form-group" style="justify-content:flex-end;">
+            <label>&nbsp;</label>
+            <button class="btn btn-outline" id="btn-limpar">Limpar</button>
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="btn-group">
+          <button class="btn btn-danger" id="btn-pdf">📄 Exportar PDF</button>
+          <button class="btn btn-success" id="btn-excel" style="background:#16a34a;color:white;">📊 Exportar Excel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumo consolidado -->
+    <div class="cards" id="cards-resumo">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+
+    <!-- Tabela de registros detalhados -->
+    <div class="box">
+      <div class="box-header">
+        <span>Registros Detalhados</span>
+        <span id="count-label" style="font-size:.8rem;color:rgba(255,255,255,.7);"></span>
+      </div>
+      <div class="box-body" style="padding:0;">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Turno</th>
+                <th>Responsável</th>
+                <th>Status</th>
+                <th>Lig. Total</th>
+                <th>Lig. Atend.</th>
+                <th>WhatsApp</th>
+                <th>Agend.</th>
+                <th>Comp.</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tbody-registros">
+              <tr><td colspan="10" class="text-center" style="padding:2rem;color:var(--muted);">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela de unidades por período -->
+    <div class="box" id="box-unidades" style="display:none;">
+      <div class="box-header">Agendamentos por Unidade (período)</div>
+      <div class="box-body" style="padding:0;">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Unidade</th>
+                <th style="text-align:center;">Agendamentos</th>
+                <th style="text-align:center;">Compareceram</th>
+                <th style="text-align:center;">Taxa</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-unidades"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>ROLDAN Marketing Educacional e Contact Center BPO | (11) 95474-2815</footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    if (!requireAuth()) throw new Error('auth');
+    renderNav('/relatorios.html');
+
+    // Default: current month
+    const hoje = todayISO();
+    document.getElementById('f-inicio').value = hoje.slice(0, 8) + '01';
+    document.getElementById('f-fim').value    = hoje;
+
+    function getParams() {
+      const ini  = document.getElementById('f-inicio').value;
+      const fim  = document.getElementById('f-fim').value;
+      const resp = document.getElementById('f-resp').value.trim();
+      const p    = new URLSearchParams();
+      if (ini)  p.set('data_inicio', ini);
+      if (fim)  p.set('data_fim', fim);
+      if (resp) p.set('responsavel', resp);
+      return p;
+    }
+
+    async function load() {
+      const params = getParams();
+      document.getElementById('cards-resumo').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+      document.getElementById('tbody-registros').innerHTML = '<tr><td colspan="10" class="text-center" style="padding:2rem;color:var(--muted);">Carregando…</td></tr>';
+
+      try {
+        const { consolidado: c, registros } = await api(`/relatorios/consolidado?${params}`);
+
+        // Cards
+        document.getElementById('cards-resumo').innerHTML = `
+          <div class="card primary">
+            <div class="card-label">Total Registros</div>
+            <div class="card-value">${c.total}</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Ligações Totais</div>
+            <div class="card-value">${c.ligacoes_totais}</div>
+            <div class="card-sub">Atendidas: ${c.ligacoes_atendidas}</div>
+          </div>
+          <div class="card">
+            <div class="card-label">WhatsApp</div>
+            <div class="card-value">${c.contatos_whatsapp}</div>
+          </div>
+          <div class="card accent-card">
+            <div class="card-label">Agendamentos</div>
+            <div class="card-value">${c.agendamentos_confirmados}</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Compareceram</div>
+            <div class="card-value">${c.compareceram_visita}</div>
+            <div class="card-sub">Taxa: ${c.agendamentos_confirmados ? Math.round(c.compareceram_visita/c.agendamentos_confirmados*100) : 0}%</div>
+          </div>
+        `;
+
+        // Count label
+        document.getElementById('count-label').textContent = `${registros.length} registro(s)`;
+
+        // Records table
+        if (registros.length === 0) {
+          document.getElementById('tbody-registros').innerHTML =
+            '<tr><td colspan="10"><div class="empty"><div class="empty-icon">📋</div><p>Nenhum registro encontrado para o período.</p></div></td></tr>';
+        } else {
+          document.getElementById('tbody-registros').innerHTML = registros.map(r => `
+            <tr>
+              <td>${fmtDate(r.data_atendimento)}</td>
+              <td>${turnoBadge(r.turno)}</td>
+              <td>${r.responsavel}</td>
+              <td>${statusBadge(r.status_dia)}</td>
+              <td>${r.ligacoes_totais}</td>
+              <td>${r.ligacoes_atendidas}</td>
+              <td>${r.contatos_whatsapp}</td>
+              <td>${r.agendamentos_confirmados}</td>
+              <td>${r.compareceram_visita}</td>
+              <td>
+                <a href="/registro.html?id=${r.id}" class="btn btn-ghost btn-sm">✏️</a>
+              </td>
+            </tr>
+          `).join('');
+        }
+
+        // Units table
+        const unidades = Object.entries(c.unidades);
+        const comDados = unidades.filter(([, d]) => d.agendamentos > 0 || d.compareceram > 0);
+        const boxUnd = document.getElementById('box-unidades');
+        if (comDados.length > 0) {
+          boxUnd.style.display = 'block';
+          document.getElementById('tbody-unidades').innerHTML = unidades.map(([nome, d]) => {
+            const taxa = d.agendamentos ? Math.round(d.compareceram / d.agendamentos * 100) : 0;
+            return `
+              <tr>
+                <td><strong>${nome}</strong></td>
+                <td style="text-align:center;">${d.agendamentos}</td>
+                <td style="text-align:center;">${d.compareceram}</td>
+                <td style="text-align:center;">${taxa}%</td>
+              </tr>
+            `;
+          }).join('');
+        } else {
+          boxUnd.style.display = 'none';
+        }
+
+      } catch (err) {
+        document.getElementById('cards-resumo').innerHTML = `<div class="alert alert-danger" style="grid-column:1/-1;">Erro: ${err.message}</div>`;
+      }
+    }
+
+    document.getElementById('btn-filtrar').addEventListener('click', load);
+    document.getElementById('btn-limpar').addEventListener('click', () => {
+      document.getElementById('f-inicio').value = '';
+      document.getElementById('f-fim').value    = '';
+      document.getElementById('f-resp').value   = '';
+      load();
+    });
+
+    document.getElementById('btn-pdf').addEventListener('click', async () => {
+      const params = getParams();
+      const ini = document.getElementById('f-inicio').value || 'tudo';
+      const fim = document.getElementById('f-fim').value   || 'tudo';
+      showToast('Gerando PDF…', 'info');
+      await downloadFile(`/relatorios/pdf?${params}`, `relatorio_roldan_${ini}_${fim}.pdf`);
+    });
+
+    document.getElementById('btn-excel').addEventListener('click', async () => {
+      const params = getParams();
+      const ini = document.getElementById('f-inicio').value || 'tudo';
+      const fim = document.getElementById('f-fim').value   || 'tudo';
+      showToast('Gerando Excel…', 'info');
+      await downloadFile(`/relatorios/excel?${params}`, `relatorio_roldan_${ini}_${fim}.xlsx`);
+    });
+
+    load();
+  </script>
+</body>
+</html>

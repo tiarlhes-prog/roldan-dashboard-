@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROLDAN – Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header><div id="navbar" class="navbar"></div></header>
+
+  <main>
+    <div class="page-header">
+      <h1>Administração</h1>
+      <p>Gerenciar usuários e configurações</p>
+    </div>
+
+    <div id="alert-area"></div>
+
+    <!-- Criar usuário -->
+    <div class="box" style="margin-bottom:1.5rem;">
+      <div class="box-header">Criar Novo Usuário</div>
+      <div class="box-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Login (username)</label>
+            <input type="text" id="new-username" placeholder="ex: joao.silva">
+          </div>
+          <div class="form-group">
+            <label>Nome completo</label>
+            <input type="text" id="new-nome" placeholder="João Silva">
+          </div>
+          <div class="form-group">
+            <label>Senha</label>
+            <input type="password" id="new-password" placeholder="Mínimo 6 caracteres">
+          </div>
+          <div class="form-group">
+            <label>Perfil</label>
+            <select id="new-role">
+              <option value="user">Usuário</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:1rem;">
+          <button class="btn btn-accent" id="btn-criar-user">+ Criar Usuário</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alterar senha própria -->
+    <div class="box" style="margin-bottom:1.5rem;">
+      <div class="box-header">Alterar Minha Senha</div>
+      <div class="box-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Senha Atual</label>
+            <input type="password" id="senha-atual" placeholder="Senha atual">
+          </div>
+          <div class="form-group">
+            <label>Nova Senha</label>
+            <input type="password" id="nova-senha" placeholder="Nova senha (mín. 6 chars)">
+          </div>
+        </div>
+        <div style="margin-top:1rem;">
+          <button class="btn btn-primary" id="btn-alterar-senha">🔑 Alterar Senha</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de usuários -->
+    <div class="box">
+      <div class="box-header">Usuários Cadastrados</div>
+      <div class="box-body" style="padding:0;">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Usuário</th>
+                <th>Nome</th>
+                <th>Perfil</th>
+                <th>Criado em</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tbody-users">
+              <tr><td colspan="5" class="text-center" style="padding:2rem;color:var(--muted);">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>ROLDAN Marketing Educacional e Contact Center BPO | (11) 95474-2815</footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    if (!requireAuth()) throw new Error('auth');
+    const me = getUser();
+    if (me?.role !== 'admin') { window.location.href = '/dashboard.html'; throw new Error('não admin'); }
+    renderNav('/admin.html');
+
+    async function loadUsers() {
+      try {
+        const users = await api('/auth/usuarios');
+        document.getElementById('tbody-users').innerHTML = users.map(u => `
+          <tr>
+            <td><strong>${u.username}</strong></td>
+            <td>${u.nome}</td>
+            <td><span class="badge ${u.role === 'admin' ? 'badge-info' : 'badge-muted'}">${u.role}</span></td>
+            <td>${fmtDate(u.created_at?.slice(0,10))}</td>
+            <td>
+              ${u.username !== 'admin' ? `<button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="deleteUser(${u.id},'${u.nome}')">🗑️</button>` : ''}
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        showAlert('Erro ao carregar usuários: ' + err.message, 'danger');
+      }
+    }
+
+    document.getElementById('btn-criar-user').addEventListener('click', async () => {
+      const username = document.getElementById('new-username').value.trim();
+      const nome     = document.getElementById('new-nome').value.trim();
+      const password = document.getElementById('new-password').value;
+      const role     = document.getElementById('new-role').value;
+
+      if (!username || !nome || !password) { showAlert('Preencha todos os campos.', 'danger'); return; }
+
+      try {
+        await api('/auth/usuarios', { method: 'POST', body: JSON.stringify({ username, nome, password, role }) });
+        showAlert(`Usuário "${nome}" criado com sucesso!`, 'success');
+        document.getElementById('new-username').value = '';
+        document.getElementById('new-nome').value     = '';
+        document.getElementById('new-password').value = '';
+        loadUsers();
+      } catch (err) {
+        showAlert('Erro: ' + err.message, 'danger');
+      }
+    });
+
+    document.getElementById('btn-alterar-senha').addEventListener('click', async () => {
+      const senha_atual = document.getElementById('senha-atual').value;
+      const nova_senha  = document.getElementById('nova-senha').value;
+      if (!senha_atual || !nova_senha) { showAlert('Preencha a senha atual e a nova senha.', 'danger'); return; }
+      try {
+        await api('/auth/senha', { method: 'PUT', body: JSON.stringify({ senha_atual, nova_senha }) });
+        showAlert('Senha alterada com sucesso!', 'success');
+        document.getElementById('senha-atual').value = '';
+        document.getElementById('nova-senha').value  = '';
+      } catch (err) {
+        showAlert('Erro: ' + err.message, 'danger');
+      }
+    });
+
+    async function deleteUser(id, nome) {
+      if (!confirm(`Remover o usuário "${nome}"?`)) return;
+      try {
+        await api(`/auth/usuarios/${id}`, { method: 'DELETE' });
+        showAlert('Usuário removido.', 'success');
+        loadUsers();
+      } catch (err) {
+        showAlert('Erro: ' + err.message, 'danger');
+      }
+    }
+
+    function showAlert(msg, type) {
+      const el = document.getElementById('alert-area');
+      el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+      setTimeout(() => { el.innerHTML = ''; }, 4000);
+    }
+
+    loadUsers();
+  </script>
+</body>
+</html>

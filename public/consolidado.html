@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROLDAN – Consolidado</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header><div id="navbar" class="navbar"></div></header>
+
+  <main>
+    <div class="page-header">
+      <h1>Consolidado</h1>
+      <p>Totais agregados por período</p>
+    </div>
+
+    <!-- Filtro -->
+    <div class="box">
+      <div class="box-header">Filtrar Período</div>
+      <div class="box-body">
+        <div class="filter-bar">
+          <div class="form-group">
+            <label>Data Início</label>
+            <input type="date" id="f-inicio">
+          </div>
+          <div class="form-group">
+            <label>Data Fim</label>
+            <input type="date" id="f-fim">
+          </div>
+          <div class="form-group">
+            <label>Responsável</label>
+            <input type="text" id="f-resp" placeholder="Filtrar por nome">
+          </div>
+          <div class="form-group" style="justify-content:flex-end;">
+            <label>&nbsp;</label>
+            <button class="btn btn-primary" id="btn-filtrar">🔍 Filtrar</button>
+          </div>
+          <div class="form-group" style="justify-content:flex-end;">
+            <label>&nbsp;</label>
+            <button class="btn btn-outline" id="btn-limpar">Limpar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Totais -->
+    <div class="cards" id="cards-totais">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+
+    <!-- Unidades -->
+    <div class="box">
+      <div class="box-header">Agendamentos por Unidade</div>
+      <div class="box-body" style="padding:0;">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Unidade</th>
+                <th style="text-align:center;">Agendamentos</th>
+                <th style="text-align:center;">Compareceram</th>
+                <th style="text-align:center;">Taxa de Comparecimento</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-unidades">
+              <tr><td colspan="4" class="text-center" style="padding:2rem;color:var(--muted);">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Link para relatórios -->
+    <div class="btn-group">
+      <a href="/relatorios.html" class="btn btn-primary">Ver Relatório Detalhado</a>
+      <a href="/registro.html" class="btn btn-accent">+ Novo Registro</a>
+    </div>
+  </main>
+
+  <footer>ROLDAN Marketing Educacional e Contact Center BPO | (11) 95474-2815</footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    if (!requireAuth()) throw new Error('auth');
+    renderNav('/consolidado.html');
+
+    // Default: current month
+    const hoje = todayISO();
+    document.getElementById('f-inicio').value = hoje.slice(0, 8) + '01';
+    document.getElementById('f-fim').value    = hoje;
+
+    async function load() {
+      const ini  = document.getElementById('f-inicio').value;
+      const fim  = document.getElementById('f-fim').value;
+      const resp = document.getElementById('f-resp').value.trim();
+
+      const params = new URLSearchParams();
+      if (ini)  params.set('data_inicio', ini);
+      if (fim)  params.set('data_fim', fim);
+      if (resp) params.set('responsavel', resp);
+
+      document.getElementById('cards-totais').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+      document.getElementById('tbody-unidades').innerHTML = '<tr><td colspan="4" class="text-center" style="padding:2rem;color:var(--muted);">Carregando…</td></tr>';
+
+      try {
+        const { consolidado: c } = await api(`/relatorios/consolidado?${params}`);
+
+        document.getElementById('cards-totais').innerHTML = `
+          <div class="card primary">
+            <div class="card-label">Total de Registros</div>
+            <div class="card-value">${c.total}</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Ligações Realizadas</div>
+            <div class="card-value">${c.ligacoes_totais}</div>
+            <div class="card-sub">Atendidas: ${c.ligacoes_atendidas}</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Contatos WhatsApp</div>
+            <div class="card-value">${c.contatos_whatsapp}</div>
+          </div>
+          <div class="card accent-card">
+            <div class="card-label">Agendamentos</div>
+            <div class="card-value">${c.agendamentos_confirmados}</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Compareceram</div>
+            <div class="card-value">${c.compareceram_visita}</div>
+            <div class="card-sub">Taxa: ${c.agendamentos_confirmados ? Math.round(c.compareceram_visita/c.agendamentos_confirmados*100) : 0}%</div>
+          </div>
+        `;
+
+        const unidades = Object.entries(c.unidades);
+        if (unidades.every(([, d]) => d.agendamentos === 0 && d.compareceram === 0)) {
+          document.getElementById('tbody-unidades').innerHTML =
+            '<tr><td colspan="4"><div class="empty"><div class="empty-icon">📊</div><p>Nenhum dado de unidade no período.</p></div></td></tr>';
+        } else {
+          document.getElementById('tbody-unidades').innerHTML = unidades.map(([nome, d], i) => {
+            const taxa = d.agendamentos ? Math.round(d.compareceram / d.agendamentos * 100) : 0;
+            const bar  = `<div style="display:inline-block;width:${taxa}%;max-width:100%;height:6px;background:var(--accent);border-radius:3px;vertical-align:middle;margin-left:.5rem;"></div>`;
+            return `
+              <tr>
+                <td><strong>${nome}</strong></td>
+                <td style="text-align:center;">${d.agendamentos}</td>
+                <td style="text-align:center;">${d.compareceram}</td>
+                <td style="text-align:center;">${taxa}% ${bar}</td>
+              </tr>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        document.getElementById('cards-totais').innerHTML = `<div class="alert alert-danger">Erro: ${err.message}</div>`;
+      }
+    }
+
+    document.getElementById('btn-filtrar').addEventListener('click', load);
+    document.getElementById('btn-limpar').addEventListener('click', () => {
+      document.getElementById('f-inicio').value = '';
+      document.getElementById('f-fim').value    = '';
+      document.getElementById('f-resp').value   = '';
+      load();
+    });
+
+    load();
+  </script>
+</body>
+</html>

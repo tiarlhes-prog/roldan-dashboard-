@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROLDAN – Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header><div id="navbar" class="navbar"></div></header>
+
+  <main>
+    <div class="page-header">
+      <h1>Dashboard</h1>
+      <p id="date-label"></p>
+    </div>
+
+    <!-- Stats cards -->
+    <div class="cards" id="cards-today">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="btn-group" style="margin-bottom:1.5rem;">
+      <a href="/registro.html" class="btn btn-accent">+ Novo Registro</a>
+      <a href="/consolidado.html" class="btn btn-outline">Ver Consolidado</a>
+      <a href="/relatorios.html" class="btn btn-outline">Relatórios</a>
+    </div>
+
+    <!-- Recent records -->
+    <div class="box">
+      <div class="box-header">
+        <span>Últimos Registros</span>
+        <a href="/relatorios.html" style="font-size:.8rem;color:rgba(255,255,255,.75);">Ver todos →</a>
+      </div>
+      <div class="box-body">
+        <div class="table-wrap">
+          <table id="table-recent">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Turno</th>
+                <th>Responsável</th>
+                <th>Status</th>
+                <th>Ligações</th>
+                <th>Agendamentos</th>
+                <th>Compareceram</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tbody-recent">
+              <tr><td colspan="8" class="text-center" style="padding:2rem;color:var(--muted);">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>ROLDAN Marketing Educacional e Contact Center BPO | (11) 95474-2815</footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    if (!requireAuth()) throw new Error('auth');
+    renderNav('/dashboard.html');
+
+    document.getElementById('date-label').textContent =
+      'Hoje: ' + new Date().toLocaleDateString('pt-BR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+    async function loadDashboard() {
+      const today = todayISO();
+      const monthStart = today.slice(0, 8) + '01';
+
+      // Load all records for the month
+      const registros = await api(`/registros?data_inicio=${monthStart}&data_fim=${today}`).catch(() => []);
+      const todayRecs = registros.filter(r => r.data_atendimento === today);
+
+      // Summary: today
+      const sumToday = todayRecs.reduce((a, r) => {
+        a.ligacoes_totais          += r.ligacoes_totais || 0;
+        a.ligacoes_atendidas       += r.ligacoes_atendidas || 0;
+        a.contatos_whatsapp        += r.contatos_whatsapp || 0;
+        a.agendamentos_confirmados += r.agendamentos_confirmados || 0;
+        a.compareceram_visita      += r.compareceram_visita || 0;
+        return a;
+      }, { ligacoes_totais:0, ligacoes_atendidas:0, contatos_whatsapp:0, agendamentos_confirmados:0, compareceram_visita:0 });
+
+      document.getElementById('cards-today').innerHTML = `
+        <div class="card primary">
+          <div class="card-label">Registros Hoje</div>
+          <div class="card-value">${todayRecs.length}</div>
+          <div class="card-sub">No mês: ${registros.length}</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Ligações Hoje</div>
+          <div class="card-value">${sumToday.ligacoes_totais}</div>
+          <div class="card-sub">Atendidas: ${sumToday.ligacoes_atendidas}</div>
+        </div>
+        <div class="card">
+          <div class="card-label">WhatsApp Hoje</div>
+          <div class="card-value">${sumToday.contatos_whatsapp}</div>
+        </div>
+        <div class="card accent-card">
+          <div class="card-label">Agendamentos Hoje</div>
+          <div class="card-value">${sumToday.agendamentos_confirmados}</div>
+          <div class="card-sub">Compareceram: ${sumToday.compareceram_visita}</div>
+        </div>
+      `;
+
+      // Last 20 records
+      const recent = registros.slice(0, 20);
+      if (recent.length === 0) {
+        document.getElementById('tbody-recent').innerHTML =
+          '<tr><td colspan="8"><div class="empty"><div class="empty-icon">📋</div><p>Nenhum registro encontrado este mês.</p><a href="/registro.html" class="btn btn-accent btn-sm" style="margin-top:.75rem;">Criar primeiro registro</a></div></td></tr>';
+        return;
+      }
+
+      document.getElementById('tbody-recent').innerHTML = recent.map(r => `
+        <tr>
+          <td>${fmtDate(r.data_atendimento)}</td>
+          <td>${turnoBadge(r.turno)}</td>
+          <td>${r.responsavel}</td>
+          <td>${statusBadge(r.status_dia)}</td>
+          <td>${r.ligacoes_totais} / ${r.ligacoes_atendidas}</td>
+          <td>${r.agendamentos_confirmados}</td>
+          <td>${r.compareceram_visita}</td>
+          <td>
+            <a href="/registro.html?id=${r.id}" class="btn btn-ghost btn-sm">✏️ Editar</a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>

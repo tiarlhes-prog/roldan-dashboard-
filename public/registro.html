@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROLDAN – Registro Diário</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .units-table { width:100%; border-collapse:collapse; font-size:.875rem; }
+    .units-table th { background:var(--primary); color:white; padding:.55rem .85rem; text-align:left; font-weight:600; }
+    .units-table td { padding:.45rem .85rem; border-bottom:1px solid var(--border); }
+    .units-table tr:last-child td { border-bottom:none; }
+    .units-table tr:nth-child(even) td { background:#f8fafc; }
+    .units-table input[type=number] { width:80px; padding:.35rem .5rem; border:1.5px solid var(--border); border-radius:6px; font-size:.875rem; text-align:center; }
+    .units-table input[type=number]:focus { border-color:var(--primary); outline:none; }
+  </style>
+</head>
+<body>
+  <header><div id="navbar" class="navbar"></div></header>
+
+  <main>
+    <div class="page-header">
+      <h1 id="page-title">Novo Registro Diário</h1>
+      <p>Preencha os dados do atendimento do dia</p>
+    </div>
+
+    <div id="alert-area"></div>
+
+    <form id="form-registro" novalidate>
+      <!-- Dados gerais -->
+      <div class="box" style="margin-bottom:1.25rem;">
+        <div class="box-header">Informações Gerais</div>
+        <div class="box-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="data_atendimento">Data do Atendimento *</label>
+              <input type="date" id="data_atendimento" name="data_atendimento" required>
+            </div>
+            <div class="form-group">
+              <label for="turno">Turno *</label>
+              <select id="turno" name="turno" required>
+                <option value="">Selecione…</option>
+                <option value="Manhã">Manhã</option>
+                <option value="Tarde">Tarde</option>
+                <option value="Noite">Noite</option>
+                <option value="Integral">Integral</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="responsavel">Responsável / SDR *</label>
+              <input type="text" id="responsavel" name="responsavel" placeholder="Nome do responsável" required>
+            </div>
+            <div class="form-group">
+              <label for="status_dia">Status do Dia *</label>
+              <select id="status_dia" name="status_dia" required>
+                <option value="">Selecione…</option>
+                <option value="Em andamento">Em andamento</option>
+                <option value="Finalizado">Finalizado</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Indicadores numéricos -->
+      <div class="box" style="margin-bottom:1.25rem;">
+        <div class="box-header">Indicadores de Atendimento</div>
+        <div class="box-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="ligacoes_totais">Ligações Totais Realizadas</label>
+              <input type="number" id="ligacoes_totais" name="ligacoes_totais" min="0" value="0">
+            </div>
+            <div class="form-group">
+              <label for="ligacoes_atendidas">Ligações Atendidas</label>
+              <input type="number" id="ligacoes_atendidas" name="ligacoes_atendidas" min="0" value="0">
+            </div>
+            <div class="form-group">
+              <label for="contatos_whatsapp">Contatos via WhatsApp</label>
+              <input type="number" id="contatos_whatsapp" name="contatos_whatsapp" min="0" value="0">
+            </div>
+            <div class="form-group">
+              <label for="agendamentos_confirmados">Agendamentos Confirmados</label>
+              <input type="number" id="agendamentos_confirmados" name="agendamentos_confirmados" min="0" value="0">
+            </div>
+            <div class="form-group">
+              <label for="compareceram_visita">Compareceram à Visita</label>
+              <input type="number" id="compareceram_visita" name="compareceram_visita" min="0" value="0">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agendamentos por unidade -->
+      <div class="box" style="margin-bottom:1.5rem;">
+        <div class="box-header">Agendamentos por Unidade</div>
+        <div class="box-body" style="padding:0;">
+          <div class="table-wrap">
+            <table class="units-table">
+              <thead>
+                <tr>
+                  <th style="width:55%;">Unidade</th>
+                  <th>Agendamentos</th>
+                  <th>Compareceram</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-units"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="btn-group">
+        <button type="submit" class="btn btn-accent" id="btn-save">💾 Salvar Registro</button>
+        <a href="/dashboard.html" class="btn btn-outline">Cancelar</a>
+        <button type="button" class="btn btn-danger hidden" id="btn-delete">🗑️ Excluir</button>
+      </div>
+    </form>
+  </main>
+
+  <footer>ROLDAN Marketing Educacional e Contact Center BPO | (11) 95474-2815</footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    if (!requireAuth()) throw new Error('auth');
+    renderNav('/registro.html');
+
+    const UNIDADES = [
+      'Atibaia', 'Bragança Paulista', 'Caraguatatuba', 'Gopoúva',
+      'Jacareí', 'Lorena', 'Mogi das Cruzes', 'São José dos Campos',
+      'Taubaté', 'Vila Galvão'
+    ];
+
+    // Build units table
+    const tbody = document.getElementById('tbody-units');
+    tbody.innerHTML = UNIDADES.map(u => `
+      <tr>
+        <td><strong>${u}</strong></td>
+        <td><input type="number" min="0" value="0" class="unit-agend" data-unidade="${u}"></td>
+        <td><input type="number" min="0" value="0" class="unit-comp"  data-unidade="${u}"></td>
+      </tr>
+    `).join('');
+
+    // Default date = today
+    document.getElementById('data_atendimento').value = todayISO();
+
+    // Check for edit mode
+    const params = new URLSearchParams(location.search);
+    const editId = params.get('id');
+
+    if (editId) {
+      document.getElementById('page-title').textContent = 'Editar Registro';
+      document.getElementById('btn-delete').classList.remove('hidden');
+      loadRegistro(editId);
+    }
+
+    async function loadRegistro(id) {
+      try {
+        const r = await api(`/registros/${id}`);
+        document.getElementById('data_atendimento').value = r.data_atendimento;
+        document.getElementById('turno').value = r.turno;
+        document.getElementById('responsavel').value = r.responsavel;
+        document.getElementById('status_dia').value = r.status_dia;
+        document.getElementById('ligacoes_totais').value = r.ligacoes_totais;
+        document.getElementById('ligacoes_atendidas').value = r.ligacoes_atendidas;
+        document.getElementById('contatos_whatsapp').value = r.contatos_whatsapp;
+        document.getElementById('agendamentos_confirmados').value = r.agendamentos_confirmados;
+        document.getElementById('compareceram_visita').value = r.compareceram_visita;
+
+        for (const u of r.unidades || []) {
+          const agendEl = tbody.querySelector(`.unit-agend[data-unidade="${u.unidade}"]`);
+          const compEl  = tbody.querySelector(`.unit-comp[data-unidade="${u.unidade}"]`);
+          if (agendEl) agendEl.value = u.agendamentos;
+          if (compEl)  compEl.value  = u.compareceram;
+        }
+      } catch (err) {
+        showAlert('Erro ao carregar registro: ' + err.message, 'danger');
+      }
+    }
+
+    function getFormData() {
+      const unidades = UNIDADES.map(nome => ({
+        unidade:      nome,
+        agendamentos: +tbody.querySelector(`.unit-agend[data-unidade="${nome}"]`).value || 0,
+        compareceram: +tbody.querySelector(`.unit-comp[data-unidade="${nome}"]`).value  || 0,
+      }));
+
+      return {
+        data_atendimento:        document.getElementById('data_atendimento').value,
+        turno:                   document.getElementById('turno').value,
+        responsavel:             document.getElementById('responsavel').value.trim(),
+        status_dia:              document.getElementById('status_dia').value,
+        ligacoes_totais:         +document.getElementById('ligacoes_totais').value || 0,
+        ligacoes_atendidas:      +document.getElementById('ligacoes_atendidas').value || 0,
+        contatos_whatsapp:       +document.getElementById('contatos_whatsapp').value || 0,
+        agendamentos_confirmados:+document.getElementById('agendamentos_confirmados').value || 0,
+        compareceram_visita:     +document.getElementById('compareceram_visita').value || 0,
+        unidades,
+      };
+    }
+
+    document.getElementById('form-registro').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = getFormData();
+      if (!data.data_atendimento || !data.turno || !data.responsavel || !data.status_dia) {
+        showAlert('Preencha todos os campos obrigatórios (*).', 'danger');
+        return;
+      }
+
+      const btn = document.getElementById('btn-save');
+      btn.disabled = true;
+      btn.textContent = 'Salvando…';
+
+      try {
+        if (editId) {
+          await api(`/registros/${editId}`, { method: 'PUT', body: JSON.stringify(data) });
+          showAlert('Registro atualizado com sucesso!', 'success');
+        } else {
+          await api('/registros', { method: 'POST', body: JSON.stringify(data) });
+          showAlert('Registro salvo com sucesso!', 'success');
+          setTimeout(() => window.location.href = '/dashboard.html', 1200);
+        }
+      } catch (err) {
+        showAlert('Erro ao salvar: ' + err.message, 'danger');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Salvar Registro';
+      }
+    });
+
+    document.getElementById('btn-delete')?.addEventListener('click', async () => {
+      if (!confirm('Deseja excluir este registro? Esta ação não pode ser desfeita.')) return;
+      try {
+        await api(`/registros/${editId}`, { method: 'DELETE' });
+        showAlert('Registro excluído.', 'success');
+        setTimeout(() => window.location.href = '/dashboard.html', 1000);
+      } catch (err) {
+        showAlert('Erro ao excluir: ' + err.message, 'danger');
+      }
+    });
+
+    function showAlert(msg, type) {
+      const el = document.getElementById('alert-area');
+      el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  </script>
+</body>
+</html>

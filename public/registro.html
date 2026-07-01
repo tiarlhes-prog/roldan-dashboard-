@@ -72,20 +72,12 @@
               <input type="number" id="ligacoes_totais" name="ligacoes_totais" min="0" value="0">
             </div>
             <div class="form-group">
-              <label for="ligacoes_atendidas">Ligações Atendidas</label>
-              <input type="number" id="ligacoes_atendidas" name="ligacoes_atendidas" min="0" value="0">
-            </div>
-            <div class="form-group">
               <label for="contatos_whatsapp">Contatos via WhatsApp</label>
               <input type="number" id="contatos_whatsapp" name="contatos_whatsapp" min="0" value="0">
             </div>
             <div class="form-group">
               <label for="agendamentos_confirmados">Agendamentos Confirmados</label>
               <input type="number" id="agendamentos_confirmados" name="agendamentos_confirmados" min="0" value="0">
-            </div>
-            <div class="form-group">
-              <label for="compareceram_visita">Compareceram à Visita</label>
-              <input type="number" id="compareceram_visita" name="compareceram_visita" min="0" value="0">
             </div>
           </div>
         </div>
@@ -99,9 +91,8 @@
             <table class="units-table">
               <thead>
                 <tr>
-                  <th style="width:55%;">Unidade</th>
+                  <th style="width:60%;">Unidade</th>
                   <th>Agendamentos</th>
-                  <th>Compareceram</th>
                 </tr>
               </thead>
               <tbody id="tbody-units"></tbody>
@@ -138,7 +129,6 @@
       <tr>
         <td><strong>${u}</strong></td>
         <td><input type="number" min="0" value="0" class="unit-agend" data-unidade="${u}"></td>
-        <td><input type="number" min="0" value="0" class="unit-comp"  data-unidade="${u}"></td>
       </tr>
     `).join('');
 
@@ -163,16 +153,12 @@
         document.getElementById('responsavel').value = r.responsavel;
         document.getElementById('status_dia').value = r.status_dia;
         document.getElementById('ligacoes_totais').value = r.ligacoes_totais;
-        document.getElementById('ligacoes_atendidas').value = r.ligacoes_atendidas;
         document.getElementById('contatos_whatsapp').value = r.contatos_whatsapp;
         document.getElementById('agendamentos_confirmados').value = r.agendamentos_confirmados;
-        document.getElementById('compareceram_visita').value = r.compareceram_visita;
 
         for (const u of r.unidades || []) {
           const agendEl = tbody.querySelector(`.unit-agend[data-unidade="${u.unidade}"]`);
-          const compEl  = tbody.querySelector(`.unit-comp[data-unidade="${u.unidade}"]`);
           if (agendEl) agendEl.value = u.agendamentos;
-          if (compEl)  compEl.value  = u.compareceram;
         }
       } catch (err) {
         showAlert('Erro ao carregar registro: ' + err.message, 'danger');
@@ -183,7 +169,6 @@
       const unidades = UNIDADES.map(nome => ({
         unidade:      nome,
         agendamentos: +tbody.querySelector(`.unit-agend[data-unidade="${nome}"]`).value || 0,
-        compareceram: +tbody.querySelector(`.unit-comp[data-unidade="${nome}"]`).value  || 0,
       }));
 
       return {
@@ -192,10 +177,8 @@
         responsavel:             document.getElementById('responsavel').value.trim(),
         status_dia:              document.getElementById('status_dia').value,
         ligacoes_totais:         +document.getElementById('ligacoes_totais').value || 0,
-        ligacoes_atendidas:      +document.getElementById('ligacoes_atendidas').value || 0,
         contatos_whatsapp:       +document.getElementById('contatos_whatsapp').value || 0,
         agendamentos_confirmados:+document.getElementById('agendamentos_confirmados').value || 0,
-        compareceram_visita:     +document.getElementById('compareceram_visita').value || 0,
         unidades,
       };
     }

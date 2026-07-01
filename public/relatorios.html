@@ -70,15 +70,13 @@
                 <th>Responsável</th>
                 <th>Status</th>
                 <th>Lig. Total</th>
-                <th>Lig. Atend.</th>
                 <th>WhatsApp</th>
                 <th>Agend.</th>
-                <th>Comp.</th>
                 <th></th>
               </tr>
             </thead>
             <tbody id="tbody-registros">
-              <tr><td colspan="10" class="text-center" style="padding:2rem;color:var(--muted);">Carregando…</td></tr>
+              <tr><td colspan="8" class="text-center" style="padding:2rem;color:var(--muted);">Carregando…</td></tr>
             </tbody>
           </table>
         </div>
@@ -95,8 +93,6 @@
               <tr>
                 <th>Unidade</th>
                 <th style="text-align:center;">Agendamentos</th>
-                <th style="text-align:center;">Compareceram</th>
-                <th style="text-align:center;">Taxa</th>
               </tr>
             </thead>
             <tbody id="tbody-unidades"></tbody>
@@ -146,7 +142,6 @@
           <div class="card">
             <div class="card-label">Ligações Totais</div>
             <div class="card-value">${c.ligacoes_totais}</div>
-            <div class="card-sub">Atendidas: ${c.ligacoes_atendidas}</div>
           </div>
           <div class="card">
             <div class="card-label">WhatsApp</div>
@@ -155,11 +150,6 @@
           <div class="card accent-card">
             <div class="card-label">Agendamentos</div>
             <div class="card-value">${c.agendamentos_confirmados}</div>
-          </div>
-          <div class="card">
-            <div class="card-label">Compareceram</div>
-            <div class="card-value">${c.compareceram_visita}</div>
-            <div class="card-sub">Taxa: ${c.agendamentos_confirmados ? Math.round(c.compareceram_visita/c.agendamentos_confirmados*100) : 0}%</div>
           </div>
         `;
 
@@ -178,10 +168,8 @@
               <td>${r.responsavel}</td>
               <td>${statusBadge(r.status_dia)}</td>
               <td>${r.ligacoes_totais}</td>
-              <td>${r.ligacoes_atendidas}</td>
               <td>${r.contatos_whatsapp}</td>
               <td>${r.agendamentos_confirmados}</td>
-              <td>${r.compareceram_visita}</td>
               <td>
                 <a href="/registro.html?id=${r.id}" class="btn btn-ghost btn-sm">✏️</a>
               </td>
@@ -191,21 +179,16 @@
 
         // Units table
         const unidades = Object.entries(c.unidades);
-        const comDados = unidades.filter(([, d]) => d.agendamentos > 0 || d.compareceram > 0);
+        const comDados = unidades.filter(([, d]) => d.agendamentos > 0);
         const boxUnd = document.getElementById('box-unidades');
         if (comDados.length > 0) {
           boxUnd.style.display = 'block';
-          document.getElementById('tbody-unidades').innerHTML = unidades.map(([nome, d]) => {
-            const taxa = d.agendamentos ? Math.round(d.compareceram / d.agendamentos * 100) : 0;
-            return `
+          document.getElementById('tbody-unidades').innerHTML = unidades.map(([nome, d]) => `
               <tr>
                 <td><strong>${nome}</strong></td>
                 <td style="text-align:center;">${d.agendamentos}</td>
-                <td style="text-align:center;">${d.compareceram}</td>
-                <td style="text-align:center;">${taxa}%</td>
               </tr>
-            `;
-          }).join('');
+            `).join('');
         } else {
           boxUnd.style.display = 'none';
         }

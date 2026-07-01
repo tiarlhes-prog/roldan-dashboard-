@@ -44,12 +44,11 @@
                 <th>Status</th>
                 <th>Ligações</th>
                 <th>Agendamentos</th>
-                <th>Compareceram</th>
                 <th></th>
               </tr>
             </thead>
             <tbody id="tbody-recent">
-              <tr><td colspan="8" class="text-center" style="padding:2rem;color:var(--muted);">Carregando…</td></tr>
+              <tr><td colspan="7" class="text-center" style="padding:2rem;color:var(--muted);">Carregando…</td></tr>
             </tbody>
           </table>
         </div>
@@ -78,12 +77,10 @@
       // Summary: today
       const sumToday = todayRecs.reduce((a, r) => {
         a.ligacoes_totais          += r.ligacoes_totais || 0;
-        a.ligacoes_atendidas       += r.ligacoes_atendidas || 0;
         a.contatos_whatsapp        += r.contatos_whatsapp || 0;
         a.agendamentos_confirmados += r.agendamentos_confirmados || 0;
-        a.compareceram_visita      += r.compareceram_visita || 0;
         return a;
-      }, { ligacoes_totais:0, ligacoes_atendidas:0, contatos_whatsapp:0, agendamentos_confirmados:0, compareceram_visita:0 });
+      }, { ligacoes_totais:0, contatos_whatsapp:0, agendamentos_confirmados:0 });
 
       document.getElementById('cards-today').innerHTML = `
         <div class="card primary">
@@ -94,7 +91,6 @@
         <div class="card">
           <div class="card-label">Ligações Hoje</div>
           <div class="card-value">${sumToday.ligacoes_totais}</div>
-          <div class="card-sub">Atendidas: ${sumToday.ligacoes_atendidas}</div>
         </div>
         <div class="card">
           <div class="card-label">WhatsApp Hoje</div>
@@ -103,7 +99,6 @@
         <div class="card accent-card">
           <div class="card-label">Agendamentos Hoje</div>
           <div class="card-value">${sumToday.agendamentos_confirmados}</div>
-          <div class="card-sub">Compareceram: ${sumToday.compareceram_visita}</div>
         </div>
       `;
 
@@ -121,9 +116,8 @@
           <td>${turnoBadge(r.turno)}</td>
           <td>${r.responsavel}</td>
           <td>${statusBadge(r.status_dia)}</td>
-          <td>${r.ligacoes_totais} / ${r.ligacoes_atendidas}</td>
+          <td>${r.ligacoes_totais}</td>
           <td>${r.agendamentos_confirmados}</td>
-          <td>${r.compareceram_visita}</td>
           <td>
             <a href="/registro.html?id=${r.id}" class="btn btn-ghost btn-sm">✏️ Editar</a>
           </td>

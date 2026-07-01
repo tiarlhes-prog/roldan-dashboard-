@@ -59,12 +59,10 @@
               <tr>
                 <th>Unidade</th>
                 <th style="text-align:center;">Agendamentos</th>
-                <th style="text-align:center;">Compareceram</th>
-                <th style="text-align:center;">Taxa de Comparecimento</th>
               </tr>
             </thead>
             <tbody id="tbody-unidades">
-              <tr><td colspan="4" class="text-center" style="padding:2rem;color:var(--muted);">Carregando…</td></tr>
+              <tr><td colspan="2" class="text-center" style="padding:2rem;color:var(--muted);">Carregando…</td></tr>
             </tbody>
           </table>
         </div>
@@ -114,7 +112,6 @@
           <div class="card">
             <div class="card-label">Ligações Realizadas</div>
             <div class="card-value">${c.ligacoes_totais}</div>
-            <div class="card-sub">Atendidas: ${c.ligacoes_atendidas}</div>
           </div>
           <div class="card">
             <div class="card-label">Contatos WhatsApp</div>
@@ -124,30 +121,19 @@
             <div class="card-label">Agendamentos</div>
             <div class="card-value">${c.agendamentos_confirmados}</div>
           </div>
-          <div class="card">
-            <div class="card-label">Compareceram</div>
-            <div class="card-value">${c.compareceram_visita}</div>
-            <div class="card-sub">Taxa: ${c.agendamentos_confirmados ? Math.round(c.compareceram_visita/c.agendamentos_confirmados*100) : 0}%</div>
-          </div>
         `;
 
         const unidades = Object.entries(c.unidades);
-        if (unidades.every(([, d]) => d.agendamentos === 0 && d.compareceram === 0)) {
+        if (unidades.every(([, d]) => d.agendamentos === 0)) {
           document.getElementById('tbody-unidades').innerHTML =
-            '<tr><td colspan="4"><div class="empty"><div class="empty-icon">📊</div><p>Nenhum dado de unidade no período.</p></div></td></tr>';
+            '<tr><td colspan="2"><div class="empty"><div class="empty-icon">📊</div><p>Nenhum dado de unidade no período.</p></div></td></tr>';
         } else {
-          document.getElementById('tbody-unidades').innerHTML = unidades.map(([nome, d], i) => {
-            const taxa = d.agendamentos ? Math.round(d.compareceram / d.agendamentos * 100) : 0;
-            const bar  = `<div style="display:inline-block;width:${taxa}%;max-width:100%;height:6px;background:var(--accent);border-radius:3px;vertical-align:middle;margin-left:.5rem;"></div>`;
-            return `
+          document.getElementById('tbody-unidades').innerHTML = unidades.map(([nome, d]) => `
               <tr>
                 <td><strong>${nome}</strong></td>
                 <td style="text-align:center;">${d.agendamentos}</td>
-                <td style="text-align:center;">${d.compareceram}</td>
-                <td style="text-align:center;">${taxa}% ${bar}</td>
               </tr>
-            `;
-          }).join('');
+            `).join('');
         }
       } catch (err) {
         document.getElementById('cards-totais').innerHTML = `<div class="alert alert-danger">Erro: ${err.message}</div>`;

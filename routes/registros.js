@@ -60,8 +60,8 @@ router.get('/:id', authMiddleware, (req, res) => {
 router.post('/', authMiddleware, (req, res) => {
   const {
     data_atendimento, turno, responsavel, status_dia,
-    ligacoes_totais = 0, ligacoes_atendidas = 0, contatos_whatsapp = 0,
-    agendamentos_confirmados = 0, compareceram_visita = 0, unidades = []
+    ligacoes_totais = 0, contatos_whatsapp = 0,
+    agendamentos_confirmados = 0, unidades = []
   } = req.body;
 
   if (!data_atendimento || !turno || !responsavel || !status_dia)
@@ -70,23 +70,23 @@ router.post('/', authMiddleware, (req, res) => {
   const db = getDb();
   const insReg = db.prepare(`
     INSERT INTO registros_diarios
-    (data_atendimento,turno,responsavel,status_dia,ligacoes_totais,ligacoes_atendidas,
-     contatos_whatsapp,agendamentos_confirmados,compareceram_visita,usuario_id)
-    VALUES (?,?,?,?,?,?,?,?,?,?)
+    (data_atendimento,turno,responsavel,status_dia,ligacoes_totais,
+     contatos_whatsapp,agendamentos_confirmados,usuario_id)
+    VALUES (?,?,?,?,?,?,?,?)
   `);
   const insUnd = db.prepare(
-    'INSERT INTO agendamentos_unidade (registro_id,unidade,agendamentos,compareceram) VALUES (?,?,?,?)'
+    'INSERT INTO agendamentos_unidade (registro_id,unidade,agendamentos) VALUES (?,?,?)'
   );
 
   const tx = db.transaction(() => {
     const { lastInsertRowid: id } = insReg.run(
       data_atendimento, turno, responsavel.trim(), status_dia,
-      +ligacoes_totais, +ligacoes_atendidas, +contatos_whatsapp,
-      +agendamentos_confirmados, +compareceram_visita, req.user.id
+      +ligacoes_totais, +contatos_whatsapp,
+      +agendamentos_confirmados, req.user.id
     );
     for (const nome of UNIDADES) {
       const u = unidades.find(x => x.unidade === nome) || {};
-      insUnd.run(id, nome, +(u.agendamentos || 0), +(u.compareceram || 0));
+      insUnd.run(id, nome, +(u.agendamentos || 0));
     }
     return id;
   });
@@ -105,8 +105,8 @@ router.post('/', authMiddleware, (req, res) => {
 router.put('/:id', authMiddleware, (req, res) => {
   const {
     data_atendimento, turno, responsavel, status_dia,
-    ligacoes_totais = 0, ligacoes_atendidas = 0, contatos_whatsapp = 0,
-    agendamentos_confirmados = 0, compareceram_visita = 0, unidades = []
+    ligacoes_totais = 0, contatos_whatsapp = 0,
+    agendamentos_confirmados = 0, unidades = []
   } = req.body;
 
   const db = getDb();
@@ -116,22 +116,22 @@ router.put('/:id', authMiddleware, (req, res) => {
   const updReg = db.prepare(`
     UPDATE registros_diarios SET
     data_atendimento=?,turno=?,responsavel=?,status_dia=?,
-    ligacoes_totais=?,ligacoes_atendidas=?,contatos_whatsapp=?,
-    agendamentos_confirmados=?,compareceram_visita=?,updated_at=CURRENT_TIMESTAMP
+    ligacoes_totais=?,contatos_whatsapp=?,
+    agendamentos_confirmados=?,updated_at=CURRENT_TIMESTAMP
     WHERE id=?
   `);
   const updUnd = db.prepare(
-    'UPDATE agendamentos_unidade SET agendamentos=?,compareceram=? WHERE registro_id=? AND unidade=?'
+    'UPDATE agendamentos_unidade SET agendamentos=? WHERE registro_id=? AND unidade=?'
   );
 
   const tx = db.transaction(() => {
     updReg.run(
       data_atendimento, turno, responsavel.trim(), status_dia,
-      +ligacoes_totais, +ligacoes_atendidas, +contatos_whatsapp,
-      +agendamentos_confirmados, +compareceram_visita, req.params.id
+      +ligacoes_totais, +contatos_whatsapp,
+      +agendamentos_confirmados, req.params.id
     );
     for (const u of unidades)
-      updUnd.run(+(u.agendamentos || 0), +(u.compareceram || 0), req.params.id, u.unidade);
+      updUnd.run(+(u.agendamentos || 0), req.params.id, u.unidade);
   });
 
   try {

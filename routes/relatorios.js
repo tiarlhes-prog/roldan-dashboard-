@@ -42,22 +42,17 @@ function buildConsolidado(registros) {
   const c = {
     total: registros.length,
     ligacoes_totais: 0,
-    ligacoes_atendidas: 0,
     contatos_whatsapp: 0,
     agendamentos_confirmados: 0,
-    compareceram_visita: 0,
-    unidades: Object.fromEntries(UNIDADES.map(u => [u, { agendamentos: 0, compareceram: 0 }]))
+    unidades: Object.fromEntries(UNIDADES.map(u => [u, { agendamentos: 0 }]))
   };
   for (const r of registros) {
     c.ligacoes_totais          += r.ligacoes_totais || 0;
-    c.ligacoes_atendidas       += r.ligacoes_atendidas || 0;
     c.contatos_whatsapp        += r.contatos_whatsapp || 0;
     c.agendamentos_confirmados += r.agendamentos_confirmados || 0;
-    c.compareceram_visita      += r.compareceram_visita || 0;
     for (const u of r.unidades || []) {
       if (c.unidades[u.unidade]) {
         c.unidades[u.unidade].agendamentos += u.agendamentos || 0;
-        c.unidades[u.unidade].compareceram += u.compareceram || 0;
       }
     }
   }
@@ -145,10 +140,8 @@ router.get('/pdf', authMiddleware, (req, res) => {
   sectionTitle('RESUMO CONSOLIDADO');
   const summaryItems = [
     ['Ligações Totais Realizadas', con.ligacoes_totais],
-    ['Ligações Atendidas',         con.ligacoes_atendidas],
     ['Contatos via WhatsApp',      con.contatos_whatsapp],
     ['Agendamentos Confirmados',   con.agendamentos_confirmados],
-    ['Compareceram à Visita',      con.compareceram_visita],
   ];
 
   const COL1 = CONTENT_W * 0.7;
@@ -172,10 +165,10 @@ router.get('/pdf', authMiddleware, (req, res) => {
   sectionTitle('AGENDAMENTOS POR UNIDADE');
   const UC = [CONTENT_W * 0.5, CONTENT_W * 0.25, CONTENT_W * 0.25];
   y = doc.y;
-  y = tableRow(['Unidade', 'Agendamentos', 'Compareceram'], UC, y, COR_AZUL);
+  y = tableRow(['Unidade', 'Agendamentos'], [CONTENT_W * 0.6, CONTENT_W * 0.4], y, COR_AZUL);
   let idx = 0;
   for (const [nome, dados] of Object.entries(con.unidades)) {
-    y = tableRow([nome, dados.agendamentos, dados.compareceram], UC, y, idx % 2 === 0 ? '#f1f5f9' : 'white');
+    y = tableRow([nome, dados.agendamentos], [CONTENT_W * 0.6, CONTENT_W * 0.4], y, idx % 2 === 0 ? '#f1f5f9' : 'white');
     idx++;
   }
   doc.y = y + 8;
@@ -194,20 +187,18 @@ router.get('/pdf', authMiddleware, (req, res) => {
 
       const detalhe = [
         `Lig. Totais: ${r.ligacoes_totais}`,
-        `Lig. Atendidas: ${r.ligacoes_atendidas}`,
         `WhatsApp: ${r.contatos_whatsapp}`,
         `Agendamentos: ${r.agendamentos_confirmados}`,
-        `Compareceram: ${r.compareceram_visita}`,
       ].join('   |   ');
       doc.fillColor('#334155').font('Helvetica').fontSize(7.5)
         .text(detalhe, MARGIN + 4, doc.y + 2);
       doc.y += 16;
 
       // mini tabela de unidades apenas se tiver valores
-      const comDados = (r.unidades || []).filter(u => u.agendamentos > 0 || u.compareceram > 0);
+      const comDados = (r.unidades || []).filter(u => u.agendamentos > 0);
       if (comDados.length > 0) {
         doc.fillColor('#64748b').font('Helvetica').fontSize(7)
-          .text(comDados.map(u => `${u.unidade}: ${u.agendamentos} agend. / ${u.compareceram} comp.`).join('   '), MARGIN + 4, doc.y + 1);
+          .text(comDados.map(u => `${u.unidade}: ${u.agendamentos} agend.`).join('   '), MARGIN + 4, doc.y + 1);
         doc.y += 12;
       }
       doc.y += 4;
@@ -280,10 +271,8 @@ router.get('/excel', authMiddleware, async (req, res) => {
 
   const summaryItems = [
     ['Ligações Totais Realizadas', con.ligacoes_totais],
-    ['Ligações Atendidas',         con.ligacoes_atendidas],
     ['Contatos via WhatsApp',      con.contatos_whatsapp],
     ['Agendamentos Confirmados',   con.agendamentos_confirmados],
-    ['Compareceram à Visita',      con.compareceram_visita],
   ];
   summaryItems.forEach(([label, val], i) => {
     const r = ws1.addRow([label, '']);
@@ -299,28 +288,26 @@ router.get('/excel', authMiddleware, async (req, res) => {
   const hu = ws1.addRow(['AGENDAMENTOS POR UNIDADE', '', '']);
   hu.getCell(1).font = { bold: true, size: 11, color: { argb: 'FF1E3A5F' } };
 
-  const hu2 = ws1.addRow(['Unidade', 'Agendamentos', 'Compareceram']);
-  [1, 2, 3].forEach(i => styleHeader(hu2.getCell(i)));
+  const hu2 = ws1.addRow(['Unidade', 'Agendamentos']);
+  [1, 2].forEach(i => styleHeader(hu2.getCell(i)));
   ws1.getRow(hu2.number).height = 22;
 
   Object.entries(con.unidades).forEach(([nome, d], i) => {
-    const r = ws1.addRow([nome, d.agendamentos, d.compareceram]);
+    const r = ws1.addRow([nome, d.agendamentos]);
     styleAlt(r, i % 2 === 0);
     r.getCell(2).alignment = { horizontal: 'center' };
-    r.getCell(3).alignment = { horizontal: 'center' };
     r.height = 20;
   });
 
-  ws1.columns = [{ width: 34 }, { width: 18 }, { width: 18 }];
+  ws1.columns = [{ width: 34 }, { width: 18 }];
 
   // ── Aba 2: Registros Detalhados ────────────────────────────────────────────
   const ws2 = wb.addWorksheet('Registros Detalhados');
 
   const colHeaders = [
     'Data', 'Turno', 'Responsável', 'Status',
-    'Lig. Totais', 'Lig. Atendidas', 'WhatsApp', 'Agend. Confirm.', 'Compareceram',
+    'Lig. Totais', 'WhatsApp', 'Agend. Confirm.',
     ...UNIDADES.map(u => `${u} – Agend.`),
-    ...UNIDADES.map(u => `${u} – Comp.`),
   ];
   const hdrRow = ws2.addRow(colHeaders);
   hdrRow.eachCell(c => styleHeader(c));
@@ -332,10 +319,9 @@ router.get('/excel', authMiddleware, async (req, res) => {
     const row = ws2.addRow([
       fmtDate(r.data_atendimento),
       r.turno, r.responsavel, r.status_dia,
-      r.ligacoes_totais, r.ligacoes_atendidas, r.contatos_whatsapp,
-      r.agendamentos_confirmados, r.compareceram_visita,
+      r.ligacoes_totais, r.contatos_whatsapp,
+      r.agendamentos_confirmados,
       ...UNIDADES.map(u => undMap[u]?.agendamentos || 0),
-      ...UNIDADES.map(u => undMap[u]?.compareceram  || 0),
     ]);
     styleAlt(row, i % 2 === 0);
     row.height = 18;
@@ -343,8 +329,7 @@ router.get('/excel', authMiddleware, async (req, res) => {
 
   ws2.columns = [
     { width: 12 }, { width: 10 }, { width: 22 }, { width: 14 },
-    { width: 12 }, { width: 14 }, { width: 12 }, { width: 16 }, { width: 14 },
-    ...UNIDADES.map(() => ({ width: 20 })),
+    { width: 12 }, { width: 12 }, { width: 16 },
     ...UNIDADES.map(() => ({ width: 20 })),
   ];
 

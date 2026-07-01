@@ -41,10 +41,8 @@ function initDatabase() {
       responsavel              TEXT NOT NULL,
       status_dia               TEXT NOT NULL,
       ligacoes_totais          INTEGER NOT NULL DEFAULT 0,
-      ligacoes_atendidas       INTEGER NOT NULL DEFAULT 0,
       contatos_whatsapp        INTEGER NOT NULL DEFAULT 0,
       agendamentos_confirmados INTEGER NOT NULL DEFAULT 0,
-      compareceram_visita      INTEGER NOT NULL DEFAULT 0,
       usuario_id               INTEGER REFERENCES usuarios(id),
       created_at               DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at               DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -54,8 +52,7 @@ function initDatabase() {
       id          INTEGER PRIMARY KEY AUTOINCREMENT,
       registro_id INTEGER NOT NULL REFERENCES registros_diarios(id) ON DELETE CASCADE,
       unidade     TEXT NOT NULL,
-      agendamentos INTEGER NOT NULL DEFAULT 0,
-      compareceram INTEGER NOT NULL DEFAULT 0
+      agendamentos INTEGER NOT NULL DEFAULT 0
     );
   `);
 

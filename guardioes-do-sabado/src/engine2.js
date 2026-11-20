@@ -664,7 +664,7 @@ function openSources() {
   const c = CHM[active], ids = (c && c.pins) || [];
   openModal(`<button class="m-x" data-act="close" aria-label="Fechar">${I.x}</button><h2>Fontes deste canal</h2>` +
     (ids.length ? `<ul class="list" style="margin-top:12px">${ids.map(id => `<li>${srcLabel(id)}</li>`).join('')}</ul>` : '<p style="color:var(--dim)">Este canal não tem fontes específicas.</p>') +
-    `<p style="color:var(--dim);font-size:13.5px;margin-top:14px">Versos bíblicos aparecem <b>parafraseados</b> ou em citações curtas de versões comuns — confira sempre na sua Bíblia. As citações de E. G. White e as sugestões práticas vêm do folder do sábado; as do documento oficial vêm do texto da Divisão Sul-Americana (24/10/2023). Ambas foram conferidas contra os textos originais fornecidos. A Lei 13.796/2019 e o documento têm link para o texto completo.</p>`, { label: 'Fontes' });
+    `<p style="color:var(--dim);font-size:13.5px;margin-top:14px">Versos bíblicos aparecem <b>parafraseados</b> ou em citações curtas de versões comuns — confira sempre na sua Bíblia. As citações de E. G. White e as sugestões práticas vêm do folder do sábado; as do documento oficial vêm do texto da Divisão Sul-Americana (24/10/2023). Ambas foram conferidas contra os textos originais fornecidos. Quando o folder e o documento divergem, o jogo segue o documento, que é mais atualizado. A Lei 13.796/2019 e o documento têm link para o texto completo.</p>`, { label: 'Fontes' });
 }
 const sw = (id, t, d) => `<div class="sw"><span>${t}<small>${d}</small></span><button class="tog${S.set[id] ? ' on' : ''}" data-act="tog" data-id="${id}" role="switch" aria-checked="${!!S.set[id]}" aria-label="${t}"></button></div>`;
 function openSettings() {

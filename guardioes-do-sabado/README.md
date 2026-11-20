@@ -50,7 +50,7 @@ Os textos-base estão em `fontes/` e são a referência para conferir qualquer c
 
 | Fonte | Arquivo | Uso |
 |---|---|---|
-| Folder “O Significado e a Prática do Sábado” | `fontes/textos_do_folder.md` | citações de E. G. White, F. D. Nichol, *Declarações da Igreja* e as sugestões práticas, **copiadas literalmente** |
+| Folder “O Significado e a Prática do Sábado” | `fontes/textos_do_folder.md` | citações de E. G. White, *Declarações da Igreja* (p. 198, o “teste do sábado”) e as sugestões práticas, **copiadas literalmente**. Onde diverge do documento, vale o documento |
 | Documento oficial “Observância do Sábado” (Divisão Sul-Americana, 24/10/2023) | `fontes/observancia-do-sabado-dsa-2023.txt` | citado literalmente, seção por seção (cada seção é uma fonte: *Esportes e lazer*, *Restaurantes e alimentação* etc.) |
 | Bíblia | referências no jogo | **parafraseada** ou em citações curtas de versões comuns; confira sempre na sua Bíblia |
 | Crença Fundamental 20 | link no jogo | parafraseada |
@@ -58,17 +58,19 @@ Os textos-base estão em `fontes/` e são a referência para conferir qualquer c
 
 O texto do documento oficial foi colado pelo usuário na sessão de criação (20/11/2026). Na primeira versão do jogo ele ainda não tinha sido lido, e duas respostas do FAQ (esportes e restaurantes) estavam erradas por isso. Foram corrigidas.
 
-`tools/verificar-citacoes.js` compara todo trecho entre aspas com `fontes/`. Na última execução: 218 trechos, 185 batem com as fontes; os 28 restantes são versos bíblicos, falas de personagens fictícios e rótulos do jogo (lista em `tools/citacoes-fora-das-fontes.json`).
+`tools/verificar-citacoes.js` compara todo trecho entre aspas com `fontes/`. Na última execução: 210 trechos, 177 batem com as fontes; os 28 restantes são versos bíblicos, falas de personagens fictícios e rótulos do jogo (lista em `tools/citacoes-fora-das-fontes.json`).
 
-### Pontos para decisão pastoral
+### Regra editorial: quando divergem, vale o documento
 
-O folder e o documento oficial nem sempre dizem o mesmo. O jogo apresenta o **documento como a posição declarada da Divisão** e o folder como complemento, sem arbitrar. Cabe à liderança decidir como tratar:
+Decisão do responsável pelo projeto em 20/11/2026: o documento oficial é mais atualizado que o folder, então **onde os dois divergem, o jogo segue o documento**. Foi aplicado assim:
 
-- **Ações sociais no sábado.** O folder sugere doação de sangue e a campanha *Quebrando o Silêncio*. O documento diz que “ações sociais que podem ser realizadas em outro dia não devem tomar as sagradas horas do sábado”.
-- **Trabalho em instituições seculares.** O folder (*Declarações da Igreja*) fala em a obrigação de “recordar os princípios”. O documento é explícito: abster-se de trabalhar, e plantões rotineiros em hospitais não adventistas são impróprios.
-- **Restaurantes.** O folder traz a opinião de Nichol (aceitável em viagem, sem alternativa). O documento diz que a frequência a restaurantes comerciais deve ser evitada, sem citar exceção.
-- **Delivery.** Nenhuma das duas fontes fala. O jogo diz isso e aponta o princípio (alimento providenciado antes, compra fora das horas do sábado).
-- **Citação no folder.** “Testemunhos Seletos, vol. 6, p. 359” parece engano: o documento oficial cita *Testemunhos Para a Igreja*, v. 6, p. 356-359 para o mesmo tema. O jogo mantém o folder e avisa na lista de fontes.
+- **Ações sociais no sábado:** vale o documento (“ações sociais que podem ser realizadas em outro dia não devem tomar as sagradas horas do sábado”). Saíram do jogo as sugestões do folder de doação de sangue e da campanha *Quebrando o Silêncio* como atividades de sábado. Ficam as visitas a enfermos, viúvas e órfãos, encarcerados, e compartilhar uma refeição.
+- **Trabalho em instituições seculares:** vale o documento (abster-se de trabalhar, mesmo em instituições seculares de serviços básicos; plantões rotineiros em hospitais não adventistas são impróprios). Saiu a citação de *Declarações da Igreja*, p. 204-205 (“recordar os princípios”).
+- **Restaurantes:** vale o documento (a frequência a restaurantes comerciais deve ser evitada). Saiu a opinião de F. D. Nichol, que admitia a exceção em viagem.
+- **Delivery:** mantido como estava. Nenhuma das duas fontes fala; o jogo diz isso e aponta o princípio (alimento providenciado antes, compra fora das horas do sábado).
+- **Citação do folder:** vale a do documento, *Testemunhos Para a Igreja*, v. 6, p. 356-359. O folder indicava “Testemunhos Seletos, vol. 6, p. 359”. O arquivo `fontes/textos_do_folder.md` mantém o texto original, sem alteração.
+
+O jogo avisa isso ao jovem na janela “Fontes” (botão no topo de cada canal) e na resposta sobre o documento no `#pergunte-ao-neemias`. Se algum dia o folder for atualizado, a regra pode ser revista em `src/faq.js` e `src/content-*.js`, e conferida com `tools/verificar-citacoes.js`.
 
 Sem fonte nas bases do jogo (o Neemias diz isso e anota a pergunta no caderno do jovem): marca da besta, conflito com os pais, delivery.
 

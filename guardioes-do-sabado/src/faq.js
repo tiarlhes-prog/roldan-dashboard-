@@ -30,10 +30,10 @@ Sugestões do folder: planejar a rotina para a sexta não ficar exaustiva; **div
   { id: 'trabalho', q: 'Posso trabalhar, estudar ou fazer lição de casa no sábado?', k: 'trabalh:3 emprego:3 estagio:3 estudar:2 licao_de_casa:3 tarefa:3 dever:2 secular:3 servico:2 bico:3 freela:3 atividade_secular:3',
     a: `O folder é claro: “Nenhum dever relacionado com os seis dias anteriores será deixado para o sábado” (Test. 6, p. 354). **Planeje a semana** para terminar trabalhos e lições até a sexta.
 
-O documento oficial vai além: o quarto mandamento “desabona a realização de atividades seculares no sábado, que gerem lucro ou benefício material”, e isso inclui “a frequência às aulas e a participação em estágios, simpósios, seminários e palestras de cunho profissional, concursos públicos e exames seletivos”. Os observadores do sábado “devem se abster de trabalhar nesse dia, mesmo em instituições seculares de serviços básicos”. (O folder, sobre empregados em instituições não adventistas, fala na “obrigação de recordar os princípios que regem as atividades sabáticas” — *Declarações da Igreja*, p. 204-205.)
+O documento oficial vai além: o quarto mandamento “desabona a realização de atividades seculares no sábado, que gerem lucro ou benefício material”, e isso inclui “a frequência às aulas e a participação em estágios, simpósios, seminários e palestras de cunho profissional, concursos públicos e exames seletivos”. Os observadores do sábado “devem se abster de trabalhar nesse dia, mesmo em instituições seculares de serviços básicos”.
 
 **Obras de misericórdia** e emergências são diferentes de trabalho comum (Mt 12:12; *Beneficência Social*, p. 77). Para provas e aulas, veja **prova no sábado**; para escolha de carreira, veja **profissão**.`,
-    src: ['tpi6_354', 'doc_estag', 'doc_serv', 'decl_204', 'bs_77', 'mt12'], rel: ['prova', 'profissao', 'misericordia'] },
+    src: ['tpi6_354', 'doc_estag', 'doc_serv', 'bs_77', 'mt12'], rel: ['prova', 'profissao', 'misericordia'] },
 
   { id: 'prova', q: 'Tenho prova, aula ou vestibular no sábado. E agora?', k: 'prova:3 vestibular:3 enem:3 simulado:3 aula:2 escola:2 colegio:2 faculdade:2 concurso:3 coordenacao:3 reposicao:3 lei$:2 direito:2 nota:1 exame:3 confinamento:4',
     a: `Duas camadas:
@@ -56,10 +56,8 @@ Na dúvida, use a pergunta-chave: “**Esta atividade me leva a compreender melh
   { id: 'restaurante', q: 'Posso comer fora ou pedir delivery?', k: 'restaurante:3 comer_fora:3 lanchonete:2 pizza:2 almoco_fora:3 fast_food:3 delivery:3 ifood:3 pedir_comida:3 shopping:1',
     a: `O documento oficial é direto: o alimento deve ser providenciado com antecedência, o que “significa que ele deve ser comprado fora das horas do sábado, e que a frequência a restaurantes comerciais nesse dia deve ser evitada” (seção *Restaurantes e alimentação*).
 
-O folder traz um complemento do autor **F. D. Nichol**: em **viagem**, quando não há alternativa, “esta maneira de proceder não deve ser criticada”; mas ir a um restaurante da própria comunidade só para ter variedade ou “um novo ambiente” é, para ele, “contrário ao espírito do sábado”. E conclui: “É melhor ter aos sábados uma refeição simples na quietude do lar [...] do que o mais fino banquete no melhor restaurante.”
-
 Sobre **delivery**, o documento não fala; o princípio (alimento providenciado antes, compra fora das horas do sábado) aponta para evitar. Converse com seus pais e líder.`,
-    src: ['doc_rest', 'nichol'], rel: ['comida', 'viagem', 'compras'] },
+    src: ['doc_rest'], rel: ['comida', 'viagem', 'compras'] },
 
   { id: 'viagem', q: 'Posso viajar ou ir a um passeio no sábado?', k: 'viaj:3 viagem:3 passeio:2 onibus:2 aviao:2 estrada:2 aeroporto:2',
     a: `O documento oficial diz que “a realização de viagens por questões de trabalho ou interesses particulares é imprópria para o sábado”, com **exceções**: “compromisso religioso ou situações emergenciais”. E pede que, sempre que possível, os preparativos — “incluindo a compra de passagens e o abastecimento de combustível” — sejam feitos “com a devida antecedência”.
@@ -96,7 +94,7 @@ Na preparação de sexta, o documento oficial lembra de deixar as roupas “lava
     src: ['me2_475', 'edu_248', 'doc_prep', 'folder'], rel: ['dormir', 'escola_sabatina'] },
 
   { id: 'tarde', q: 'O que fazer à tarde? Estou entediado(a).', k: 'tarde:3 atividade:2 programa:2 ideia:2 tedio:3 chato:3 entediado:3 o_que_fazer:3 lazer:2 entretenimento:2 sem_o_que_fazer:3 passar_o_tempo:3',
-    a: `Ideias do folder para a tarde: **visitas** de cortesia e estudo bíblico com um amigo; **passeios na natureza** com família e amigos; **almoço** com convidados e música cristã ao fundo; **jogos bíblicos** e DVDs cristãos; visitar a **igreja de um amigo**; participar da **programação missionária** da igreja; e **ações sociais** (hospitais, idosos, orfanatos, presídios, doação de sangue, campanha *Quebrando o Silêncio*).\n\nTédio costuma ser **falta de plano**: monte sua “Caixa do Sábado” antes de sexta.`,
+    a: `Ideias do folder para a tarde: **visitas** de cortesia e estudo bíblico com um amigo; **passeios na natureza** com família e amigos; **almoço** com convidados e música cristã ao fundo; **jogos bíblicos** e DVDs cristãos; visitar a **igreja de um amigo**; participar da **programação missionária** da igreja; e **visitas a quem precisa** — o documento oficial cita enfermos, viúvas e órfãos, encarcerados —, lembrando que ações sociais que podem ser feitas em outro dia não devem tomar as horas do sábado.\n\nTédio costuma ser **falta de plano**: monte sua “Caixa do Sábado” antes de sexta.`,
     src: ['folder', 'csa_165', 'tpi6_358'], rel: ['natureza', 'amigos'] },
 
   { id: 'misericordia', q: 'Posso ajudar alguém doente ou em emergência no sábado?', k: 'doente:3 hospital:3 emergencia:3 ajudar:2 socorro:3 misericordia:3 cuidar:2 enfermo:3 medico:3 curar:3 urgencia:3 acidente:3 enfermeir:3',
@@ -184,7 +182,7 @@ Na **saúde**: emergências são atendidas (“é lícito curar no sábado”), 
     src: ['doc_igreja'], rel: ['escola_sabatina', 'festas'] },
 
   { id: 'documento', q: 'O que diz o documento oficial “Observância do Sábado”?', k: 'documento:4 documento_oficial:5 divisao_sul_americana:5 dsa:4 declaracao:3 oficial:3 igreja_diz:3 posicao_oficial:4',
-    a: `É um documento da **Divisão Sul-Americana** da Igreja Adventista, de **24/10/2023**. Ele trata de: vida de santificação, preparação para o sábado, início e término (cultos de pôr do sol), espírito de comunhão, reuniões da igreja, casamentos e festas, mídia secular, esportes e lazer, horas de sono, viagens, excursões e acampamentos, restaurantes e alimentação, medicamentos, estágios e práticas escolares, escolha da profissão, serviços básicos, atividades de saúde, projetos assistenciais e atividades missionárias. Pergunte por qualquer tema e eu respondo com o trecho. O texto completo está no link da fonte abaixo.`,
+    a: `É um documento da **Divisão Sul-Americana** da Igreja Adventista, de **24/10/2023**. Ele trata de: vida de santificação, preparação para o sábado, início e término (cultos de pôr do sol), espírito de comunhão, reuniões da igreja, casamentos e festas, mídia secular, esportes e lazer, horas de sono, viagens, excursões e acampamentos, restaurantes e alimentação, medicamentos, estágios e práticas escolares, escolha da profissão, serviços básicos, atividades de saúde, projetos assistenciais e atividades missionárias. Pergunte por qualquer tema e eu respondo com o trecho. Neste servidor, quando o folder e o documento divergem, **vale o documento**, que é mais atualizado. O texto completo está no link da fonte abaixo.`,
     src: ['doc'], rel: ['esporte', 'festas', 'prova'] },
 
   { id: 'jogo', q: 'Como o jogo avalia minhas respostas? Como ganho XP?', k: 'xp$:3 pontos:3 pontuacao:3 como_funciona:4 cargo:3 nivel:3 avalia:3 nota:2 como_ganho:4',

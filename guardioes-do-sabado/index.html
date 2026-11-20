@@ -493,6 +493,7 @@ const NPC = {
 };
 
 /* Fontes. A chave é usada em src:[...] nas perguntas. */
+const DOC_URL = 'https://institucional.adventistas.org/pt/documentos/observancia-do-sabado/';
 const SRC = {
   // Bíblia (referência; o jogo parafraseia)
   gn2:  { t: 'Gênesis 2:1-3' },        ex20: { t: 'Êxodo 20:8-11' },       ex31: { t: 'Êxodo 31:13-17' },
@@ -513,6 +514,7 @@ const SRC = {
   me2_475:  { t: 'E. G. White, Mensagens Escolhidas, vol. 2, p. 475' },
   css_41:   { t: 'E. G. White, Conselhos Sobre a Escola Sabatina, p. 41' },
   vj_74:    { t: 'E. G. White, Vida de Jesus, p. 74' },
+  css_170:  { t: 'E. G. White, Conselhos Sobre a Escola Sabatina, p. 170 (citado no documento oficial)' },
   tpi6_357: { t: 'E. G. White, Testemunhos Para a Igreja, vol. 6, p. 357' },
   tpi6_357b:{ t: 'E. G. White, Testemunhos Para a Igreja, vol. 6, p. 357-358' },
   nichol:   { t: 'F. D. Nichol, Questions People Have Asked Me, p. 237' },
@@ -525,17 +527,20 @@ const SRC = {
   tpi6_358: { t: 'E. G. White, Testemunhos Para a Igreja, vol. 6, p. 358' },
   tpi6_354: { t: 'E. G. White, Testemunhos Para a Igreja, vol. 6, p. 354' },
   tpi6_359: { t: 'E. G. White, Testemunhos Para a Igreja, vol. 6, p. 359-360' },
-  ts6_359:  { t: 'E. G. White, Testemunhos Seletos, vol. 6, p. 359' },
+  ts6_359:  { t: 'E. G. White, Testemunhos Seletos, vol. 6, p. 359 (como no folder; o documento oficial cita, para o mesmo tema, Testemunhos Para a Igreja, v. 6, p. 356-359)' },
   dtn_283:  { t: 'E. G. White, O Desejado de Todas as Nações, p. 283' },
   tpi5_609: { t: 'E. G. White, Testemunhos Para a Igreja, vol. 5, p. 609' },
   oc_521:   { t: 'E. G. White, Orientação da Criança, p. 521' },
   st_1884:  { t: 'E. G. White, Signs of the Times, 7 de agosto de 1884' },
   folder:   { t: 'Folder “O Significado e a Prática do Sábado” (sugestões práticas)' },
   // Igreja e lei
-  doc: { t: 'Documento oficial “Observância do Sábado” (Igreja Adventista)', u: 'https://institucional.adventistas.org/pt/documentos/observancia-do-sabado/' },
+  doc: { t: 'Documento oficial “Observância do Sábado” (Divisão Sul-Americana, 24/10/2023)', u: DOC_URL },
   cf20:{ t: 'Crença Fundamental 20 — O Sábado', u: 'https://institucional.adventistas.org/pt/nossas-crencas/20-o-sabado/' },
   lei: { t: 'Lei 13.796/2019 (art. 7º-A da LDB)', u: 'https://www2.camara.leg.br/legin/fed/lei/2019/lei-13796-3-janeiro-2019-787598-norma-pl.html' }
 };
+/* Seções do documento oficial: cada uma vira uma fonte citável (doc_prep, doc_esporte…) */
+const DOC_SEC = { intro: 'Introdução', santif: 'Vida de santificação', cresc: 'Crescimento espiritual', prep: 'Preparação para o sábado', inicio: 'Início e término do sábado', infl: 'Pessoas sob nossa influência', comun: 'Espírito de comunhão', igreja: 'Reuniões da igreja', festas: 'Casamentos e festas', midia: 'Mídia secular', esporte: 'Esportes e lazer', sono: 'Horas de sono', viagem: 'Viagens', excurs: 'Excursões e acampamentos', rest: 'Restaurantes e alimentação', med: 'Medicamentos', estag: 'Estágios e práticas escolares', prof: 'Escolha e exercício da profissão', serv: 'Instituições de serviços básicos', saude: 'Atividades médicas e de saúde', assist: 'Projetos assistenciais', missao: 'Atividades missionárias' };
+Object.keys(DOC_SEC).forEach(k => { SRC['doc_' + k] = { t: 'Documento oficial “Observância do Sábado” (DSA, 2023) · ' + DOC_SEC[k], u: DOC_URL }; });
 
 /* ---------- construtores de passos ---------- */
 const say   = (who, text, o = {}) => ({ t: 'say', who, text, ...o });
@@ -643,8 +648,9 @@ const CH_A = [
     emb({ title: 'O que a Bíblia e a Igreja dizem', c: 'var(--violet)', fields: [
       { n: '📖 Bíblia', v: 'Deus chama o sábado de **sinal** entre Ele e o Seu povo, para saberem que é o Senhor quem os **santifica** (Êx 31:13-17; Ez 20:12, 20).', w: 1 },
       { n: '⛪ Crença Fundamental 20', v: 'O sábado é um **símbolo da nossa redenção em Cristo**, um **sinal de santificação**, uma demonstração de **lealdade** e um antegozo do futuro eterno.', w: 1 },
-      { n: '📄 Documento oficial', v: 'Descreve o sábado como **sinal distintivo de lealdade a Deus** e como **sinal exterior da graça divina**, e diz que sua observância vale para todas as pessoas, em qualquer tempo e lugar.', w: 1 }
-    ], src: ['ex31', 'ez20', 'cf20', 'doc'] }),
+      { n: '📄 Documento oficial (DSA, 2023)', v: `A Igreja “reconhece o sábado como **sinal distintivo de lealdade a Deus**”, cuja observância “é pertinente a todos os seres humanos em todas as épocas e lugares”. E conclui que o sábado deve ser, para cada um, “um **sinal exterior da graça de Deus** e um canal de Suas incontáveis bênçãos”.`, w: 1 },
+      { n: '✝️ Fé em Cristo', v: `Os filhos de Deus observam o sábado “como uma importante expressão da **justificação pela fé em Cristo**” (Hb 4:4-11). E a verdadeira observância “se fundamenta em uma **vida santificada pela graça de Cristo**”.`, w: 1 }
+    ], src: ['ex31', 'ez20', 'cf20', 'doc_intro', 'doc_santif'] }),
     ask({ id: 'q2_1', kind: 'concept', xp: 40, minWords: 6,
       text: `Explique com suas palavras: o que quer dizer que o sábado é um **sinal**? Sinal **de quê**, e **entre quem**?`,
       concepts: [
@@ -672,7 +678,7 @@ const CH_A = [
   topic: 'Respostas curtas · 35s por pergunta · combo de acertos', pins: ['ex20', 'tpi6_352', 'edu_250'], reward: 40, quiz: true,
   steps: [
     QUIZ_INTRO(6),
-    qz('z1_1', `Em qual livro da Bíblia está o 4º mandamento (“Lembra-te do dia de sábado”)?`, [/(exodo|\bex\b|deuteronomio|deut)/], `Êxodo (cap. 20) — também em Deuteronômio 5`),
+    qz('z1_1', `Em qual livro da Bíblia está o 4º mandamento (“Lembra-te do dia do sábado”)?`, [/(exodo|\bex\b|deuteronomio|deut)/], `Êxodo (cap. 20) — também em Deuteronômio 5`),
     qz('z1_2', `Quantos dias Deus trabalhou na Criação antes de descansar?`, [/\b(6|seis)\b/], `Seis`),
     qz('z1_3', `Em que dia da semana Deus descansou? (nome ou número)`, [/(sabado|setimo|\b7\b|\bsete\b)/], `No sétimo dia (sábado)`),
     qz('z1_4', `Complete: o sábado é um elo de ____ que nos une a Deus.`, [/ouro/], `Ouro`),
@@ -711,7 +717,7 @@ const CH_A = [
       bonus: /(visita|hospital|idos|asilo|orfanato|presid|sangue|ajud|mensagem|ligar|conversar|ouvir|consol|compart|alimento|cesta|doa|vizinh|amigo|estudo|biblia|oracao|orar)/,
       text: `Dê um exemplo **de 2026** de uma “obra de misericórdia” que você poderia fazer num sábado — de verdade, no seu mundo.`,
       ph: 'Ex.: visitar… / mandar mensagem…',
-      react: `Boa! Misericórdia não precisa ser gigante: uma visita, uma mensagem, uma carona, um ouvido. O folder também lista: visitas a hospitais, idosos, orfanatos e presídios, doação de sangue e a campanha *Quebrando o Silêncio*.` }),
+      react: `Boa! Misericórdia não precisa ser gigante: uma visita, uma mensagem, uma carona, um ouvido. O folder também lista: visitas a hospitais, idosos, orfanatos e presídios, doação de sangue e a campanha *Quebrando o Silêncio*. O documento oficial cita visitar “enfermos, viúvas e órfãos, encarcerados” e “compartilhar uma refeição” — e lembra que ações sociais que podem ser feitas em outro dia não devem tomar as horas do sábado.`, src: ['bs_77', 'doc_assist', 'folder'] }),
     ask({ id: 'q3_4', kind: 'reflect', xp: 25, minWords: 10,
       bonus: /(presente|beneficio|bem|descans|dadiva|cuidado|amor|liberd|paz)/,
       text: `Marcos 2:27 diz que **“o sábado foi feito por causa do homem”**. Isso muda como você vê o sábado: é mais uma **regra pesada** ou um **presente**? Por quê?`,
@@ -722,7 +728,10 @@ const CH_A = [
 { id: '2-deleite', cat: 'f2', name: '2-deleite', title: 'O Sábado Que Dá Vontade de Voltar',
   topic: 'Isaías 58:13-14 · deleite, alegria e família', pins: ['is58', 'tpi2_585', 'ts6_359'], reward: 40,
   steps: [
-    say('neemias', `Isaías 58:13-14 convida a chamar o sábado de **deleitoso** (uma delícia). Ellen White pede algo parecido para as famílias:`, { embed: { src: ['is58'] } }),
+    say('neemias', `Isaías 58:13-14 convida a chamar o sábado de **deleitoso** (uma delícia). O documento oficial da Divisão Sul-Americana cita o texto assim:`),
+    quote(`Se desviares o pé de profanar o sábado e de cuidar dos teus próprios interesses no Meu santo dia; se chamares ao sábado deleitoso e santo dia do Senhor, digno de honra, e o honrares não seguindo os teus caminhos, não pretendendo fazer a tua própria vontade, nem falando palavras vãs, então, te deleitarás no Senhor.`, `Isaías 58:13, 14 — como citado no documento oficial (DSA, 2023)`, ['is58', 'doc_intro']),
+    emb({ title: '📄 Documento oficial · Espírito de comunhão', c: 'var(--violet)', desc: `O sábado deve se caracterizar por “um prazeroso e alegre compromisso com as prioridades espirituais, com momentos especiais de leitura da Bíblia, oração e, se possível, de contato com a natureza”.`, src: ['doc_comun'] }),
+    say('neemias', `Ellen White pede algo parecido para as famílias:`),
     quote(`Devemos tornar o sábado tão interessante para nossa família, que sua volta semanal seja saudada com alegria. [...] Pais, tornem o sábado um deleite, para que seus filhos o aguardem e o acolham de coração.`, `E. G. White, Testemunhos Para a Igreja, vol. 2, pág. 585`, ['tpi2_585']),
     ask({ id: 'q4_1', kind: 'reflect', xp: 35, minWords: 10,
       bonus: /(deleit|alegr|delicia|prazer|feliz|present|descans|paz|liberd|famili|amig|comunh)/,
@@ -753,7 +762,7 @@ const CH_A = [
 
 /* ---------- FASE 3 · COMO GUARDAR ---------- */
 { id: '3-sexta', cat: 'f3', name: '3-sexta', title: 'Sexta: Preparação e Pôr do Sol',
-  topic: 'Dia de preparação · quando o sábado começa · culto de abertura', pins: ['tpi6_354', 'ex16', 'lv23', 'cf20', 'doc', 'tpi6_357b', 'folder'], reward: 40,
+  topic: 'Dia de preparação · quando o sábado começa · culto de abertura', pins: ['tpi6_354', 'ex16', 'lv23', 'cf20', 'doc_prep', 'doc_inicio', 'tpi6_357b', 'folder'], reward: 40,
   steps: [
     say('neemias', `**Fase 3 · Como guardar** 🧭\nHora de sair da teoria e ir para o *calendário*. Tudo começa na **sexta**. 🌅`),
     quote(`Embora devamos nos preparar para o sábado durante toda a semana, a sexta-feira é o dia especial de preparação. Por intermédio de Moisés, o Senhor disse a Israel: “Amanhã é o repouso, o santo sábado do Senhor; o que quiserdes cozer no forno, cozei-o, e o que quiserdes cozer em água, cozei-o em água; e tudo o que sobrar, ponde em guarda para vós até amanhã.” Êxo. 16:23.`, `E. G. White, Testemunhos Para a Igreja, vol. 6, pág. 354`, ['tpi6_354', 'ex16']),
@@ -768,8 +777,8 @@ const CH_A = [
         ], 2, 2)
       ], full: .6,
       hint: `Pense em tudo o que, se ficar para o sábado, vira correria: roupa, comida, ofertas, tarefas…`,
-      model: `A sexta é o dia de **deixar tudo pronto** para o sábado ser descanso de verdade (Êx 16:23). Exemplos do folder: **roupa e calçado**, **ofertas**, tarefas da casa **divididas** entre todos, atividades da semana planejadas — e preparar-se **espiritualmente**. Hoje dá para somar: celular carregado e o **Modo Sábado** programado.`,
-      src: ['tpi6_354', 'ex16', 'folder'] }),
+      model: `A sexta é o dia de **deixar tudo pronto** para o sábado ser descanso de verdade (Êx 16:23). O documento oficial pede: casa **limpa e arrumada**, roupas **lavadas e passadas**, alimentos **providenciados** e a família **pronta**, antes do pôr do sol. O folder soma: **roupa e calçado**, **ofertas**, tarefas **divididas** entre todos e preparo **espiritual**. Hoje dá para somar: celular carregado e o **Modo Sábado** programado.`,
+      src: ['tpi6_354', 'ex16', 'doc_prep', 'folder'] }),
     ask({ id: 'q5_2', kind: 'concept', xp: 40, minWords: 5,
       text: `**Quando o sábado começa e quando termina?** E como você descobre esse horário na sua cidade?`,
       concepts: [
@@ -780,10 +789,10 @@ const CH_A = [
       hint: `É “de entardecer a entardecer”. Qual momento do dia marca o começo e o fim?`,
       model: `O sábado vai **de pôr do sol a pôr do sol**: começa quando o sol se põe na **sexta** e termina quando se põe no **sábado** (Lv 23:32; Crença Fundamental 20). O horário muda por cidade e época do ano: use um app de clima/calendário ou pesquise “horário do pôr do sol” na sua cidade.`,
       src: ['lv23', 'cf20'] }),
-    emb({ title: 'O documento oficial recomenda', c: 'var(--violet)', fields: [
-      { n: '🌅 Preparação para o sábado', v: 'Interromper as atividades seculares **antes do pôr do sol de sexta** e deixar **casa, roupas e comida** preparadas com antecedência.', w: 1 },
-      { n: '🕯️ Início e término do sábado', v: 'Abrir e encerrar o dia com **cultos breves** ao pôr do sol, em família.', w: 1 }
-    ], src: ['doc'] }),
+    emb({ title: '📄 O documento oficial recomenda', c: 'var(--violet)', fields: [
+      { n: '🌅 Preparação para o sábado', v: `Antes do pôr do sol de sexta, as atividades seculares devem ser interrompidas; a casa, **limpa e arrumada**; as roupas, **lavadas e passadas**; os alimentos, **providenciados**; e os membros da família, **já prontos**.`, w: 1 },
+      { n: '🕯️ Início e término do sábado', v: `O dia deve ser aberto e encerrado com “**breves e atrativos cultos de pôr do sol**, com a participação dos membros da família”: cantar alguns hinos, ler uma passagem bíblica com comentários pertinentes e agradecer a Deus em oração.`, w: 1 }
+    ], src: ['doc_prep', 'doc_inicio'] }),
     quote(`As crianças devem participar do culto familiar, cada qual com sua Bíblia, lendo um ou dois versículos. Podem cantar um hino preferido, seguido de oração [...]. Em singela petição, contemos ao Senhor as nossas necessidades exprimindo gratidão por Suas bênçãos. Deste modo, saudaremos a Jesus como hóspede bem-vindo em nosso lar e coração.`, `E. G. White, Testemunhos Para a Igreja, vol. 6, págs. 357-358`, ['tpi6_357b']),
     ask({ id: 'q5_3', kind: 'concept', xp: 50, minWords: 8,
       text: `Monte o seu **culto de pôr do sol** nota 10: descreva pelo menos **3 elementos** (música, leitura, dinâmica, convidados, surpresa…).`,
@@ -795,15 +804,16 @@ const CH_A = [
         ], 3)
       ], full: .99,
       hint: `Dê uma olhada em tudo o que cabe em 15 minutos: cantar, ler, agradecer, dramatizar, convidar, abraçar…`,
-      model: `Ideias do folder: **cantar vários hinos**; ler um parágrafo do Espírito de Profecia; **dramatizar** uma história bíblica; dar a cada participante um **texto bíblico** para ler; cada um **agradecer** por algo específico da semana; **convidar amigos**; preparar uma **recordação-surpresa**; e fechar com um **abraço** e um “feliz sábado”.`,
-      src: ['folder', 'tpi6_357b'] })
+      model: `O documento oficial resume o essencial de um culto de pôr do sol **breve e atrativo**: **cantar alguns hinos**, **ler uma passagem bíblica com comentários pertinentes** e **agradecer a Deus em oração**. O folder acrescenta: ler um parágrafo do Espírito de Profecia; **dramatizar** uma história bíblica; dar a cada participante um **texto bíblico**; cada um **agradecer** por algo específico da semana; **convidar amigos**; preparar uma **recordação-surpresa**; e fechar com um **abraço** e um “feliz sábado”.`,
+      src: ['doc_inicio', 'folder', 'tpi6_357b'] })
   ] },
 
 { id: '3-manha', cat: 'f3', name: '3-manha', title: 'Manhã: Sono, Roupa e Igreja',
-  topic: 'Descansar sem desperdiçar o dia · o que vestir · Escola Sabatina e culto', pins: ['tpi2_704', 'me2_475', 'edu_248', 'css_41', 'folder'], reward: 40,
+  topic: 'Descansar sem desperdiçar o dia · o que vestir · Escola Sabatina e culto', pins: ['tpi2_704', 'doc_sono', 'css_170', 'me2_475', 'edu_248', 'css_41', 'doc_igreja', 'folder'], reward: 40,
   steps: [
     say('neemias', `O sábado de manhã é o “lançamento” do dia. Três temas: **sono, roupa e igreja**. ⛪`),
     quote(`Ninguém se deve sentir na liberdade de gastar tempo santo inutilmente. Desagrada a Deus que os observadores do sábado durmam muito tempo no sábado. [...] Devem dedicar o tempo e as energias a cultos religiosos, para que a divina influência os possa acompanhar durante a semana. De todos os dias semanais, nenhum é tão favorável aos pensamentos e sentimentos religiosos como o sábado.`, `E. G. White, Testemunhos Para a Igreja, vol. 2, pág. 704`, ['tpi2_704']),
+    emb({ title: '📄 Documento oficial · Horas de sono', c: 'var(--violet)', desc: `A Bíblia define o sábado como dia de “repouso solene” (Êx 31:15), “e não como dia de recuperar o sono atrasado da semana. Ricas bênçãos advirão de levantar cedo no sábado, dedicando esse dia ao serviço do Senhor”.`, src: ['doc_sono', 'css_170'] }),
     ask({ id: 'q6_1', kind: 'concept', xp: 35, minWords: 5,
       text: `Como **não** ficar morto de sono no sábado? Que hábito de **sexta à noite** ajuda? (O folder dá dicas.)`,
       concepts: [
@@ -812,8 +822,8 @@ const CH_A = [
         C('programar horários', /(horario|despertador|acordar|alarme|levantar|programar|desjejum|cafe)/)
       ], full: .5,
       hint: `Logo após o jantar… o que o folder sugere fazer e a que horas ir para a cama?`,
-      model: `Depois do jantar, **converse um pouco em família e descanse mais cedo** que de costume; assim você fica mais disposto(a). E **programe** o horário de levantar, o café e a saída de casa para chegar a tempo, antes do início dos serviços.`,
-      src: ['folder', 'tpi2_704'] }),
+      model: `Depois do jantar, **converse um pouco em família e descanse mais cedo** que de costume; assim você fica mais disposto(a). **Programe** o horário de levantar, o café e a saída de casa para chegar a tempo. O documento oficial lembra que o sábado não é dia de “recuperar o sono atrasado da semana” — “ricas bênçãos advirão de levantar cedo no sábado”.`,
+      src: ['folder', 'tpi2_704', 'doc_sono'] }),
     quote(`Alguns adquirem a ideia de que, para efetuar a separação do mundo que a Palavra de Deus requer, devem negligenciar o vestuário. [...] Reúnem-se com o povo de Deus no sábado, com a roupa poeirenta e encardida, e mesmo com bocejantes rasgões, e posta sobre o corpo de maneira negligente.`, `E. G. White, Mensagens Escolhidas, vol. 2, pág. 475`, ['me2_475', 'edu_248']),
     ask({ id: 'q6_2', kind: 'concept', xp: 40, minWords: 8,
       text: `Qual é o **princípio** por trás da roupa de sábado? (Dica: não é sobre ser chique, nem sobre ser desleixado.)`,
@@ -826,6 +836,7 @@ const CH_A = [
       model: `O princípio é **honrar a Deus**: você está “indo ao encontro do Criador”. Por isso, a **melhor roupa** separada para o sábado, **sóbria e de bom gosto** — sem extravagância e sem desleixo — e **sem transformar roupa em motivo de discussão**.`,
       src: ['me2_475', 'edu_248', 'folder'] }),
     quote(`A Escola Sabatina oferece a pais e filhos preciosa oportunidade para o estudo da Palavra de Deus. Mas, a fim de receber o benefício que devem conseguir na Escola Sabatina, tanto os pais como os filhos precisam dedicar tempo ao estudo das lições [...].`, `E. G. White, Conselhos Sobre a Escola Sabatina, pág. 41`, ['css_41']),
+    emb({ title: '📄 Documento oficial · Reuniões da igreja', c: 'var(--violet)', desc: `Somos admoestados a não deixar “de congregar-nos” (Hb 10:25). Por isso, “as programações e atividades regulares da igreja aos sábados devem ter precedência sobre outros compromissos pessoais e sociais, mesmo que estes sejam pertinentes para o sábado”.`, src: ['doc_igreja'] }),
     ask({ id: 'q6_3', kind: 'concept', xp: 30, minWords: 6,
       text: `O que você pode fazer **durante a semana** para aproveitar mais a Escola Sabatina e o culto? Cite **2 ações** práticas.`,
       concepts: [
@@ -841,10 +852,11 @@ const CH_A = [
   ] },
 
 { id: '3-tarde', cat: 'f3', name: '3-tarde', title: 'Tarde: Mesa, Gente e Natureza',
-  topic: 'Almoço simples e alegre · natureza · tarde com gente · irmãos menores', pins: ['tpi6_357', 'csa_165', 'tpi6_358', 'folder'], reward: 40,
+  topic: 'Almoço simples e alegre · natureza · tarde com gente · irmãos menores', pins: ['tpi6_357', 'doc_rest', 'csa_165', 'doc_assist', 'tpi6_358', 'folder'], reward: 40,
   steps: [
     say('neemias', `Depois do culto vem a parte que mais define se o sábado vai ser **deleite** ou **tédio**: a tarde. ☀️`),
     quote(`No sábado, não devemos aumentar a quantidade de alimento ou preparar maior variedade do que nos outros dias. Ao contrário, a refeição do sábado deve ser mais simples, e devemos comer menos, a fim de ter o espírito claro e em condições de compreender os temas espirituais. A alimentação em excesso entorpece a mente.`, `E. G. White, Testemunhos Para a Igreja, vol. 6, pág. 357`, ['tpi6_357']),
+    emb({ title: '📄 Documento oficial · Restaurantes e alimentação', c: 'var(--violet)', desc: `O alimento deve ser providenciado com antecedência: isso “significa que ele deve ser comprado fora das horas do sábado, e que a frequência a restaurantes comerciais nesse dia deve ser evitada”.`, src: ['doc_rest'] }),
     ask({ id: 'q7_1', kind: 'concept', xp: 35, minWords: 8,
       text: `Por que a refeição do sábado deve ser **mais simples**? E como fazer dela um momento **alegre** mesmo assim?`,
       concepts: [
@@ -853,16 +865,16 @@ const CH_A = [
         C('convivência e alegria', /(amig|convid|famili|conversa|alegr|descontr|musica|ajudar|todos ajudam)/)
       ], full: .66,
       hint: `Duas ideias: o efeito de comer demais na mente… e o que o folder sugere para o almoço virar festa sem virar banquete.`,
-      model: `Porque comer demais “entorpece a mente” e atrapalha entender os temas espirituais. O folder sugere: comida **simples, mas saborosa e atraente** (um prato especial é bem-vindo), **convidar amigos**, ter **música instrumental cristã** ao fundo, conversar sobre o sermão e fazer **todos ajudarem** no preparo e na arrumação.`,
-      src: ['tpi6_357', 'folder'] }),
+      model: `Porque comer demais “entorpece a mente” e atrapalha entender os temas espirituais. O folder sugere: comida **simples, mas saborosa e atraente** (um prato especial é bem-vindo), **convidar amigos**, ter **música instrumental cristã** ao fundo, conversar sobre o sermão e fazer **todos ajudarem** no preparo e na arrumação. Lembrete do documento oficial: o alimento é providenciado **antes**, e a ida a restaurantes comerciais nesse dia deve ser evitada.`,
+      src: ['tpi6_357', 'doc_rest', 'folder'] }),
     quote(`O sábado convida-nos a contemplar, nas obras criadas, a glória do Criador. [...] Mais do que em qualquer outro dia, devemos, no santo dia de descanso, estudar as mensagens que Deus para nós escreveu na natureza. [...] À medida que penetramos no seio da natureza, Cristo nos torna real a Sua presença, e nos fala ao coração de Sua paz e amor.`, `E. G. White, Conselhos Sobre Saúde, pág. 165`, ['csa_165']),
     ask({ id: 'q7_2', kind: 'list', xp: 40, need: 3,
       bonus: /(natureza|trilha|parque|praca|passeio|caminh|ar livre|campo|praia)/,
       text: `Monte a sua **tarde de sábado ideal**: cite **3 atividades** (com gente, na natureza ou servindo alguém) que você realmente curtiria.`,
       ph: 'Ex.: trilha, visita, jogo bíblico…',
       react: `Boa! O folder reforça: visitas, estudo bíblico com um amigo, passeios na natureza, jogos bíblicos e ações sociais. Quanto mais **gente e propósito**, menos tédio. 🌿`,
-      model: `Exemplos do folder: **visitas** de cortesia e estudo bíblico com um amigo; **passeio na natureza** com família e amigos; **jogos bíblicos** ou DVD cristão; visitar a **igreja de um amigo**; **ações sociais** (hospitais, idosos, orfanatos, doação de sangue).`,
-      src: ['folder', 'csa_165'] }),
+      model: `Exemplos do folder: **visitas** de cortesia e estudo bíblico com um amigo; **passeio na natureza** com família e amigos; **jogos bíblicos** ou DVD cristão; visitar a **igreja de um amigo**; **ações sociais** (hospitais, idosos, orfanatos, doação de sangue). O documento oficial cita visitar “enfermos, viúvas e órfãos, encarcerados” e “compartilhar uma refeição” — e lembra que ações sociais que podem ser feitas em outro dia não devem tomar as horas do sábado.`,
+      src: ['folder', 'csa_165', 'doc_assist'] }),
     quote(`Em muitas famílias, os filhos menores são deixados à vontade, a fim de se entreterem como melhor puderem. Abandonadas a si mesmas, as crianças em breve ficam inquietas e começam a brincar ou ocupar-se de coisas inadequadas. Deste modo, o sábado perde para elas sua importância sagrada.`, `E. G. White, Testemunhos Para a Igreja, vol. 6, pág. 358`, ['tpi6_358'], `Você tem irmãos menores, primos ou sobrinhos? Aqui o desafio é **você liderar**.`),
     ask({ id: 'q7_3', kind: 'reflect', xp: 25, minWords: 8,
       text: `O folder sugere, por exemplo, uma **caixa** com brinquedos e jogos bíblicos usados **só no sábado**. Que ideia **nova** você teria para tornar o sábado especial para uma criança?`,
@@ -871,15 +883,16 @@ const CH_A = [
   ] },
 
 { id: '3-modo', cat: 'f3', name: '3-modo-sabado', title: 'Modo Sábado (telas e mundo secular)',
-  topic: 'Mídia desativada · o teste do sábado · planejar para não invadir as horas sagradas', pins: ['folder', 'decl_198', 'tpi6_354', 'ne13'], reward: 40,
+  topic: 'Mídia desativada · o teste do sábado · planejar para não invadir as horas sagradas', pins: ['doc_midia', 'folder', 'decl_198', 'tpi6_354', 'ne13'], reward: 40,
   steps: [
     say('neemias', `Chegou o tema mais 2026 de todos: **telas**. 📱`),
     emb({ title: 'O que o folder sugere', c: 'var(--violet)', fields: [
       { n: '📵 Mídia', v: `“A Mídia (TV, rádio, computador, internet, celular, jogos eletrônicos, DVD's, etc.) deve ficar desativada durante as horas do sábado, a menos que esteja relacionada com assuntos religiosos.”`, w: 1 },
+      { n: '📄 Documento oficial · Mídia secular', v: `“A mídia secular, em todas as suas formas, deve ser deixada de lado durante as horas do sábado, para que este, rompendo com a rotina da vida, possa ser um dia ‘deleitoso e santo’.” (Is 58:13)`, w: 1 },
       { n: '🗂️ Longe da vista', v: `“Guarde em locais que não desperte a sua atenção as revistas, jornais e músicas seculares.”`, w: 1 },
       { n: '📅 Planejamento', v: `“Planeje as atividades diárias de forma que não invadam as horas sabáticas.”`, w: 1 },
       { n: '🧭 A pergunta-chave', v: `“É importante ter em mente a seguinte pergunta: Esta atividade me leva a compreender melhor a verdadeira e sagrada natureza do sábado?” — *Declarações da Igreja*, pág. 198`, w: 1 }
-    ], src: ['folder', 'decl_198'] }),
+    ], src: ['doc_midia', 'folder', 'decl_198'] }),
     quote(`Nenhum dever relacionado com os seis dias anteriores será deixado para o sábado. Durante a semana, teremos o cuidado de não gastar as energias com trabalho físico a ponto de estarmos demasiadamente cansados para participar do culto, no dia em que o Senhor descansou.`, `E. G. White, Testemunhos Para a Igreja, vol. 6, pág. 354`, ['tpi6_354']),
     qz('q8_1', `Complete a **pergunta-chave** do sábado: “Esta atividade me leva a compreender melhor a verdadeira e sagrada ______ do sábado?”`, [/natureza/], `Natureza`, { xp: 20, time: 0 }),
     ask({ id: 'q8_2', kind: 'reflect', xp: 60, minWords: 18, listBonus: 3,
@@ -897,6 +910,57 @@ const CH_A = [
       model: `Uma boa configuração tem 3 partes: **horário** (sexta no pôr do sol → sábado no pôr do sol), **o que fecha** (redes sociais, jogos, séries, notificações de grupos) e **o que fica liberado** (Bíblia, hinos, lição da Escola Sabatina, ligar para alguém em emergência). No iPhone use *Foco*; no Android, *Não perturbe/Modos*.`,
       src: ['folder', 'decl_198'] }),
     say('neemias', `Dica final: programe esse modo **agora**, antes de sexta. É o seu **“portão de Neemias”** digital — fechado *antes* de a tentação chegar. 🔒`, { embed: { src: ['ne13'] } })
+  ] },
+
+{ id: '3-documento', cat: 'f3', name: '3-documento-oficial', title: 'O Documento Oficial na Vida Real',
+  topic: 'Esportes e lazer · festas · escola e provas · profissão · restaurantes e viagens', reward: 50,
+  pins: ['doc', 'doc_esporte', 'doc_festas', 'doc_estag', 'doc_prof', 'doc_serv', 'doc_rest', 'doc_viagem', 'doc_med', 'doc_excurs'],
+  steps: [
+    say('neemias', `Agora o **documento oficial** da Divisão Sul-Americana da Igreja Adventista (24/10/2023). Ele trata de coisas bem concretas: esporte, festa, escola, trabalho, viagem. Vamos ler alguns trechos e testar se você entendeu. 📄`, { embed: { src: ['doc'] } }),
+    emb({ title: 'O que o documento diz (trechos)', c: 'var(--violet)', fields: [
+      { n: '⚽ Esportes e lazer', v: `“Muitas atividades esportivas e de lazer, aceitáveis durante a semana, não são condizentes com a observância do sábado, pois desviam a mente das questões espirituais.” (Is 58:13)`, w: 1 },
+      { n: '🎉 Casamentos e festas', v: `Devem ser realizados “fora desse período sagrado”, incluindo os preparativos. E “Casamentos e algumas festas mais suntuosas não devem ser planejados para os sábados à noite”, porque os preparativos envolvem “expectativas e atividades não condizentes com o espírito de comunhão com Deus”.`, w: 1 },
+      { n: '🏫 Estágios e práticas escolares', v: `Entre as atividades seculares “que gerem lucro ou benefício material” estão os programas de preparo para a vida profissional, “incluindo a frequência às aulas e a participação em estágios, simpósios, seminários e palestras de cunho profissional, concursos públicos e exames seletivos”. Se o exame exigir confinamento depois do fim do sábado, “as horas desse dia devem ser gastas em atividades espirituais”.`, w: 1 },
+      { n: '💼 Profissão e trabalho', v: `Os adventistas do sétimo dia “devem escolher e exercer profissões condizentes com a devida observância do sábado”. Mesmo em instituições seculares de serviços básicos, “devem se abster de trabalhar nesse dia”.`, w: 1 },
+      { n: '🍽️ Restaurantes', v: `O alimento deve ser “comprado fora das horas do sábado”, e a frequência a restaurantes comerciais nesse dia “deve ser evitada”.` },
+      { n: '🧳 Viagens', v: `Viagem “por questões de trabalho ou interesses particulares é imprópria para o sábado”; as exceções são “compromisso religioso ou situações emergenciais”.` },
+      { n: '💊 Medicamentos', v: `Comprar remédio é aceitável “em situações emergenciais”; é “imprópria quando a pessoa já os necessitava, e acabou postergando sua compra para esse dia”.` },
+      { n: '⛺ Excursões e acampamentos', v: `A realização de excursões e acampamentos “pode promover a socialização cristã”, mas todos devem “chegar ao devido local antes do início do sábado e montar sua estrutura, incluindo suas barracas”.` }
+    ], src: ['doc_esporte', 'doc_festas', 'doc_estag', 'doc_prof', 'doc_serv', 'doc_rest', 'doc_viagem', 'doc_med', 'doc_excurs'] }),
+    ask({ id: 'q10_1', kind: 'concept', xp: 35, minWords: 8,
+      text: `**Esportes e lazer:** que **critério** o documento usa para dizer que atividades “aceitáveis durante a semana” não combinam com o sábado? E ele diz que **toda** atividade esportiva fica de fora?`,
+      concepts: [
+        C('“muitas”, não todas', /(muita|nem toda|nem todas|algumas|nao e toda|nao sao todas|depende|nao diz que toda|nao proibe toda)/),
+        C('desviam a mente das questões espirituais', /(desvi|mente|espiritu|distra|foco|afast)/),
+        C('o critério vem de Isaías 58:13', /(proprios interesses|proprios caminhos|propria vontade|isaias|\bis\b 58|58)/)
+      ], full: .66,
+      hint: `O critério não é “esporte é pecado”: é o que a atividade faz com a sua **mente**. E repare na primeira palavra da frase do documento.`,
+      model: `O documento diz que “**muitas** atividades esportivas e de lazer, aceitáveis durante a semana, não são condizentes com a observância do sábado, pois **desviam a mente das questões espirituais**” (Is 58:13). Ou seja: não diz “todas”, e o critério é o efeito na mente. Por isso vale aplicar o **teste do sábado** e conversar com seu líder.`,
+      src: ['doc_esporte', 'decl_198'] }),
+    ask({ id: 'q10_2', kind: 'concept', xp: 35, minWords: 8,
+      text: `**Festas:** segundo o documento, **quando** casamentos e festas devem acontecer? E por que ele alerta até sobre festas planejadas para o **sábado à noite**?`,
+      concepts: [
+        C('fora do período sagrado do sábado', /(fora (d[oe]|desse|dessas|do) (periodo|sabado|horas)|periodo sagrado|fora do sabado|fora dessas horas|fora das horas)/),
+        C('os preparativos acontecem no sábado', /(preparativ|prepar)/),
+        C('expectativas e atividades não condizentes com a comunhão com Deus', /(expectativ|nao condizent|comunhao|espirito de comunhao|incompativ|nao combin)/)
+      ], full: .66,
+      hint: `Pense no que acontece durante a tarde de sábado quando há uma festa grande à noite: quem está se preparando, e para quê?`,
+      model: `Casamentos e festas, “incluindo seus devidos preparativos”, devem ser feitos **fora do período sagrado**. As festas mais suntuosas não devem ser planejadas para o sábado à noite porque os **preparativos** acontecem durante o sábado e envolvem “expectativas e atividades não condizentes com o espírito de comunhão com Deus”.`,
+      src: ['doc_festas'] }),
+    ask({ id: 'q10_3', kind: 'concept', xp: 40, minWords: 10,
+      text: `**Escola e provas:** que atividades escolares e profissionais o documento lista entre as atividades seculares? E o que fazer com as **horas do sábado** se o exame exigir confinamento depois do pôr do sol?`,
+      concepts: [
+        CI('aulas, estágios, seminários, concursos, exames', [/(aula|frequencia)/, /(estagio)/, /(simposio|seminario|palestra)/, /(concurso)/, /(exame|vestibular|selet|prova)/], 2),
+        C('gastar as horas do sábado em atividades espirituais', /(atividades espirituais|espiritu|oracao|biblia|culto|estudo biblico|louvor)/)
+      ], full: .99,
+      hint: `São atividades de “preparo para a vida profissional”. E, no confinamento, o documento diz para ocupar as horas do sábado com …`,
+      model: `O documento cita “a frequência às aulas e a participação em estágios, simpósios, seminários e palestras de cunho profissional, concursos públicos e exames seletivos”. Se o exame exigir confinamento depois do fim do sábado, “as horas desse dia devem ser gastas em atividades espirituais”.`,
+      src: ['doc_estag'] }),
+    ask({ id: 'q10_4', kind: 'reflect', xp: 30, minWords: 12,
+      bonus: /(esporte|festa|escola|prova|trabalho|restaurante|viagem|amigo|familia|time|vestibular|estagio|jogo|celular)/,
+      text: `Dos trechos de hoje, **qual é o mais difícil de viver** no seu mundo (esporte, festa, escola, trabalho, restaurante, viagem)? Conte com sinceridade — o jogo não julga.`,
+      ph: 'Conte com sinceridade…',
+      react: `Obrigado por ser sincero(a). Dificuldade não é pecado: é **mapa**. Os dilemas da Fase 4 vão usar exatamente esses pontos.` })
   ] },
 
 { id: '3-despedida', cat: 'f3', name: '3-despedida', title: 'Despedida e Sete Dias',
@@ -933,9 +997,9 @@ const CH_A = [
   ] },
 
 { id: '3-quiz', cat: 'f3', name: '3-quiz', title: 'Quiz-relâmpago · Como Guardar', pill: 'QUIZ',
-  topic: 'Respostas curtas · 35s por pergunta', pins: ['tpi6_354', 'tpi6_357', 'csa_165', 'folder', 'decl_198'], reward: 50, quiz: true,
+  topic: 'Respostas curtas · 35s por pergunta', pins: ['tpi6_354', 'tpi6_357', 'csa_165', 'folder', 'decl_198', 'doc_sono', 'doc_rest', 'doc_inicio'], reward: 50, quiz: true,
   steps: [
-    QUIZ_INTRO(7),
+    QUIZ_INTRO(10),
     qz('z3_1', `Qual dia da semana é o “dia de preparação”?`, [/sexta/], `Sexta-feira`),
     qz('z3_2', `O sábado começa em qual momento da sexta?`, [/(por do sol|poente|entardecer|anoitecer)/], `No pôr do sol`),
     qz('z3_3', `Complete: a refeição do sábado deve ser mais ______.`, [/simples/], `Simples`),
@@ -943,6 +1007,9 @@ const CH_A = [
     qz('z3_5', `Em que “lugar” devemos estudar as mensagens que Deus escreveu, segundo Conselhos Sobre Saúde, p. 165?`, [/(natureza|campo|prado|ar livre|ceu aberto)/], `Na natureza`),
     qz('z3_6', `A mídia (TV, internet, jogos) deve ficar ______ nas horas do sábado, a menos que seja religiosa.`, [/(desativ|desligad|\boff\b|fechad|bloquead)/], `Desativada`),
     qz('z3_7', `A compra de alimento ou remédio deve ser feita durante a ______ (exceto emergências).`, [/semana/], `Semana`),
+    qz('z3_8', `O documento oficial diz que a Bíblia define o sábado como dia de “repouso ______” (Êx 31:15). (uma palavra)`, [/solene/], `Solene`),
+    qz('z3_9', `Segundo o documento, a frequência a restaurantes ______ nesse dia deve ser evitada. (uma palavra)`, [/comerc/], `Comerciais`),
+    qz('z3_10', `Os cultos de pôr do sol devem ser “______ e atrativos”, segundo o documento. (uma palavra)`, [/breve/], `Breves`),
     { t: 'quizend' }
   ] }
 
@@ -995,10 +1062,11 @@ dilemma({
     ['rafa', `ninguém precisa saber kkkk. e se a gente perder por sua causa?`]
   ],
   q2: `A pressão aumentou. **Você mantém ou cede?** Escreva a resposta (pode ser a mesma ou outra — seja honesto(a)).`,
-  theory: `• O sábado é **memorial do Criador** e sinal de lealdade (Êx 20:8-11; 31:13-17).\n• O folder orienta: a mídia, incluindo **jogos eletrônicos**, “deve ficar desativada durante as horas do sábado, a menos que esteja relacionada com assuntos religiosos”.\n• Pergunta-chave: “Esta atividade me leva a compreender melhor a verdadeira e sagrada natureza do sábado?” (*Declarações da Igreja*, p. 198)`,
+  theory: `• O sábado é **memorial do Criador** e sinal de lealdade (Êx 20:8-11; 31:13-17).\n• O folder orienta: a mídia, incluindo **jogos eletrônicos**, “deve ficar desativada durante as horas do sábado, a menos que esteja relacionada com assuntos religiosos”.\n• Pergunta-chave: “Esta atividade me leva a compreender melhor a verdadeira e sagrada natureza do sábado?” (*Declarações da Igreja*, p. 198)
+• O documento oficial: “Muitas atividades esportivas e de lazer, aceitáveis durante a semana, não são condizentes com a observância do sábado, pois desviam a mente das questões espirituais” — e “a mídia secular, em todas as suas formas, deve ser deixada de lado durante as horas do sábado”.`,
   practice: `• A decisão forte é a de **antes**: avise o time **quando a tabela sair**, não na hora do jogo.\n• Chegue com **alternativa**: outro dia ou horário, treino extra na quinta, indicar um reserva.\n• Sem sermão e sem drama: *“Sábado eu não jogo — mas conta comigo em qualquer outro dia.”*\n• Aceite o custo: você pode perder a vaga. Isso é real.`,
   faith: `Fé não é garantia de placar. É decidir **antes de ver o resultado**, confiando em quem Deus é — como Neemias, que fechou os portões sem saber o que os comerciantes fariam (Ne 13:19-22).`,
-  src: ['ne13', 'decl_198', 'ex20', 'folder'],
+  src: ['ne13', 'decl_198', 'ex20', 'folder', 'doc_esporte', 'doc_midia'],
   dec: { title: 'Decisão de Fé · O Torneio', fields: [
     { id: 'msg', label: 'A mensagem que vou mandar ao time (até hoje)', ph: 'Ex.: Pessoal, sábado eu não jogo porque guardo o sábado. Mas quero ajudar o time: posso…', min: 12, rows: 4 },
     { id: 'alt', label: 'A alternativa que eu ofereço', ph: 'Ex.: treinar na quinta, indicar um reserva…', min: 4, rows: 2 },
@@ -1022,10 +1090,12 @@ dilemma({
     ['bia', `vai perder a chance de passar em medicina por causa disso?? 😳`]
   ],
   q2: `O medo de perder a chance bateu. **Qual é a sua resposta agora?** Mantém, cede ou propõe outro caminho?`,
-  theory: `• O sábado é dia de deixar “as ocupações da vida diária” e dedicar as horas a “um saudável repouso, ao culto e a boas obras” (DTN, p. 207).\n• O folder: “Planeje as atividades diárias de forma que não invadam as horas sabáticas.”\n• Ellen White: “Nenhum dever relacionado com os seis dias anteriores será deixado para o sábado” (Test. 6, p. 354) — **estudo é valioso**, o desafio é planejar.`,
-  practice: `• No Brasil, a **Lei 13.796/2019** (art. 7º-A da LDB) prevê que o aluno de escola pública ou privada pode, mediante **requerimento prévio e motivado**, faltar a prova ou aula em dia de guarda religiosa; a escola oferece **prestação alternativa** (reposição ou trabalho), sem custo para o aluno. *Há exceções, como o ensino militar. Confira o texto oficial e converse com seus responsáveis.*\n• Faça o pedido **cedo**, com **respeito** e **por escrito** (assim fica registrado), com a ajuda dos seus pais, explicando o motivo religioso.\n• Você não está *fugindo* da prova: está pedindo **outro horário**.\n• Concursos e vestibulares externos seguem o edital: fale com a organizadora com antecedência.`,
+  theory: `• O sábado é dia de deixar “as ocupações da vida diária” e dedicar as horas a “um saudável repouso, ao culto e a boas obras” (DTN, p. 207).\n• O folder: “Planeje as atividades diárias de forma que não invadam as horas sabáticas.”\n• Ellen White: “Nenhum dever relacionado com os seis dias anteriores será deixado para o sábado” (Test. 6, p. 354) — **estudo é valioso**, o desafio é planejar.
+• O documento oficial inclui entre as atividades seculares os “programas de planejamento e preparo para a vida profissional, incluindo a frequência às aulas e a participação em estágios, simpósios, seminários e palestras de cunho profissional, concursos públicos e exames seletivos”. Se o exame exigir confinamento depois do fim do sábado, “as horas desse dia devem ser gastas em atividades espirituais”.`,
+  practice: `• No Brasil, a **Lei 13.796/2019** (art. 7º-A da LDB) prevê que o aluno de escola pública ou privada pode, mediante **requerimento prévio e motivado**, faltar a prova ou aula em dia de guarda religiosa; a escola oferece **prestação alternativa** (reposição ou trabalho), sem custo para o aluno. *Há exceções, como o ensino militar. Confira o texto oficial e converse com seus responsáveis.*\n• Faça o pedido **cedo**, com **respeito** e **por escrito** (assim fica registrado), com a ajuda dos seus pais, explicando o motivo religioso.\n• Você não está *fugindo* da prova: está pedindo **outro horário**.\n• Concursos e vestibulares externos seguem o edital: fale com a organizadora com antecedência.
+• Se não houver alternativa e o exame exigir confinamento depois do pôr do sol, o documento orienta ocupar as horas do sábado com atividades espirituais.`,
   faith: `Pedir um direito com educação é uma fé **ativa**: você faz a sua parte e confia que Deus faz a Dele (Mt 6:33).`,
-  src: ['lei', 'dtn_207', 'tpi6_354', 'mt6', 'folder'],
+  src: ['lei', 'dtn_207', 'tpi6_354', 'mt6', 'folder', 'doc_estag'],
   dec: { title: 'Decisão de Fé · A Prova do Sábado', fields: [
     { id: 'pedido', label: 'Meu pedido à coordenação (2 a 4 frases)', ph: 'Prezada coordenação, sou aluno(a) adventista e guardo o sábado como dia de descanso e adoração. Por isso, peço…', min: 15, rows: 4 },
     { id: 'quem', label: 'Quem vai comigo nessa conversa?', ph: 'Ex.: minha mãe e o líder JA', min: 2, rows: 1 },
@@ -1049,10 +1119,11 @@ dilemma({
     ['duda', `pelo menos fica até o parabéns, é 21h!`]
   ],
   q2: `Agora é pessoal e dói um pouco. **O que você responde, de coração?**`,
-  theory: `• O sábado vai “de entardecer a entardecer”: começa no **pôr do sol de sexta** (Lv 23:32; Crença Fundamental 20).\n• O documento oficial *Observância do Sábado* recomenda interromper as atividades seculares **antes do pôr do sol de sexta** e abrir o sábado com um culto breve, em família.\n• Test. 6, p. 357-358: no culto de pôr do sol, “saudaremos a Jesus como hóspede bem-vindo em nosso lar e coração”.`,
-  practice: `• Amizade e convicção **não precisam brigar**. Diga com carinho o que você valoriza.\n• Ofereça algo concreto: entregar o presente **antes do pôr do sol**, um almoço só de vocês no domingo, ou convidar a Duda para o seu sábado.\n• Evite o sermão: fale de **você**, não dos erros dos outros.\n• Sim, pode doer: algumas amizades vão testar sua decisão. Outras vão te surpreender.\n• *No sábado à noite*, depois que o dia acabou, faça a despedida (oração e louvor) antes de sair — o folder chama de “momento de transição”.`,
+  theory: `• O sábado vai “de entardecer a entardecer”: começa no **pôr do sol de sexta** (Lv 23:32; Crença Fundamental 20).\n• O documento oficial *Observância do Sábado* recomenda interromper as atividades seculares **antes do pôr do sol de sexta** e abrir o sábado com um culto breve, em família.\n• Test. 6, p. 357-358: no culto de pôr do sol, “saudaremos a Jesus como hóspede bem-vindo em nosso lar e coração”.
+• O documento oficial: casamentos e festas, “incluindo seus devidos preparativos, devem ser realizados fora desse período sagrado”; e algumas festas mais suntuosas “não devem ser planejados para os sábados à noite”, pois os preparativos “envolvem expectativas e atividades não condizentes com o espírito de comunhão com Deus”.`,
+  practice: `• Amizade e convicção **não precisam brigar**. Diga com carinho o que você valoriza.\n• Ofereça algo concreto: entregar o presente **antes do pôr do sol**, um almoço só de vocês no domingo, ou convidar a Duda para o seu sábado.\n• Evite o sermão: fale de **você**, não dos erros dos outros.\n• Sim, pode doer: algumas amizades vão testar sua decisão. Outras vão te surpreender.\n• *No sábado à noite*, o dia já terminou no pôr do sol — mas o documento alerta que festas mais suntuosas não sejam planejadas para essa hora, porque os preparativos invadem o sábado. Faça a despedida (oração e louvor) antes de sair: o folder chama de “momento de transição”.`,
   faith: `Pela fé, você escolhe o **relacionamento com Deus** sem abandonar as **pessoas**. Jesus esteve com gente — e nunca abriu mão de quem Ele era.`,
-  src: ['lv23', 'cf20', 'doc', 'tpi6_357b', 'ts6_359'],
+  src: ['lv23', 'cf20', 'doc', 'tpi6_357b', 'ts6_359', 'doc_festas'],
   dec: { title: 'Decisão de Fé · O Níver da Sexta', fields: [
     { id: 'msg', label: 'Minha mensagem para a Duda (carinhosa e firme)', ph: 'Duda, você é muito importante pra mim e…', min: 12, rows: 4 },
     { id: 'alt', label: 'A alternativa que ofereço (dia, hora, atividade)', ph: 'Ex.: entrego o presente às 17h e almoçamos domingo…', min: 5, rows: 2 },
@@ -1077,10 +1148,12 @@ dilemma({
     ['gui', `ficar 24h sem celular é impossível kkkk você vai surtar`]
   ],
   q2: `Tente de novo: **dá para ficar sem?** O que você diria ao Gui — e a si mesmo(a)?`,
-  theory: `• Folder: “A Mídia (TV, rádio, computador, internet, celular, jogos eletrônicos, DVD's, etc.) deve ficar desativada durante as horas do sábado, a menos que esteja relacionada com assuntos religiosos.”\n• Folder: “Guarde em locais que não desperte a sua atenção as revistas, jornais e músicas seculares.”\n• Neemias mandou fechar os portões **antes** de o sábado começar (Ne 13:19): o preparo vem **antes** da tentação.`,
-  practice: `• Crie um **Modo Sábado**: no iPhone, *Foco*; no Android, *Não perturbe/Modos*. Programe de **sexta no pôr do sol** até **sábado no pôr do sol**.\n• Deixe uma **resposta automática**: *“Hoje é sábado: respondo à noite 🌅”.* Seus amigos aprendem — e muitos respeitam.\n• **Use a tela para Deus**: hinos, Bíblia, lição da Escola Sabatina, uma mensagem de ânimo a alguém (isso é “relacionado a assuntos religiosos”).\n• Perder a ofensiva tem custo — **pequeno** e visível. O que você ganha também é real: presença.`,
+  theory: `• Folder: “A Mídia (TV, rádio, computador, internet, celular, jogos eletrônicos, DVD's, etc.) deve ficar desativada durante as horas do sábado, a menos que esteja relacionada com assuntos religiosos.”\n• Folder: “Guarde em locais que não desperte a sua atenção as revistas, jornais e músicas seculares.”\n• Neemias mandou fechar os portões **antes** de o sábado começar (Ne 13:19): o preparo vem **antes** da tentação.
+• O documento oficial: “A mídia secular, em todas as suas formas, deve ser deixada de lado durante as horas do sábado, para que este, rompendo com a rotina da vida, possa ser um dia ‘deleitoso e santo’” (Is 58:13).`,
+  practice: `• Crie um **Modo Sábado**: no iPhone, *Foco*; no Android, *Não perturbe/Modos*. Programe de **sexta no pôr do sol** até **sábado no pôr do sol**.\n• Deixe uma **resposta automática**: *“Hoje é sábado: respondo à noite 🌅”.* Seus amigos aprendem — e muitos respeitam.\n• **Use a tela para Deus**: hinos, Bíblia, lição da Escola Sabatina, uma mensagem de ânimo a alguém — o folder abre exceção para o que “esteja relacionada com assuntos religiosos”.\n• Perder a ofensiva tem custo — **pequeno** e visível. O que você ganha também é real: presença.
+• O documento vai além da tela: o compromisso com as prioridades espirituais deve ser mantido “na escolha dos assuntos abordados também em nossos diálogos informais com familiares e amigos”.`,
   faith: `A pergunta que importa: **quem manda em quem?** Pela fé, você escolhe parar — e pode descobrir que o mundo continua girando sem você por 24 horas.`,
-  src: ['folder', 'decl_198', 'ne13', 'tpi6_354'],
+  src: ['folder', 'decl_198', 'ne13', 'tpi6_354', 'doc_midia', 'doc_comun'],
   dec: { title: 'Decisão de Fé · Meu Modo Sábado', fields: [
     { id: 'regras', label: 'As regras do meu Modo Sábado (horário, o que fecha, o que fica liberado)', ph: 'De sexta no pôr do sol até sábado no pôr do sol: fecho… e deixo liberado…', min: 15, rows: 4 },
     { id: 'auto', label: 'Minha resposta automática para os amigos', ph: 'Ex.: Hoje é sábado: respondo à noite 🌅', min: 4, rows: 2 },
@@ -1105,10 +1178,12 @@ dilemma({
     ['narr', `💸 Sua família está apertada este mês. Esse dinheiro ajudaria bastante.`]
   ],
   q2: `A pressão é real — e o motivo é bom. **Qual é a sua resposta agora?**`,
-  theory: `• DTN, p. 207: “A lei proíbe trabalho secular no dia de repouso do Senhor” — e as **obras de misericórdia combinam** com o sábado (Mt 12:12; *Beneficência Social*, p. 77).\n• *Declarações da Igreja*, p. 204-205: quem trabalha onde as horas do sábado “não trazem diminuição dos deveres rotineiros” tem “a obrigação de recordar os princípios que regem as atividades sabáticas”.\n• Jesus ensinou a colocar o Reino de Deus **em primeiro lugar** (Mt 6:33).`,
-  practice: `• **Converse antes de aceitar**: pergunte se há escala sem sábado, troca por domingo ou outro horário.\n• Se você é **menor de idade**, decida junto com seus pais ou responsáveis (contratos de adolescentes têm regras próprias).\n• Peça orientação do **pastor ou líder JA**: eles já viram isso muitas vezes.\n• Procure alternativas: vagas compatíveis, bicos em outros dias, trabalhos por projeto.\n• Cuide do “porquê”: não é birra — é **lealdade**.`,
+  theory: `• DTN, p. 207: “A lei proíbe trabalho secular no dia de repouso do Senhor” — e as **obras de misericórdia combinam** com o sábado (Mt 12:12; *Beneficência Social*, p. 77).\n• *Declarações da Igreja*, p. 204-205: quem trabalha onde as horas do sábado “não trazem diminuição dos deveres rotineiros” tem “a obrigação de recordar os princípios que regem as atividades sabáticas”.\n• Jesus ensinou a colocar o Reino de Deus **em primeiro lugar** (Mt 6:33).
+• O documento oficial: os adventistas do sétimo dia “devem escolher e exercer profissões condizentes com a devida observância do sábado”, e “devem se abster de trabalhar nesse dia, mesmo em instituições seculares de serviços básicos”. (O folder fala em “recordar os princípios”; o documento é mais explícito.)`,
+  practice: `• **Converse antes de aceitar**: pergunte se há escala sem sábado, troca por domingo ou outro horário.\n• Se você é **menor de idade**, decida junto com seus pais ou responsáveis (contratos de adolescentes têm regras próprias).\n• Peça orientação do **pastor ou líder JA**: eles já viram isso muitas vezes.\n• Procure alternativas: vagas compatíveis, bicos em outros dias, trabalhos por projeto.\n• Cuide do “porquê”: não é birra — é **lealdade**.
+• Pense no longo prazo: o documento pede escolher profissões e escalas **compatíveis com o sábado**. Vale conversar com seus pais e líder já na hora de escolher curso e carreira.`,
   faith: `Fé não é fingir que o problema não existe: a família está apertada e isso pesa. Fé é fazer a **sua parte** (procurar, negociar, orar) e confiar que Deus não te deixa sozinho(a) — mesmo que a resposta demore.`,
-  src: ['dtn_207', 'decl_204', 'mt12', 'bs_77', 'mt6'],
+  src: ['dtn_207', 'decl_204', 'mt12', 'bs_77', 'mt6', 'doc_prof', 'doc_serv'],
   dec: { title: 'Decisão de Fé · A Vaga', fields: [
     { id: 'resp', label: 'A mensagem que vou mandar ao Seu Marcos', ph: 'Seu Marcos, obrigado(a) pela oportunidade. Eu guardo o sábado e…', min: 15, rows: 4 },
     { id: 'neg', label: 'O que vou propor ou negociar', ph: 'Ex.: trabalhar domingo e feriados, ou…', min: 6, rows: 2 },
@@ -1133,10 +1208,11 @@ dilemma({
     ['leo', `hmm, interessante. mas então vocês acham que quem vai no domingo vai pro inferno??`]
   ],
   q2: `A pergunta ficou pesada. **Como você responde com mansidão e verdade?**`,
-  theory: `• Instituído na **Criação**, antes de Israel existir (Gn 2:1-3). Jesus: “o sábado foi feito por causa do homem” (Mc 2:27).\n• **Depois da cruz**, as mulheres descansaram no sábado “segundo o mandamento” (Lc 23:54-56).\n• Paulo seguia o costume de ir à sinagoga no sábado (At 17:2). Jesus falou do sábado num tempo futuro (Mt 24:20). Na nova terra haverá sábados (Is 66:22-23).\n• Hb 4:9: “resta ainda um repouso para o povo de Deus”.\n• A salvação é pela **graça**, não por um dia (Ef 2:8-9); o sábado é símbolo dessa redenção (Crença Fundamental 20).`,
+  theory: `• Instituído na **Criação**, antes de Israel existir (Gn 2:1-3). Jesus: “o sábado foi feito por causa do homem” (Mc 2:27).\n• **Depois da cruz**, as mulheres descansaram no sábado “segundo o mandamento” (Lc 23:54-56).\n• Paulo seguia o costume de ir à sinagoga no sábado (At 17:2). Jesus falou do sábado num tempo futuro (Mt 24:20). Na nova terra haverá sábados (Is 66:22-23).\n• Hb 4:9: “resta ainda um repouso para o povo de Deus”.\n• A salvação é pela **graça**, não por um dia (Ef 2:8-9); o sábado é símbolo dessa redenção (Crença Fundamental 20).
+• O documento oficial afirma que a observância do sábado “é pertinente a todos os seres humanos em todas as épocas e lugares” (Is 56:1-7; Mc 2:27) e que Paulo usava o sábado para persuadir “tanto judeus como gregos” (At 18:4, 11; 17:2).`,
   practice: `• Estrutura simples: **valorizo** (respeito sua fé) → **explico** (o que eu entendo da Bíblia) → **convido** (“quer estudar junto?”).\n• Nada de atacar igrejas ou pessoas: responda com “mansidão e temor” (1 Pe 3:15).\n• Sobre a ressurreição: os adventistas entendem que ela não revogou o 4º mandamento e que o texto bíblico não registra uma ordem de troca do dia.\n• Se não souber, **diga**: *“boa pergunta, vou estudar e te respondo”*. Isso é maturidade, não derrota.`,
   faith: `Testemunho não é ganhar o debate. É deixar claro **por Quem** você guarda o sábado — com um sorriso, não com um soco.`,
-  src: ['gn2', 'mc2', 'lc23', 'at17', 'mt24', 'is66', 'hb4', 'ef2', 'pe3', 'cf20'],
+  src: ['gn2', 'mc2', 'lc23', 'at17', 'mt24', 'is66', 'hb4', 'ef2', 'pe3', 'cf20', 'doc_intro', 'doc_missao'],
   dec: { title: 'Decisão de Fé · Minha Resposta', fields: [
     { id: 'resp', label: 'Minha resposta final ao grupo (cordial e bíblica)', ph: 'Léo, obrigado por perguntar! Eu guardo o sábado porque…', min: 15, rows: 4 },
     { id: 'texto', label: 'O texto-chave que vou memorizar (referência)', ph: 'Ex.: Marcos 2:27', min: 2, rows: 1 },
@@ -1160,10 +1236,11 @@ dilemma({
   ],
   q2: `Responda com sinceridade: **medo, hábito ou amor?** Por quê?`,
   after: `Qualquer das três respostas é um ponto de partida honesto. O objetivo é caminhar **em direção ao amor** — e isso é obra de Deus em você, não só esforço seu.`,
-  theory: `• DTN, p. 283: “a fim de santificar o sábado, os homens precisam ser eles próprios santos. Devem, pela fé, tornar-se participantes da justiça de Cristo.”\n• Jo 14:15: “Se me amais, guardareis os meus mandamentos” — a obediência é **resposta**, não moeda de troca.\n• Test. 6, p. 358: “Abandonadas a si mesmas, as crianças em breve ficam inquietas” — o vazio sem plano pesa em **qualquer idade**.`,
+  theory: `• DTN, p. 283: “a fim de santificar o sábado, os homens precisam ser eles próprios santos. Devem, pela fé, tornar-se participantes da justiça de Cristo.”\n• Jo 14:15: “Se me amais, guardareis os meus mandamentos” — a obediência é **resposta**, não moeda de troca.\n• Test. 6, p. 358: “Abandonadas a si mesmas, as crianças em breve ficam inquietas” — o vazio sem plano pesa em **qualquer idade**.
+• O documento oficial: “não devemos permitir que outras atividades, por mais nobres que sejam, enfraqueçam nossa comunhão com Deus nesse dia” — e pede “um prazeroso e alegre compromisso com as prioridades espirituais, com momentos especiais de leitura da Bíblia, oração e, se possível, de contato com a natureza”.`,
   practice: `• **Tédio = falta de plano**, não prova de que o sábado é chato.\n• Monte sua **Caixa do Sábado**: leitura separada, playlist de louvor, jogo bíblico, caminhada na natureza (*Conselhos Sobre Saúde*, p. 165), uma visita ou ligação a alguém (obra de misericórdia).\n• Combine um **parceiro de sábado**: alguém a quem você manda mensagem quando bater a vontade de desistir.\n• Se falhar: confesse e recomece (1 Jo 1:9). A graça não está de folga no sábado.`,
   faith: `Convicção não é o que você faz **na frente** dos outros. É o que você escolhe quando só Deus está olhando — e ainda assim descobre que não está sozinho(a).`,
-  src: ['dtn_283', 'jo14', 'tpi6_358', 'csa_165', 'jo1', 'folder'],
+  src: ['dtn_283', 'jo14', 'tpi6_358', 'csa_165', 'jo1', 'folder', 'doc_cresc', 'doc_comun'],
   dec: { title: 'Decisão de Fé · Sábado Sem Plateia', fields: [
     { id: 'plano', label: 'Meu plano de 3 atividades para uma tarde de sábado sozinho(a)', ph: '1) … 2) … 3) …', min: 12, rows: 4 },
     { id: 'gatilho', label: 'Se a tentação bater, eu vou…', ph: 'Ex.: mandar mensagem para meu parceiro de sábado e sair para caminhar…', min: 8, rows: 2 },
@@ -1255,7 +1332,7 @@ const CATS = [
   { id: 'f5', t: 'Fase 5 · Chefão' },
   { id: 'free', t: 'Sempre abertos' }
 ];
-const SEQ = ['boas-vindas', '1-criacao', '1-sinal', '1-quiz', '2-jesus', '2-deleite', '2-quiz', '3-sexta', '3-manha', '3-tarde', '3-modo', '3-despedida', '3-quiz'];
+const SEQ = ['boas-vindas', '1-criacao', '1-sinal', '1-quiz', '2-jesus', '2-deleite', '2-quiz', '3-sexta', '3-manha', '3-tarde', '3-modo', '3-documento', '3-despedida', '3-quiz'];
 const F4 = ['d1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7'];
 
 const WEEK_ITEMS = [
@@ -1284,80 +1361,126 @@ const FAQ = [
     src: ['gn2', 'ex20', 'lc4', 'lc23', 'at17', 'pe3'], rel: ['judeus', 'salvacao'] },
 
   { id: 'judeus', q: 'O sábado é só para judeus? Não acabou no Antigo Testamento?', k: 'judeu:3 judaic:3 judaismo:3 israel:2 so_pra:2 antigo_testamento:3 velho_testamento:3 antigo:2 abolid:2 acabou:2 fim_da_lei:3 novo_testamento:2',
-    a: `Na leitura adventista, **não**. O sábado nasceu na **Criação** (Gn 2:1-3), muito **antes de Israel existir**. Jesus disse que “o sábado foi feito por causa do homem” (Mc 2:27) — da humanidade. Isaías fala de **estrangeiros** que guardam o sábado (Is 56:6-7) e da **nova terra**, onde haverá sábados (Is 66:22-23). O documento oficial *Observância do Sábado* afirma que a observância vale para **todas as pessoas, em qualquer tempo e lugar**.`,
-    src: ['gn2', 'mc2', 'is56', 'is66', 'doc'], rel: ['domingo', 'sinal'] },
+    a: `Na leitura adventista, **não**. O sábado nasceu na **Criação** (Gn 2:1-3), muito **antes de Israel existir**. Jesus disse que “o sábado foi feito por causa do homem” (Mc 2:27) — da humanidade. Isaías fala de **estrangeiros** que guardam o sábado (Is 56:6-7) e da **nova terra**, onde haverá sábados (Is 66:22-23). O documento oficial diz que a observância “é pertinente a todos os seres humanos em todas as épocas e lugares” (Is 56:1-7; Mc 2:27).`,
+    src: ['gn2', 'mc2', 'is56', 'is66', 'doc_intro'], rel: ['domingo', 'sinal'] },
 
   { id: 'inicio', q: 'Quando o sábado começa e termina?', k: 'comeca:3 termina:3 horario:2 por_do_sol:2 pordosol:2 entardecer:3 anoitecer:2 inicio:2 acaba:2 comeco:2 quando_comeca:3 que_horas:3',
-    a: `O sábado vai **de pôr do sol a pôr do sol**: começa quando o sol se põe na **sexta** e termina quando se põe no **sábado** (Lv 23:32; Crença Fundamental 20). O horário muda conforme a cidade e a época — pesquise “horário do pôr do sol” na sua cidade. O documento oficial sugere **cultos breves** para abrir e encerrar o dia, em família.`,
+    a: `O sábado vai **de pôr do sol a pôr do sol**: começa quando o sol se põe na **sexta** e termina quando se põe no **sábado** (Lv 23:32; Crença Fundamental 20). O horário muda conforme a cidade e a época — pesquise “horário do pôr do sol” na sua cidade. O documento oficial remete a Lv 23:32, Dt 16:6 e Ne 13:19 e sugere **cultos de pôr do sol breves e atrativos**, em família, para abrir e encerrar o dia.`,
     src: ['lv23', 'cf20', 'doc'], rel: ['sexta', 'culto'] },
 
   { id: 'sexta', q: 'O que fazer na sexta? (preparação)', k: 'sexta:3 prepara:3 preparacao:3 preparar:2 vespera:2 deixar_pronto:3',
-    a: `A sexta é o **dia de preparação** (Test. 6, p. 354; Êx 16:23). Sugestões do folder: planejar a rotina para a sexta não ficar exaustiva; **dividir tarefas** da casa; separar **roupa e calçado**; preparar as **ofertas**; preparar-se **espiritualmente**; e, na tarde de sexta, **deixar as preocupações da semana de fora**. O documento oficial acrescenta: interrompa as atividades seculares **antes do pôr do sol** e deixe casa, roupas e comida prontas.`,
-    src: ['tpi6_354', 'ex16', 'folder', 'doc'], rel: ['inicio', 'roupa'] },
+    a: `A sexta é o **dia de preparação** (Test. 6, p. 354; Êx 16:23). O documento oficial pede que, antes do pôr do sol, as atividades seculares sejam interrompidas; a casa esteja **limpa e arrumada**; as roupas, **lavadas e passadas**; os alimentos, **providenciados**; e os membros da família, **já prontos**.
+
+Sugestões do folder: planejar a rotina para a sexta não ficar exaustiva; **dividir tarefas** da casa; separar **roupa e calçado**; preparar as **ofertas**; preparar-se **espiritualmente**; e, na tarde de sexta, **deixar as preocupações da semana de fora**.`,
+    src: ['tpi6_354', 'ex16', 'doc_prep', 'folder'], rel: ['inicio', 'roupa'] },
 
   { id: 'trabalho', q: 'Posso trabalhar, estudar ou fazer lição de casa no sábado?', k: 'trabalh:3 emprego:3 estagio:3 estudar:2 licao_de_casa:3 tarefa:3 dever:2 secular:3 servico:2 bico:3 freela:3 atividade_secular:3',
-    a: `O folder é claro: “Nenhum dever relacionado com os seis dias anteriores será deixado para o sábado” (Test. 6, p. 354). **Planeje a semana** para terminar trabalhos e lições até a sexta. Quem trabalha em serviços que não param (como hospitais) deve “recordar os princípios que regem as atividades sabáticas” (*Declarações da Igreja*, p. 204-205). **Obras de misericórdia** e emergências são diferentes de trabalho comum (Mt 12:12; *Beneficência Social*, p. 77). Para provas e aulas, veja a pergunta sobre **prova no sábado**.`,
-    src: ['tpi6_354', 'decl_204', 'bs_77', 'mt12'], rel: ['prova', 'misericordia'] },
+    a: `O folder é claro: “Nenhum dever relacionado com os seis dias anteriores será deixado para o sábado” (Test. 6, p. 354). **Planeje a semana** para terminar trabalhos e lições até a sexta.
 
-  { id: 'prova', q: 'Tenho prova, aula ou vestibular no sábado. E agora?', k: 'prova:3 vestibular:3 enem:3 simulado:3 aula:2 escola:2 colegio:2 faculdade:2 concurso:3 coordenacao:3 reposicao:3 lei$:2 direito:2 nota:1',
-    a: `No Brasil, a **Lei 13.796/2019** acrescentou o **art. 7º-A à LDB**: o aluno de instituição pública ou privada pode, mediante **requerimento prévio e motivado** (pedido feito com antecedência, explicando o motivo religioso), faltar a prova ou aula em dia de guarda religiosa, e a escola oferece uma **prestação alternativa** (prova/aula de reposição ou trabalho), sem custo para o aluno. Há exceções (por exemplo, o ensino militar).\n\n⚠️ Isto **não é orientação jurídica**: confira o texto oficial da lei e converse com seus responsáveis e com a coordenação. Para concursos e vestibulares externos, valem as regras do edital: fale com a organizadora com antecedência.`,
-    src: ['lei'], rel: ['trabalho'] },
+O documento oficial vai além: o quarto mandamento “desabona a realização de atividades seculares no sábado, que gerem lucro ou benefício material”, e isso inclui “a frequência às aulas e a participação em estágios, simpósios, seminários e palestras de cunho profissional, concursos públicos e exames seletivos”. Os observadores do sábado “devem se abster de trabalhar nesse dia, mesmo em instituições seculares de serviços básicos”. (O folder, sobre empregados em instituições não adventistas, fala na “obrigação de recordar os princípios que regem as atividades sabáticas” — *Declarações da Igreja*, p. 204-205.)
+
+**Obras de misericórdia** e emergências são diferentes de trabalho comum (Mt 12:12; *Beneficência Social*, p. 77). Para provas e aulas, veja **prova no sábado**; para escolha de carreira, veja **profissão**.`,
+    src: ['tpi6_354', 'doc_estag', 'doc_serv', 'decl_204', 'bs_77', 'mt12'], rel: ['prova', 'profissao', 'misericordia'] },
+
+  { id: 'prova', q: 'Tenho prova, aula ou vestibular no sábado. E agora?', k: 'prova:3 vestibular:3 enem:3 simulado:3 aula:2 escola:2 colegio:2 faculdade:2 concurso:3 coordenacao:3 reposicao:3 lei$:2 direito:2 nota:1 exame:3 confinamento:4',
+    a: `Duas camadas:
+
+**1) A orientação da Igreja.** O documento oficial inclui entre as atividades seculares inadequadas para o sábado “a frequência às aulas e a participação em estágios, simpósios, seminários e palestras de cunho profissional, concursos públicos e exames seletivos”. Se o exame exigir **confinamento** depois do fim do sábado, “as horas desse dia devem ser gastas em atividades espirituais”.
+
+**2) O que a lei brasileira permite.** A **Lei 13.796/2019** acrescentou o **art. 7º-A à LDB**: o aluno de instituição pública ou privada pode, mediante **requerimento prévio e motivado** (pedido feito com antecedência, explicando o motivo religioso), faltar a prova ou aula em dia de guarda religiosa, e a escola oferece uma **prestação alternativa** (prova/aula de reposição ou trabalho), sem custo para o aluno. Há exceções (por exemplo, o ensino militar).
+
+⚠️ Isto **não é orientação jurídica**: confira o texto oficial da lei e converse com seus responsáveis e com a coordenação. Para concursos e vestibulares externos, valem as regras do edital: fale com a organizadora com antecedência.`,
+    src: ['doc_estag', 'lei'], rel: ['trabalho', 'profissao'] },
 
   { id: 'celular', q: 'Posso usar celular, jogos, séries e redes sociais?', k: 'celular:3 jogo:2 jogar:2 videogame:3 game:3 serie:3 filme:2 tv$:2 televisao:2 internet:2 redes_sociais:3 rede_social:3 instagram:3 tiktok:3 youtube:3 netflix:3 whatsapp:2 midia:3 tela:3 streaming:3 discord:3 console:3 musica:2',
-    a: `O folder diz: “A Mídia (TV, rádio, computador, internet, celular, jogos eletrônicos, DVD's, etc.) deve ficar desativada durante as horas do sábado, a menos que esteja relacionada com assuntos religiosos.” E sugere guardar “revistas, jornais e músicas seculares” longe da vista.\n\nNa dúvida, use a pergunta-chave: “**Esta atividade me leva a compreender melhor a verdadeira e sagrada natureza do sábado?**” (*Declarações da Igreja*, p. 198). Dica prática: crie um **Modo Sábado** no celular (Foco/Não perturbe) e use a tela para hinos, Bíblia e a lição.`,
-    src: ['folder', 'decl_198'], rel: ['esporte', 'tarde'] },
+    a: `O documento oficial diz: “A mídia secular, em todas as suas formas, deve ser deixada de lado durante as horas do sábado, para que este, rompendo com a rotina da vida, possa ser um dia ‘deleitoso e santo’” (Is 58:13).
+
+O folder detalha: “A Mídia (TV, rádio, computador, internet, celular, jogos eletrônicos, DVD's, etc.) deve ficar desativada durante as horas do sábado, a menos que esteja relacionada com assuntos religiosos.” E sugere guardar “revistas, jornais e músicas seculares” longe da vista.
+
+Na dúvida, use a pergunta-chave: “**Esta atividade me leva a compreender melhor a verdadeira e sagrada natureza do sábado?**” (*Declarações da Igreja*, p. 198). Dica prática: crie um **Modo Sábado** no celular (Foco/Não perturbe) e use a tela para hinos, Bíblia e a lição.`,
+    src: ['doc_midia', 'folder', 'decl_198'], rel: ['esporte', 'tarde'] },
 
   { id: 'restaurante', q: 'Posso comer fora ou pedir delivery?', k: 'restaurante:3 comer_fora:3 lanchonete:2 pizza:2 almoco_fora:3 fast_food:3 delivery:3 ifood:3 pedir_comida:3 shopping:1',
-    a: `Sobre restaurantes, o folder cita **F. D. Nichol** (autor adventista): em **viagem**, quando não há alternativa, ir a um restaurante é algo que “não deve ser criticado”; mas ir a um restaurante **da própria comunidade** só para ter variedade ou “um novo ambiente” seria, segundo ele, “contrário ao espírito do sábado”. Ele conclui: “É melhor ter aos sábados uma refeição simples na quietude do lar, precedida por uma oração de agradecimento a Deus, do que o mais fino banquete no melhor restaurante.”\n\nAtenção: isso é **opinião de um autor**, não regra oficial. As fontes do servidor **não tratam de delivery**: converse com seus pais e seu líder.`,
-    src: ['nichol'], rel: ['comida', 'viagem'] },
+    a: `O documento oficial é direto: o alimento deve ser providenciado com antecedência, o que “significa que ele deve ser comprado fora das horas do sábado, e que a frequência a restaurantes comerciais nesse dia deve ser evitada” (seção *Restaurantes e alimentação*).
 
-  { id: 'viagem', q: 'Posso viajar ou ir a um passeio no sábado?', k: 'viaj:3 viagem:3 excursao:3 passeio:2 onibus:2 aviao:2 estrada:2 aeroporto:2',
-    a: `“Pode ser necessário viajar no sábado; mas sempre que possível devemos, no dia anterior, comprar a passagem e fazer todos os arranjos necessários. Quando viajarmos, devemos esforçar-nos o máximo para evitar que o dia da chegada coincida com o sábado” (Test. 6, p. 359-360). Sugestões do folder: **evite viagens longas e cansativas** no sábado e **planeje viajar na sexta**, para estar em comunhão com Deus no sábado.`,
-    src: ['tpi6_359', 'folder'], rel: ['restaurante', 'tarde'] },
+O folder traz um complemento do autor **F. D. Nichol**: em **viagem**, quando não há alternativa, “esta maneira de proceder não deve ser criticada”; mas ir a um restaurante da própria comunidade só para ter variedade ou “um novo ambiente” é, para ele, “contrário ao espírito do sábado”. E conclui: “É melhor ter aos sábados uma refeição simples na quietude do lar [...] do que o mais fino banquete no melhor restaurante.”
 
-  { id: 'compras', q: 'Posso fazer compras ou ir ao shopping?', k: 'compra:3 comprar:3 shopping:3 loja:2 mercado:2 farmacia:2 vender:2 comercio:3 gastar:2',
-    a: `O folder orienta: “A compra de alimento ou medicamento para atender as necessidades deve ser feita durante a semana, exceto emergências.” Neemias enfrentou o comércio no sábado e agiu antes que ele começasse (Ne 13:15-22).\n\nAs fontes **não trazem uma lista de “pode/não pode”** para shopping ou lazer; use o **teste do sábado** (“Esta atividade me leva a compreender melhor a verdadeira e sagrada natureza do sábado?”) e converse com seus pais e líder.`,
-    src: ['folder', 'ne13', 'decl_198'], rel: ['celular', 'misericordia'] },
+Sobre **delivery**, o documento não fala; o princípio (alimento providenciado antes, compra fora das horas do sábado) aponta para evitar. Converse com seus pais e líder.`,
+    src: ['doc_rest', 'nichol'], rel: ['comida', 'viagem', 'compras'] },
 
-  { id: 'esporte', q: 'Posso jogar bola, praticar esportes ou disputar campeonato?', k: 'esporte:3 bola:3 futebol:3 volei:3 basquete:3 campeonato:3 treino:2 academia:2 correr:2 corrida:2 natacao:2 competi:3 time$:2 jogo_da_escola:3',
-    a: `Ponto de honestidade: **as fontes do servidor não trazem uma regra específica sobre esportes**.\n\nO que elas dizem: o sábado é dia de **descanso, culto e boas obras** (DTN, p. 207); a atividade **secular** fica de fora; e a “recreação imprópria” faz o dia perder “sua importância sagrada” (Test. 6, p. 358). Ao mesmo tempo, o folder **incentiva** passeios ao ar livre com família, amigos e igreja, em contato com a natureza.\n\nAplique o **teste do sábado** (*Declarações da Igreja*, p. 198) e leve a pergunta ao seu pastor ou líder — principalmente se envolver campeonato ou compromisso com time.`,
-    src: ['dtn_207', 'tpi6_358', 'decl_198', 'csa_165'], rel: ['celular', 'natureza'] },
+  { id: 'viagem', q: 'Posso viajar ou ir a um passeio no sábado?', k: 'viaj:3 viagem:3 passeio:2 onibus:2 aviao:2 estrada:2 aeroporto:2',
+    a: `O documento oficial diz que “a realização de viagens por questões de trabalho ou interesses particulares é imprópria para o sábado”, com **exceções**: “compromisso religioso ou situações emergenciais”. E pede que, sempre que possível, os preparativos — “incluindo a compra de passagens e o abastecimento de combustível” — sejam feitos “com a devida antecedência”.
+
+Ellen White: “Pode ser necessário viajar no sábado; mas sempre que possível devemos, no dia anterior, comprar a passagem e fazer todos os arranjos necessários” (Test. 6, p. 359-360). O folder sugere **evitar viagens longas e cansativas** e **planejar viajar na sexta**.
+
+Para **excursões e acampamentos**, veja a pergunta própria.`,
+    src: ['doc_viagem', 'tpi6_359', 'folder'], rel: ['excursao', 'restaurante'] },
+
+  { id: 'compras', q: 'Posso fazer compras, comprar remédio ou ir ao shopping?', k: 'compra:3 comprar:3 shopping:3 loja:2 mercado:2 farmacia:3 remedio:3 medicamento:3 vender:2 comercio:3 gastar:2',
+    a: `O folder orienta: “A compra de alimento ou medicamento para atender as necessidades deve ser feita durante a semana, exceto emergências.” O documento oficial confirma: o alimento deve ser “comprado fora das horas do sábado”; e sobre remédios, a compra é aceitável “em situações emergenciais” e “imprópria quando a pessoa já os necessitava, e acabou postergando sua compra para esse dia”.
+
+Neemias enfrentou o comércio no sábado e agiu antes que ele começasse (Ne 13:15-22). Para **shopping**, as fontes não trazem uma lista de “pode/não pode”; use o **teste do sábado** e lembre que, segundo o documento, “muitas atividades esportivas e de lazer, aceitáveis durante a semana, não são condizentes com a observância do sábado”. Converse com seus pais e líder.`,
+    src: ['folder', 'doc_rest', 'doc_med', 'doc_esporte', 'ne13', 'decl_198'], rel: ['restaurante', 'misericordia'] },
+
+  { id: 'esporte', q: 'Posso jogar bola, praticar esportes ou disputar campeonato?', k: 'esporte:3 bola:3 futebol:3 volei:3 basquete:3 campeonato:3 treino:2 academia:2 correr:2 corrida:2 natacao:2 competi:3 time$:2 jogo_da_escola:3 lazer:3 diversao:2',
+    a: `O documento oficial da Divisão Sul-Americana trata disso em **Esportes e lazer**: “Muitas atividades esportivas e de lazer, aceitáveis durante a semana, não são condizentes com a observância do sábado, pois desviam a mente das questões espirituais” (Is 58:13). Repare no “**muitas**”: o critério é o que a atividade faz com a sua **mente**.
+
+Do outro lado, o folder **incentiva** passeios ao ar livre com família, amigos e igreja, em contato com a natureza, e o documento também fala em “contato com a natureza” como parte do espírito de comunhão (At 16:13). Use o **teste do sábado** (“Esta atividade me leva a compreender melhor a verdadeira e sagrada natureza do sábado?” — *Declarações da Igreja*, p. 198) e, na dúvida — principalmente se envolver campeonato ou compromisso com time —, converse com seu pastor ou líder.`,
+    src: ['doc_esporte', 'doc_comun', 'csa_165', 'decl_198'], rel: ['celular', 'natureza', 'festas'] },
 
   { id: 'dormir', q: 'Posso dormir até tarde no sábado?', k: 'dorm:3 sono:3 acordar:2 preguica:3 cochilo:2 soneca:2 cama:2 tarde_demais:2 descansar:2',
-    a: `Descansar faz parte do sábado (“saudável repouso”, DTN p. 207). Mas Ellen White diz que “desagrada a Deus que os observadores do sábado durmam muito tempo no sábado”, porque o tempo santo deve ir também para o **culto** (Test. 2, p. 704).\n\nDica do folder: depois do jantar de sexta, converse em família e **descanse mais cedo** — assim você acorda disposto(a). E programe horário de levantar, café e saída para chegar **antes** do início dos serviços.`,
-    src: ['tpi2_704', 'dtn_207', 'folder'], rel: ['roupa', 'sexta'] },
+    a: `O documento oficial é firme: a Bíblia define o sábado como dia de “repouso solene” (Êx 31:15), “e não como dia de recuperar o sono atrasado da semana. Ricas bênçãos advirão de levantar cedo no sábado, dedicando esse dia ao serviço do Senhor” (seção *Horas de sono*; ver *Conselhos Sobre a Escola Sabatina*, p. 170).
+
+Ellen White diz que “desagrada a Deus que os observadores do sábado durmam muito tempo no sábado”, porque o tempo santo deve ir também para o **culto** (Test. 2, p. 704). Isso não proíbe descansar (“saudável repouso”, DTN, p. 207): o ponto é **não** transformar o sábado no dia de dormir.
+
+Dica do folder: depois do jantar de sexta, converse em família e **descanse mais cedo**; programe horário de levantar, café e saída para chegar **antes** do início dos serviços.`,
+    src: ['doc_sono', 'css_170', 'tpi2_704', 'dtn_207', 'folder'], rel: ['roupa', 'sexta'] },
 
   { id: 'roupa', q: 'Que roupa usar no sábado?', k: 'roupa:3 vestir:3 vestuario:3 traje:3 tenis:2 bermuda:2 camiseta:2 chique:2 vestido:2 look:3 arrumar:2',
-    a: `Dicas do folder: separe a **melhor roupa** para o sábado; ela deve ser **sóbria e de bom gosto**, não extravagante; **não faça da roupa um motivo de discussão**; e lembre que você está “indo ao encontro do Criador”.\n\nO princípio é **honrar a Deus**: nem vaidade, nem desleixo. Ellen White critica quem vai à igreja com a roupa “poeirenta e encardida” e “posta sobre o corpo de maneira negligente” (*Mensagens Escolhidas*, vol. 2, p. 475). Para ela, “o caráter de uma pessoa é julgado pelo aspecto de seu vestuário” (*Educação*, p. 248).`,
-    src: ['me2_475', 'edu_248', 'folder'], rel: ['dormir', 'escola_sabatina'] },
+    a: `Dicas do folder: separe a **melhor roupa** para o sábado; ela deve ser **sóbria e de bom gosto**, não extravagante; **não faça da roupa um motivo de discussão**; e lembre que você está “indo ao encontro do Criador”.\n\nO princípio é **honrar a Deus**: nem vaidade, nem desleixo. Ellen White critica quem vai à igreja com a roupa “poeirenta e encardida” e “posta sobre o corpo de maneira negligente” (*Mensagens Escolhidas*, vol. 2, p. 475). Para ela, “o caráter de uma pessoa é julgado pelo aspecto de seu vestuário” (*Educação*, p. 248).
+
+Na preparação de sexta, o documento oficial lembra de deixar as roupas “lavadas e passadas”.`,
+    src: ['me2_475', 'edu_248', 'doc_prep', 'folder'], rel: ['dormir', 'escola_sabatina'] },
 
   { id: 'tarde', q: 'O que fazer à tarde? Estou entediado(a).', k: 'tarde:3 atividade:2 programa:2 ideia:2 tedio:3 chato:3 entediado:3 o_que_fazer:3 lazer:2 entretenimento:2 sem_o_que_fazer:3 passar_o_tempo:3',
     a: `Ideias do folder para a tarde: **visitas** de cortesia e estudo bíblico com um amigo; **passeios na natureza** com família e amigos; **almoço** com convidados e música cristã ao fundo; **jogos bíblicos** e DVDs cristãos; visitar a **igreja de um amigo**; participar da **programação missionária** da igreja; e **ações sociais** (hospitais, idosos, orfanatos, presídios, doação de sangue, campanha *Quebrando o Silêncio*).\n\nTédio costuma ser **falta de plano**: monte sua “Caixa do Sábado” antes de sexta.`,
     src: ['folder', 'csa_165', 'tpi6_358'], rel: ['natureza', 'amigos'] },
 
-  { id: 'misericordia', q: 'Posso ajudar alguém doente ou em emergência no sábado?', k: 'doente:3 hospital:3 emergencia:3 ajudar:2 socorro:3 misericordia:3 cuidar:2 enfermo:3 medico:3 curar:3 remedio:2 urgencia:3 acidente:3 enfermeir:3',
-    a: `Sim. Jesus curou no sábado e disse: “é lícito fazer o bem” (Mt 12:12). Ellen White escreve: “as obras de misericórdia e beneficência estavam em harmonia com o propósito do Senhor [...]. Aliviar os aflitos, confortar os tristes, é um trabalho de amor que faz honra ao dia de Deus” (*Beneficência Social*, p. 77). O folder lembra que remédios e alimentos devem ser comprados **durante a semana**, “exceto emergências”.`,
-    src: ['mt12', 'bs_77', 'folder'], rel: ['trabalho', 'tarde'] },
+  { id: 'misericordia', q: 'Posso ajudar alguém doente ou em emergência no sábado?', k: 'doente:3 hospital:3 emergencia:3 ajudar:2 socorro:3 misericordia:3 cuidar:2 enfermo:3 medico:3 curar:3 urgencia:3 acidente:3 enfermeir:3',
+    a: `Sim. Jesus curou no sábado e disse: “é lícito fazer o bem” (Mt 12:12). Ellen White escreve: “as obras de misericórdia e beneficência estavam em harmonia com o propósito do Senhor [...]. Aliviar os aflitos, confortar os tristes, é um trabalho de amor que faz honra ao dia de Deus” (*Beneficência Social*, p. 77).
+
+O documento oficial acrescenta: “é lícito nas horas sagradas do sábado visitar enfermos, viúvas e órfãos, encarcerados e compartilhar uma refeição”, mas “ações sociais que podem ser realizadas em outro dia não devem tomar as sagradas horas do sábado”. Na saúde, as **emergências** são atendidas “com base no princípio de que ‘é lícito curar no sábado’”; já os “plantões rotineiros” em hospitais não adventistas “são impróprios para as horas do sábado”.
+
+O folder lembra que remédios e alimentos devem ser comprados **durante a semana**, “exceto emergências”.`,
+    src: ['mt12', 'bs_77', 'doc_assist', 'doc_saude', 'folder'], rel: ['trabalho', 'tarde', 'profissao'] },
 
   { id: 'escola_sabatina', q: 'O que é a Escola Sabatina?', k: 'escola_sabatina:4 escola_sabatica:4 licao:2 classe:2 estudo_da_biblia:2',
     a: `A Escola Sabatina “oferece a pais e filhos preciosa oportunidade para o estudo da Palavra de Deus”, e para aproveitá-la todos precisam “dedicar tempo ao estudo das lições” (*Conselhos Sobre a Escola Sabatina*, p. 41). Sugestões do folder: tenha a **assinatura da lição** para cada pessoa da família; incentive o **estudo pessoal** durante a semana; **saúde os visitantes**; e, ao entrar na igreja, faça uma **oração silenciosa**.`,
     src: ['css_41', 'folder'], rel: ['roupa', 'culto'] },
 
   { id: 'culto', q: 'Como fazer um bom culto de pôr do sol ou culto familiar?', k: 'culto:4 culto_familiar:5 adoracao_em_casa:3 devocional:2 familiar:2 oracao_em_familia:3 hinos:2',
-    a: `Ideias do folder: **cante vários hinos**; leia um parágrafo do Espírito de Profecia; **dramatize** uma história bíblica; dê a cada pessoa um **texto bíblico** para ler; cada um agradece por algo específico da semana; **convide amigos**; prepare uma **recordação-surpresa**; e feche com um abraço desejando “feliz sábado”.\n\nMantenha **curto e espiritual**, sem monotonia (*Orientação da Criança*, p. 521): com um pouco de cuidado, “o culto familiar pode tornar-se agradável” (*Signs of the Times*, 1884).`,
-    src: ['folder', 'oc_521', 'st_1884', 'tpi6_357b'], rel: ['inicio', 'amigos'] },
+    a: `O documento oficial recomenda “breves e atrativos cultos de pôr do sol, com a participação dos membros da família”, para abrir e para encerrar o sábado: “cantar alguns hinos, ler uma passagem bíblica, seguida de comentários pertinentes, e expressar gratidão a Deus em oração” (ver *Testemunhos Para a Igreja*, v. 6, p. 356-359).
+
+Ideias do folder para variar: **cante vários hinos**; leia um parágrafo do Espírito de Profecia; **dramatize** uma história bíblica; dê a cada pessoa um **texto bíblico** para ler; cada um agradece por algo específico da semana; **convide amigos**; prepare uma **recordação-surpresa**; e feche com um abraço desejando “feliz sábado”.
+
+Mantenha **curto e espiritual**, sem monotonia (*Orientação da Criança*, p. 521): com um pouco de cuidado, “o culto familiar pode tornar-se agradável” (*Signs of the Times*, 1884).`,
+    src: ['doc_inicio', 'folder', 'oc_521', 'st_1884', 'tpi6_357b'], rel: ['inicio', 'amigos'] },
 
   { id: 'comida', q: 'O que comer ou cozinhar no sábado?', k: 'comida:3 comer:3 almoco:3 refeicao:3 cozinhar:3 jantar:2 cardapio:2 churrasco:2 lanche:2 receita:1',
     a: `“No sábado, não devemos aumentar a quantidade de alimento ou preparar maior variedade do que nos outros dias. Ao contrário, a refeição do sábado deve ser mais simples, e devemos comer menos, a fim de ter o espírito claro” (Test. 6, p. 357).\n\nO folder acrescenta: faça uma comida **simples, mas saborosa e atraente** (um prato especial é bem-vindo), convide amigos, tenha música instrumental cristã, conversem sobre o sermão e **todos ajudem** no preparo e na arrumação.`,
     src: ['tpi6_357', 'folder'], rel: ['restaurante', 'amigos'] },
 
   { id: 'salvacao', q: 'Guardar o sábado me salva? E se eu falhar?', k: 'salva:3 salvacao:3 salvo:3 perder_a_salvacao:4 falhei:3 falhar:3 errei:3 errar:3 culpa:3 pecado:2 perdoa:3 perdao:3 inferno:3 condena:3 legalismo:4 obrigacao:2 mereco:2',
-    a: `A salvação é pela **graça**, mediante a fé em Cristo: “não vem de vós, é dom de Deus” (Ef 2:8-9). O sábado é **símbolo da nossa redenção em Cristo** (Crença Fundamental 20), não um jeito de “ganhar pontos”. Obedecemos por **amor** (Jo 14:15). Ellen White escreve que, para santificar o sábado, é preciso, “pela fé, tornar-se participante da justiça de Cristo” (DTN, p. 283).\n\nE se você falhar? “Se confessarmos os nossos pecados, Ele é fiel e justo para nos perdoar” (1 Jo 1:9): **confesse, receba perdão e recomece**.`,
-    src: ['ef2', 'cf20', 'jo14', 'dtn_283', 'jo1'], rel: ['sinal', 'pais'] },
+    a: `A salvação é pela **graça**, mediante a fé em Cristo: “não vem de vós, é dom de Deus” (Ef 2:8-9). O documento oficial diz que os filhos de Deus observam o sábado “como uma importante expressão da justificação pela fé em Cristo” (Hb 4:4-11) e que a verdadeira observância “se fundamenta em uma vida santificada pela graça de Cristo”. O sábado é **símbolo da nossa redenção em Cristo** (Crença Fundamental 20), não um jeito de ganhar pontos. Obedecemos por **amor** (Jo 14:15).
+
+Ellen White escreve que, para santificar o sábado, os homens devem, “pela fé, tornar-se participantes da justiça de Cristo” (DTN, p. 283).
+
+E se você falhar? “Se confessarmos os nossos pecados, Ele é fiel e justo para nos perdoar” (1 Jo 1:9): **confesse, receba perdão e recomece**.`,
+    src: ['ef2', 'doc_intro', 'doc_santif', 'cf20', 'jo14', 'dtn_283', 'jo1'], rel: ['sinal', 'pais'] },
 
   { id: 'sinal', q: 'O que significa o sábado ser um “sinal”?', k: 'sinal:3 alianca:3 pacto:3 lealdade:3 identidade:2 simbolo:3',
-    a: `Na Bíblia, o sábado é **sinal** entre Deus e o Seu povo, para lembrar que é Ele quem nos **santifica** (Êx 31:13-17; Ez 20:12, 20). Segundo a Crença Fundamental 20, é um símbolo da nossa redenção em Cristo, um sinal de santificação, uma demonstração de lealdade e um antegozo do futuro eterno. O documento oficial fala em **sinal distintivo de lealdade** a Deus e **sinal exterior da graça divina**.`,
-    src: ['ex31', 'ez20', 'cf20', 'doc'], rel: ['oque', 'salvacao'] },
+    a: `Na Bíblia, o sábado é **sinal** entre Deus e o Seu povo, para lembrar que é Ele quem nos **santifica** (Êx 31:13-17; Ez 20:12, 20). O documento oficial diz que a Igreja “reconhece o sábado como sinal distintivo de lealdade a Deus” e que o sábado deve ser, para cada um, “um sinal exterior da graça de Deus e um canal de Suas incontáveis bênçãos”. Segundo a Crença Fundamental 20, é também um símbolo da nossa redenção em Cristo, um sinal de santificação e um antegozo do futuro eterno.`,
+    src: ['ex31', 'ez20', 'doc_intro', 'cf20'], rel: ['oque', 'salvacao'] },
 
   { id: 'ellen', q: 'Quem foi Ellen White e por que vocês citam ela?', k: 'ellen:4 white:3 profetisa:3 espirito_de_profecia:4 egw:3 testemunhos:2 elena:3',
     a: `Ellen G. White (1827–1915) foi uma das fundadoras da Igreja Adventista. A Igreja entende que seus escritos expressam o **dom de profecia**, sempre **submetidos à Bíblia**, que é o padrão para testar todo ensino. Neste servidor, usamos as citações dela como **conselho prático** — e a Bíblia como base.`,
@@ -1376,19 +1499,47 @@ const FAQ = [
     src: ['tpi2_585', 'tpi6_358', 'folder'], rel: ['tarde', 'culto'] },
 
   { id: 'amigos', q: 'Posso convidar amigos que não são adventistas?', k: 'convidar:3 convite:3 amigo_de_fora:4 nao_adventista:4 visitante:2 amigos:2 evangel:2 testemunh:2 missao:2 igreja_de_amigo:3',
-    a: `Pode — e o folder incentiva! Sugestões: convidar **amigos** para o almoço ou para um passeio na natureza; convidar amigos dos filhos para o **culto de pôr do sol**; fazer **visitas** e **estudo bíblico** com um amigo; e **divulgar** as atividades da igreja, pois “a comunidade que vive nos arredores da igreja precisa conhecer o que realizamos como cristãos”. Sem pressão: seja amigo(a) primeiro.`,
-    src: ['folder'], rel: ['tarde', 'culto'] },
+    a: `Pode — e o folder incentiva! Sugestões: convidar **amigos** para o almoço ou para um passeio na natureza; convidar amigos dos filhos para o **culto de pôr do sol**; fazer **visitas** e **estudo bíblico** com um amigo; e **divulgar** as atividades da igreja, pois “a comunidade que vive nos arredores da igreja precisa conhecer o que realizamos como cristãos”. Sem pressão: seja amigo(a) primeiro.
+
+O documento oficial lembra que, no sábado, “todas as pessoas sob nossa influência devem ser dispensadas das atividades seculares” — família, empregados e hóspedes — e estimuladas a observar o sábado.`,
+    src: ['folder', 'doc_infl'], rel: ['tarde', 'culto'] },
 
   { id: 'pais', q: 'Meus pais não guardam o sábado / não deixam. E agora?', k: 'meus_pais:4 pais_nao:4 minha_mae:3 meu_pai:3 familia_nao:4 proibe:3 nao_deixa:4 nao_deixam:4 sou_o_unico:4 sozinho_na_igreja:4 contra_minha:3',
     a: `Esse é um assunto delicado, e as fontes do servidor **não trazem um passo a passo** para ele. O que dá para dizer com segurança: **honrar pai e mãe** também é mandamento (Êx 20:12); converse com calma, mostre o que o sábado significa para você e **peça ajuda ao seu pastor ou líder JA** — eles já acompanharam situações parecidas. Ore, seja paciente e mostre o sábado como **alegria**, não como briga.\n\nSe a situação estiver pesada, fale com um adulto de confiança.`,
     src: ['ex20b'], rel: ['salvacao'], park: true },
+
+  { id: 'festas', q: 'Posso ir a festas, casamentos e aniversários?', k: 'festa:3 casamento:3 aniversario:3 niver:3 balada:3 festinha:3 role$:2 formatura:3 show$:2 baile:3 comemoracao:2',
+    a: `O documento oficial diz que “casamentos e festas, incluindo seus devidos preparativos, devem ser realizados fora desse período sagrado”, e que “Casamentos e algumas festas mais suntuosas não devem ser planejados para os sábados à noite, pois seus preparativos envolvem expectativas e atividades não condizentes com o espírito de comunhão com Deus”.
+
+Lembre que o sábado começa no pôr do sol de **sexta**. Se o convite cair nesse período, converse com carinho, ofereça outro horário e leve a dúvida ao seu pastor ou líder.`,
+    src: ['doc_festas', 'lv23'], rel: ['inicio', 'amigos'] },
+
+  { id: 'excursao', q: 'Posso ir a excursão, acampamento ou passeio da escola ou da igreja?', k: 'excursao:4 acampamento:4 acamp:3 passeio_da_escola:4 retiro:3 viagem_da_escola:4 camping:3 desbravador:3 aventureiro:2',
+    a: `O documento oficial diz que a realização de excursões e acampamentos “pode promover a socialização cristã” (Sl 42:4), mas todos devem “chegar ao devido local antes do início do sábado e montar sua estrutura, incluindo suas barracas”; e que as atividades nas horas do sábado “devem ser condizentes com o espírito sagrado desse dia”.
+
+Na prática: confira os horários de saída e de chegada **antes** de aceitar o convite, e pergunte qual será o programa do sábado.`,
+    src: ['doc_excurs'], rel: ['viagem', 'natureza'] },
+
+  { id: 'profissao', q: 'Que profissão escolher? Posso trabalhar em hospital, loja ou delivery?', k: 'profissao:4 carreira:4 curso$:2 medicina:3 enfermagem:3 turno:2 escala:3 plantao:4 aprendiz:3 sociedade:2',
+    a: `O documento oficial orienta que os adventistas do sétimo dia “devem escolher e exercer profissões condizentes com a devida observância do sábado”, reconhecendo que “a estrutura da sociedade em geral nem sempre favorece a observância do sábado”. Os observadores do sábado “devem se abster de trabalhar nesse dia, mesmo em instituições seculares de serviços básicos”. Em instituições da própria Igreja que não podem fechar, o serviço deve ser feito “por um grupo reduzido e em forma de rodízio”.
+
+Na **saúde**: emergências são atendidas (“é lícito curar no sábado”), mas “plantões rotineiros” em hospitais não adventistas “são impróprios para as horas do sábado”. Converse com seus pais e líder já na hora de escolher curso e carreira.`,
+    src: ['doc_prof', 'doc_serv', 'doc_saude'], rel: ['trabalho', 'misericordia'] },
+
+  { id: 'igreja_prec', q: 'E se eu tiver outro compromisso no sábado de manhã? (igreja ou outros compromissos)', k: 'compromisso:3 precedencia:4 prioridade:3 igreja_ou:3 reuniao:3 congregar:4 faltar_na_igreja:4 ir_a_igreja:3 obrigado_a_ir:4',
+    a: `O documento oficial cita Hb 10:25 (“de congregar-nos”) e diz que “as programações e atividades regulares da igreja aos sábados devem ter precedência sobre outros compromissos pessoais e sociais, mesmo que estes sejam pertinentes para o sábado”. Se houver conflito, converse cedo com seus pais e seu líder, antes de assumir o compromisso.`,
+    src: ['doc_igreja'], rel: ['escola_sabatina', 'festas'] },
+
+  { id: 'documento', q: 'O que diz o documento oficial “Observância do Sábado”?', k: 'documento:4 documento_oficial:5 divisao_sul_americana:5 dsa:4 declaracao:3 oficial:3 igreja_diz:3 posicao_oficial:4',
+    a: `É um documento da **Divisão Sul-Americana** da Igreja Adventista, de **24/10/2023**. Ele trata de: vida de santificação, preparação para o sábado, início e término (cultos de pôr do sol), espírito de comunhão, reuniões da igreja, casamentos e festas, mídia secular, esportes e lazer, horas de sono, viagens, excursões e acampamentos, restaurantes e alimentação, medicamentos, estágios e práticas escolares, escolha da profissão, serviços básicos, atividades de saúde, projetos assistenciais e atividades missionárias. Pergunte por qualquer tema e eu respondo com o trecho. O texto completo está no link da fonte abaixo.`,
+    src: ['doc'], rel: ['esporte', 'festas', 'prova'] },
 
   { id: 'jogo', q: 'Como o jogo avalia minhas respostas? Como ganho XP?', k: 'xp$:3 pontos:3 pontuacao:3 como_funciona:4 cargo:3 nivel:3 avalia:3 nota:2 como_ganho:4',
     a: `Cada resposta digitada é comparada com as **ideias principais** que as fontes trazem (não com palavras exatas). Quanto mais ideias você cobre, mais XP ganha. Nos **dilemas**, o XP vem de você **refletir, decidir e planejar** — não existe resposta certa para o que você faria. Se eu não reconhecer sua ideia, compare com a **resposta-modelo**. Os cargos vão de **Visitante** a **Embaixador do Sábado**. Veja mais em **#como-jogar**.`,
     src: [], rel: ['oque'] }
 ];
 
-const FAQ_SUGGEST = ['domingo', 'celular', 'inicio', 'esporte', 'prova', 'salvacao', 'tarde', 'restaurante'];
+const FAQ_SUGGEST = ['domingo', 'celular', 'inicio', 'esporte', 'prova', 'salvacao', 'festas', 'restaurante'];
 
 /* ============================================================
    ENGINE · parte 1 — utilidades, estado, renderização do chat, XP e conquistas
@@ -2425,7 +2576,7 @@ function openSources() {
   const c = CHM[active], ids = (c && c.pins) || [];
   openModal(`<button class="m-x" data-act="close" aria-label="Fechar">${I.x}</button><h2>Fontes deste canal</h2>` +
     (ids.length ? `<ul class="list" style="margin-top:12px">${ids.map(id => `<li>${srcLabel(id)}</li>`).join('')}</ul>` : '<p style="color:var(--dim)">Este canal não tem fontes específicas.</p>') +
-    `<p style="color:var(--dim);font-size:13.5px;margin-top:14px">Textos bíblicos são <b>parafraseados</b> — confira na sua Bíblia. Citações de E. G. White e as sugestões práticas vêm do folder do sábado e estão copiadas literalmente. A Lei 13.796/2019 e o documento oficial da Igreja têm link para o texto original.</p>`, { label: 'Fontes' });
+    `<p style="color:var(--dim);font-size:13.5px;margin-top:14px">Versos bíblicos aparecem <b>parafraseados</b> ou em citações curtas de versões comuns — confira sempre na sua Bíblia. As citações de E. G. White e as sugestões práticas vêm do folder do sábado; as do documento oficial vêm do texto da Divisão Sul-Americana (24/10/2023). Ambas foram conferidas contra os textos originais fornecidos. A Lei 13.796/2019 e o documento têm link para o texto completo.</p>`, { label: 'Fontes' });
 }
 const sw = (id, t, d) => `<div class="sw"><span>${t}<small>${d}</small></span><button class="tog${S.set[id] ? ' on' : ''}" data-act="tog" data-id="${id}" role="switch" aria-checked="${!!S.set[id]}" aria-label="${t}"></button></div>`;
 function openSettings() {

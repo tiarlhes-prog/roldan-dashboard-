@@ -1,0 +1,63 @@
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f5b94a"/><stop offset=".62" stop-color="#ff8a5c"/><stop offset="1" stop-color="#8f83ff"/>
+    </linearGradient>
+  </defs>
+  <symbol id="logo" viewBox="0 0 48 48">
+    <rect width="48" height="48" fill="url(#lg)"/>
+    <path d="M10 31a14 14 0 0 1 28 0z" fill="#fff"/>
+    <path d="M8 35.5h32M13 40h22" stroke="#fff" stroke-width="2.6" stroke-linecap="round" opacity=".9" fill="none"/>
+  </symbol>
+</svg>
+
+<div class="app" id="app">
+  <nav class="nav" id="nav" aria-label="Servidor e canais">
+    <div class="rail" id="rail">
+      <button class="rbtn me" id="railMe" data-act="profile" title="Meu perfil" aria-label="Meu perfil">🙂</button>
+      <i class="rsep"></i>
+      <button class="rbtn srv active" data-act="current" title="Guardiões do Sábado" aria-label="Guardiões do Sábado: voltar ao canal atual"><svg viewBox="0 0 48 48"><use href="#logo"/></svg></button>
+      <button class="rbtn" data-act="map" title="Mapa das fases" aria-label="Mapa das fases"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6z"/><path d="M9 4v14M15 6v14"/></svg></button>
+      <button class="rbtn" data-act="open" data-id="missao" title="Missão da semana" aria-label="Missão da semana"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg></button>
+      <button class="rbtn" data-act="open" data-id="pergunte" title="Pergunte ao Neemias" aria-label="Pergunte ao Neemias"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.4a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.8M12 17.3v.1"/></svg></button>
+      <i class="rsep"></i>
+      <button class="rbtn" data-act="invite" title="Convidar amigos" aria-label="Convidar amigos"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+      <span class="rspace"></span>
+      <button class="rbtn" data-act="settings" title="Configurações" aria-label="Configurações"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+    </div>
+    <aside class="side" id="side">
+      <header class="shead"><span>Guardiões do Sábado</span><button class="shead-x" data-act="current" aria-label="Fechar menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+      <div class="sday" id="sday"></div>
+      <div class="sscroll" id="chlist"></div>
+      <footer class="userbar" id="userbar"></footer>
+    </aside>
+  </nav>
+
+  <main class="main" id="main">
+    <header class="topbar">
+      <button class="tb-ico tb-menu" data-act="nav" aria-label="Abrir canais e menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <span class="tb-hash" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.5 3 7.5 21M16.5 3l-2 18M4 8.5h17M3 15.5h17"/></svg></span>
+      <h1 class="tb-name" id="tbName">boas-vindas</h1>
+      <span class="tb-sep"></span>
+      <p class="tb-topic" id="tbTopic" style="margin:0"></p>
+      <button class="tb-pin" data-act="sources" title="Fontes deste canal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h10"/></svg><span>Fontes</span></button>
+      <button class="tb-ico tb-mem" data-act="mem" aria-label="Abrir painel do jogador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.5" cy="9" r="2.4"/><path d="M17.5 14.2c2.3.2 4 2 4 4.3"/></svg></button>
+    </header>
+    <div class="msgs" id="msgs" role="log" aria-live="polite" aria-relevant="additions" tabindex="-1"></div>
+    <div class="typing" id="typing" aria-hidden="true"></div>
+    <div class="timer" id="timer" hidden><i></i></div>
+    <div class="chips" id="chips"></div>
+    <div class="comp-wrap">
+      <div class="slash" id="slash" hidden></div>
+      <div class="comp" id="comp">
+        <button class="cmpbtn" data-act="cmds" aria-label="Mostrar comandos" title="Comandos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        <textarea id="inp" rows="1" maxlength="700" placeholder="Escreva aqui…" enterkeyhint="send" autocomplete="off" aria-label="Sua mensagem"></textarea>
+        <button class="send" id="send" aria-label="Enviar mensagem"><svg viewBox="0 0 24 24"><path d="M3.5 11.5 20 4l-5.6 16-3.2-6.4z" fill="currentColor"/></svg></button>
+      </div>
+    </div>
+  </main>
+
+  <aside class="members" id="members" aria-label="Painel do jogador"></aside>
+</div>
+<div class="scrim" id="scrim" hidden></div>
+<div id="layer"></div>

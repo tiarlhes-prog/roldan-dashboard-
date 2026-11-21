@@ -19,6 +19,7 @@
   --r0:#8d8da8; --r1:#4cc38a; --r2:#5aa9ff; --r3:#9d8cff; --r4:#f5b94a;
   --shadow:0 10px 32px rgba(0,0,0,.5);
   --hover:rgba(255,255,255,.035); --nl:74%;
+  --sat:0px; --sab:0px; --sal:0px; --sar:0px;
   --font-ui:"Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --font-display:"Space Grotesk","Noto Sans",system-ui,sans-serif;
 }
@@ -44,9 +45,12 @@
 }
 
 *{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body{height:100%;margin:0;padding:0;overflow:hidden}
 body{background:var(--chat);color:var(--fg);font-family:var(--font-ui);font-size:15px;line-height:1.42;overflow:hidden;-webkit-font-smoothing:antialiased}
-button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:inherit}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+input,textarea,select{font-size:16px}
 button:disabled{cursor:not-allowed}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
 a{color:var(--link)}
@@ -57,7 +61,11 @@ svg{display:block}
 ::-webkit-scrollbar-track{background:transparent}
 
 /* ---------- casca ---------- */
-.app{display:grid;grid-template-columns:320px minmax(0,1fr) 272px;grid-template-rows:minmax(0,1fr);height:100%;min-width:0;overflow:hidden}
+.app{display:grid;grid-template-columns:320px minmax(0,1fr) 272px;grid-template-rows:minmax(0,1fr);height:100%;min-width:0;overflow:hidden;padding:0 var(--sar) 0 var(--sal)}
+body.gated .app{visibility:hidden}
+.srv-only{display:none!important}
+.app[data-mode="server"] .srv-only{display:grid!important}
+.app[data-mode="server"] .srv-only[hidden]{display:none!important}
 .nav,.main,.members{min-height:0}
 .nav{display:flex;min-width:0;height:100%;background:var(--side)}
 .main{display:flex;flex-direction:column;min-width:0;height:100%;background:var(--chat)}
@@ -128,11 +136,13 @@ svg{display:block}
 .av .st{position:absolute;right:-2px;bottom:-2px;width:12px;height:12px;border-radius:50%;background:var(--ok);border:3px solid var(--side);box-sizing:content-box}
 
 /* ---------- topo ---------- */
-.topbar{height:48px;flex:none;display:flex;align-items:center;gap:10px;padding:0 12px;border-bottom:1px solid var(--line);box-shadow:0 1px 0 rgba(0,0,0,.1);min-width:0}
+.topbar{height:calc(48px + var(--sat));flex:none;display:flex;align-items:center;gap:10px;padding:var(--sat) 12px 0;border-bottom:1px solid var(--line);box-shadow:0 1px 0 rgba(0,0,0,.1);min-width:0}
 .tb-ico{width:34px;height:34px;border-radius:6px;display:grid;place-items:center;color:var(--dim);flex:none}
 .tb-ico:hover{background:var(--hover);color:var(--fg)}
 .tb-ico svg{width:22px;height:22px}
 .tb-menu,.tb-mem{display:none}
+.tb-menu{position:relative}
+.tb-menu.pip-on::after{content:"";position:absolute;right:5px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--bad);border:2px solid var(--chat);box-sizing:content-box}
 .tb-hash{color:var(--faint);flex:none}
 .tb-hash svg{width:22px;height:22px}
 .tb-name{margin:0;font-weight:700;color:var(--fg-strong);font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
@@ -225,7 +235,7 @@ svg{display:block}
 .chip{flex:none;padding:5px 11px;border-radius:999px;background:var(--raise);border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--dim);white-space:nowrap}
 .chip:hover{color:var(--fg);border-color:var(--accent)}
 .chip.hot{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
-.comp-wrap{flex:none;padding:0 16px 16px;position:relative}
+.comp-wrap{flex:none;padding:0 16px calc(16px + var(--sab));position:relative}
 .comp{display:flex;align-items:flex-end;gap:6px;background:var(--input);border-radius:10px;padding:4px 6px 4px 12px;border:1px solid transparent}
 .comp:focus-within{border-color:color-mix(in srgb,var(--accent) 55%,transparent)}
 .comp.off{opacity:.65}
@@ -277,8 +287,9 @@ svg{display:block}
 .fld{margin-top:12px}
 .fld label{display:block;font-weight:600;font-size:14px;margin-bottom:5px;color:var(--fg)}
 .fld small{display:block;color:var(--dim);font-size:12.5px;margin-top:4px}
-.fld textarea,.fld input[type=text]{width:100%;border:1px solid var(--line);border-radius:8px;background:var(--input);color:var(--fg);font:inherit;font-size:16px;padding:9px 11px;resize:vertical;min-height:44px}
-.fld textarea:focus,.fld input:focus{outline:none;border-color:var(--accent)}
+.fld textarea,.fld input:not([type=checkbox]):not([type=radio]):not([type=range]){width:100%;border:1px solid var(--line);border-radius:10px;background:var(--input);color:var(--fg);font:inherit;font-size:16px;padding:10px 12px;resize:vertical;min-height:48px}
+.fld textarea:focus,.fld input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.fld.bad input{border-color:var(--bad)}
 .fld .err{color:var(--bad);font-size:12.5px;margin-top:4px}
 .fld input[type=range]{width:100%;accent-color:var(--accent)}
 .rng{display:flex;justify-content:space-between;font-size:12.5px;color:var(--dim)}
@@ -339,19 +350,121 @@ svg{display:block}
 .lvl .big{font-size:56px;line-height:1}
 .lvl h2{font-size:26px;margin-top:8px}
 
-/* ---------- responsivo ---------- */
+/* ---------- portão de acesso: entrar / pedir acesso / aguardar liberação ---------- */
+.gate{position:fixed;inset:0;z-index:50;overflow-y:auto;overscroll-behavior:contain;display:flex;justify-content:center;align-items:flex-start;
+  padding:calc(18px + var(--sat)) calc(14px + var(--sar)) calc(22px + var(--sab)) calc(14px + var(--sal));background-color:var(--chat);
+  background-image:radial-gradient(900px 420px at 50% -8%,color-mix(in srgb,var(--accent) 24%,transparent),transparent 70%),radial-gradient(640px 360px at 100% 100%,color-mix(in srgb,var(--violet) 20%,transparent),transparent 70%)}
+.gate-card{width:min(440px,100%);margin:auto 0;padding:20px 18px 18px;border-radius:20px;background:var(--side);border:1px solid var(--line);box-shadow:var(--shadow)}
+.gate-brand{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.gate-logo{width:52px;height:52px;border-radius:14px;overflow:hidden;flex:none}
+.gate-logo svg{width:52px;height:52px}
+.gate-brand h1{margin:0;font-family:var(--font-display);font-size:22px;line-height:1.1;color:var(--fg-strong)}
+.gate-brand small{display:block;margin-top:3px;color:var(--dim);font-size:13px}
+.gate h2{margin:6px 0 4px;font-family:var(--font-display);font-size:20px;color:var(--fg-strong);line-height:1.2}
+.gate p{margin:6px 0;color:var(--dim);font-size:14.5px;line-height:1.45}
+.gate p b,.gate li b{color:var(--fg-strong)}
+.gate-foot{margin-top:14px;display:flex;flex-wrap:wrap;justify-content:center;gap:2px 14px;font-size:13px}
+.pw{position:relative}
+.pw input{padding-right:52px!important}
+.pw .eye{position:absolute;right:2px;top:50%;transform:translateY(-50%);width:46px;height:46px;display:grid;place-items:center;color:var(--dim);border-radius:10px}
+.pw .eye:hover{color:var(--fg)}
+.pw .eye svg{width:22px;height:22px}
+.ck{display:flex;gap:12px;align-items:flex-start;margin-top:10px;padding:11px 12px;border-radius:12px;background:var(--raise);cursor:pointer;font-size:14px;line-height:1.38;color:var(--fg)}
+.ck input{appearance:none;-webkit-appearance:none;flex:none;width:24px;height:24px;margin:1px 0 0;border-radius:7px;border:2px solid var(--faint);background:transparent;display:grid;place-items:center;cursor:pointer}
+.ck input:checked{background:var(--ok);border-color:var(--ok)}
+.ck input:checked::after{content:"";width:6px;height:11px;border:solid #06150d;border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.ck.bad{outline:2px solid var(--bad)}
+.lk{display:inline;padding:0;min-height:0;color:var(--link);text-decoration:underline;font-weight:600;background:none}
+.note{margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--accent-soft);font-size:13.5px;line-height:1.42;color:var(--fg)}
+.note b{color:var(--fg-strong)}
+.note.bad{background:color-mix(in srgb,var(--bad) 17%,transparent)}
+.note.ok{background:color-mix(in srgb,var(--ok) 17%,transparent)}
+.btn.lg{min-height:50px;width:100%;font-size:16px;border-radius:12px;margin-top:14px}
+.btn.link{background:transparent;color:var(--link);text-decoration:underline;min-height:44px}
+.btn.bad{background:var(--bad);color:#fff}
+.spin{display:inline-block;width:16px;height:16px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:spin .9s linear infinite;vertical-align:-3px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.steps{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px}
+.steps li{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--raise);font-size:14px;color:var(--dim)}
+.steps li i{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:13px;background:var(--raise-2);color:var(--dim)}
+.steps li.on{outline:2px solid var(--accent);color:var(--fg)}
+.steps li.on i{background:var(--accent);color:var(--on-accent)}
+.steps li.ok i{background:var(--ok);color:#06150d}
+.big-emoji{font-size:44px;line-height:1;margin:2px 0 6px}
+
+/* ---------- atalhos no topo da lista de canais (celular: gaveta) ---------- */
+.quick-nav{display:grid;gap:6px;margin:8px 8px 0}
+.qn{position:relative;display:flex;align-items:center;gap:10px;min-height:46px;padding:8px 12px;border-radius:12px;background:var(--raise);color:var(--fg-strong);font-weight:700}
+.qn:hover{background:var(--raise-2)}
+.qn .ico{font-size:20px;line-height:1}
+.qn small{display:block;color:var(--dim);font-weight:500;font-size:12px;line-height:1.2}
+.qn .cnt{margin-left:auto;min-width:24px;height:24px;border-radius:12px;background:var(--bad);color:#fff;font-size:12.5px;font-weight:800;display:grid;place-items:center;padding:0 7px}
+
+/* ---------- ranking ---------- */
+.rk{max-width:600px}
+.rk-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.rk-you{display:flex;align-items:center;gap:12px;margin:10px 0 4px;padding:10px 12px;border-radius:12px;background:var(--accent-soft);font-size:14px}
+.rk-you .pos{font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--fg-strong);min-width:48px;text-align:center;font-variant-numeric:tabular-nums}
+.rk-you small{display:block;color:var(--dim);font-size:12.5px}
+.rk-list{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:3px}
+.rk-row{display:grid;grid-template-columns:36px 36px minmax(0,1fr) auto;align-items:center;gap:10px;padding:6px 8px;border-radius:10px}
+.rk-row:nth-child(odd){background:color-mix(in srgb,var(--raise-2) 38%,transparent)}
+.rk-row.me{background:var(--accent-soft);outline:1px solid color-mix(in srgb,var(--accent) 55%,transparent)}
+.rk-pos{text-align:center;font-family:var(--font-display);font-weight:700;color:var(--dim);font-variant-numeric:tabular-nums}
+.rk-pos.m{font-size:22px;line-height:1}
+.rk-who{min-width:0;line-height:1.2}
+.rk-who b{display:block;color:var(--fg-strong);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rk-who small{display:block;color:var(--dim);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rk-val{text-align:right;line-height:1.1}
+.rk-val b{font-family:var(--font-display);font-size:17px;color:var(--fg-strong);font-variant-numeric:tabular-nums}
+.rk-val small{display:block;font-size:11px;color:var(--dim)}
+.rk-row .tag{margin-left:6px;vertical-align:1px}
+.rk-mini .rk-row{grid-template-columns:24px 32px minmax(0,1fr) auto;gap:8px;padding:4px 4px}
+.rk-mini .rk-val b{font-size:14px}
+.rk-empty{padding:18px 8px;text-align:center;color:var(--dim);font-size:14px}
+.sk{height:46px;margin-top:6px;border-radius:10px;background:linear-gradient(90deg,var(--raise) 0%,var(--raise-2) 50%,var(--raise) 100%);background-size:200% 100%;animation:sh 1.3s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+
+/* ---------- painel do líder ---------- */
+.adm-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:12px -4px 0;padding:2px 4px 6px}
+.adm-tabs::-webkit-scrollbar{display:none}
+.adm-tabs button{flex:none;display:inline-flex;gap:7px;align-items:center;min-height:42px;padding:6px 14px;border-radius:999px;border:1px solid var(--line);font-weight:700;font-size:13.5px;color:var(--dim);white-space:nowrap}
+.adm-tabs button.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.adm-tabs .n{min-width:22px;height:22px;border-radius:11px;background:var(--raise-2);color:var(--fg);font-size:12px;display:grid;place-items:center;padding:0 6px}
+.adm-tabs button.on .n{background:rgba(0,0,0,.2);color:inherit}
+.adm-tabs .n.hot{background:var(--bad);color:#fff}
+.adm-list{display:grid;gap:10px;margin-top:10px}
+.adm-card{padding:12px;border-radius:14px;background:var(--raise)}
+.adm-top{display:flex;gap:12px;align-items:center}
+.adm-top .who{min-width:0;flex:1;line-height:1.25}
+.adm-top .who b{display:block;color:var(--fg-strong);font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.adm-top .who span{display:block;color:var(--dim);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.adm-meta{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px;font-size:12.5px;color:var(--dim)}
+.adm-meta b{color:var(--fg)}
+.adm-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.adm-act .btn{flex:1 1 120px}
+.adm-empty{padding:26px 10px;text-align:center;color:var(--dim)}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.hbar{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,2fr) auto;gap:8px;align-items:center;margin-top:7px;font-size:12.5px;color:var(--dim)}
+.hbar .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hbar .bar{height:10px}
+.tmp{display:flex;align-items:center;gap:8px;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--accent-soft)}
+.tmp code{flex:1;min-width:0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:20px;font-weight:700;letter-spacing:.08em;color:var(--fg-strong);user-select:all;overflow-wrap:anywhere}
+.rail .rbtn .dot{display:grid}
+
+/* ---------- responsivo (mobile primeiro nos ajustes finais) ---------- */
 @media (max-width:1100px){
   .app{grid-template-columns:320px minmax(0,1fr)}
-  .members{position:fixed;right:0;top:0;bottom:0;width:min(88vw,310px);z-index:40;transform:translateX(102%);transition:transform .22s ease;padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));box-shadow:var(--shadow)}
+  .members{position:fixed;right:0;top:0;bottom:0;width:min(88vw,310px);z-index:40;transform:translateX(102%);transition:transform .22s ease;padding-top:calc(16px + var(--sat));padding-bottom:calc(24px + var(--sab));padding-right:calc(12px + var(--sar));box-shadow:var(--shadow)}
   .app.show-mem .members{transform:none}
   .tb-mem{display:grid}
-  .mem-x{display:grid;position:absolute;right:10px;top:calc(8px + env(safe-area-inset-top,0px));width:36px;height:36px;border-radius:8px;place-items:center;color:var(--dim);z-index:2}
+  .mem-x{display:grid;position:absolute;right:calc(10px + var(--sar));top:calc(8px + var(--sat));width:36px;height:36px;border-radius:8px;place-items:center;color:var(--dim);z-index:2}
   .mem-x:hover{background:var(--hover);color:var(--fg)}
   .mem-x svg{width:20px;height:20px}
 }
 @media (max-width:760px){
   .app{grid-template-columns:minmax(0,1fr)}
-  .nav{position:fixed;left:0;top:0;bottom:0;width:min(94vw,330px);z-index:40;transform:translateX(-102%);transition:transform .22s ease;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-shadow:var(--shadow)}
+  .nav{position:fixed;left:0;top:0;bottom:0;width:min(94vw,330px);z-index:40;transform:translateX(-102%);transition:transform .22s ease;padding-top:var(--sat);padding-bottom:var(--sab);padding-left:var(--sal);box-shadow:var(--shadow)}
   .app.show-nav .nav{transform:none}
   .tb-menu{display:grid}
   .shead-x{display:grid}
@@ -359,21 +472,70 @@ svg{display:block}
   .tb-pin span{display:none}
   .msg{grid-template-columns:36px minmax(0,1fr);column-gap:10px;padding:2px 12px}
   .msg .av{width:36px;height:36px;font-size:19px}
-  .comp-wrap{padding:0 10px 10px}
+  .comp-wrap{padding:0 10px calc(10px + var(--sab))}
   .chips{padding:0 10px 8px}
   .timer{margin:0 10px 6px}
   .typing{padding:0 12px}
   .board{margin:6px 12px 12px}
   .day,.sys{margin-left:12px;margin-right:12px}
-  .mwrap{padding:10px}
-  .modal{padding:16px}
-  .pbanner{margin:-16px -16px 0}
   .slash{left:10px;right:10px}
+  /* janelas viram "folhas" que sobem da base, com espaço para o teclado */
+  .mwrap{padding:0;place-items:end stretch}
+  .modal,.modal.wide{width:100%;max-height:calc(var(--vvh,100dvh) - 10px - var(--sat));border-radius:18px 18px 0 0;padding:16px 16px calc(18px + var(--sab));animation:sheet .22s ease-out}
+  .pbanner{margin:-16px -16px 0}
+  .embed{max-width:none}
+}
+@keyframes sheet{from{transform:translateY(46px);opacity:.4}}
+@media (max-width:480px){
+  .tb-hash{display:none}
+  .topbar{gap:4px;padding-left:6px;padding-right:6px}
+  .tb-name{font-size:15.5px;padding-left:6px}
+  .gate-card{padding:18px 14px 16px;border-radius:18px}
+  .rk-row{grid-template-columns:30px 34px minmax(0,1fr) auto;gap:8px;padding:6px 4px}
+  .rk-val b{font-size:16px}
+  .e-fields{grid-template-columns:1fr}
+}
+/* toque: alvos de pelo menos 44px (WCAG 2.2 pede 24px; Apple e Google recomendam 44–48) */
+@media (pointer:coarse){
+  .tb-ico{width:44px;height:44px}
+  .tb-pin{min-width:44px;min-height:44px;justify-content:center}
+  .ch{min-height:44px}
+  .cat-h{min-height:40px}
+  .btn{min-height:44px}
+  .btn.sm{min-height:40px}
+  .avpick button{width:44px;height:44px}
+  .chip,.qchip{min-height:40px;display:inline-flex;align-items:center}
+  .seg button{min-height:40px}
+  .ub-btn,.m-x,.mem-x,.shead-x,.cmpbtn,.send{width:44px;height:44px}
+  .ub-me{min-height:44px}
+  .tog{width:52px;height:30px}
+  .tog::after{width:24px;height:24px}
+  .tog.on::after{transform:translateX(22px)}
+  .chk{min-height:48px}
+  .mp-c button{min-height:38px;padding:4px 13px}
+  .slash button{min-height:44px;align-items:center}
+  .rbtn{width:52px;height:52px}
+}
+/* celular deitado: sobra pouca altura, então tudo fica mais compacto */
+@media (max-height:480px) and (orientation:landscape){
+  .topbar{height:calc(42px + var(--sat))}
+  .typing{height:16px}
+  .comp-wrap{padding-bottom:calc(6px + var(--sab))}
+  .gate{align-items:flex-start}
+  .gate-card{margin:0 auto}
+  .modal,.modal.wide{max-height:calc(var(--vvh,100dvh) - 6px)}
+  .msg.first{margin-top:8px}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
   .cf{display:none}
 }
+
+/* Só nas versões de página (servidor e arquivo único): respeita barras/entalhes do aparelho e o teclado virtual.
+   Fica de fora da versão Artifact, que já trata isso no esqueleto. */
+:root{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px)}
+.app{height:100%;height:100dvh;height:var(--vvh,100dvh)}
+body{overscroll-behavior:none}
 
 </style>
 </head>
@@ -391,7 +553,7 @@ svg{display:block}
   </symbol>
 </svg>
 
-<div class="app" id="app">
+<div class="app" id="app" data-mode="static">
   <nav class="nav" id="nav" aria-label="Servidor e canais">
     <div class="rail" id="rail">
       <button class="rbtn me" id="railMe" data-act="profile" title="Meu perfil" aria-label="Meu perfil">🙂</button>
@@ -400,6 +562,8 @@ svg{display:block}
       <button class="rbtn" data-act="map" title="Mapa das fases" aria-label="Mapa das fases"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6z"/><path d="M9 4v14M15 6v14"/></svg></button>
       <button class="rbtn" data-act="open" data-id="missao" title="Missão da semana" aria-label="Missão da semana"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg></button>
       <button class="rbtn" data-act="open" data-id="pergunte" title="Pergunte ao Neemias" aria-label="Pergunte ao Neemias"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.4a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.8M12 17.3v.1"/></svg></button>
+      <button class="rbtn srv-only" data-act="rank" title="Ranking" aria-label="Ranking"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a1 1 0 0 0-1 1c0 2.2 1.6 4 4 4M16 6h3a1 1 0 0 1 1 1c0 2.2-1.6 4-4 4"/><path d="M12 13v4M9 20h6M10 17h4"/></svg></button>
+      <button class="rbtn srv-only" id="railAdm" data-act="admin" title="Painel do líder" aria-label="Painel do líder" hidden><span aria-hidden="true">🛡️</span><span class="dot" id="railAdmDot" hidden></span></button>
       <i class="rsep"></i>
       <button class="rbtn" data-act="invite" title="Convidar amigos" aria-label="Convidar amigos"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
       <span class="rspace"></span>
@@ -420,6 +584,7 @@ svg{display:block}
       <h1 class="tb-name" id="tbName">boas-vindas</h1>
       <span class="tb-sep"></span>
       <p class="tb-topic" id="tbTopic" style="margin:0"></p>
+      <button class="tb-ico tb-rank srv-only" data-act="rank" title="Ranking" aria-label="Abrir o ranking"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a1 1 0 0 0-1 1c0 2.2 1.6 4 4 4M16 6h3a1 1 0 0 1 1 1c0 2.2-1.6 4-4 4"/><path d="M12 13v4M9 20h6M10 17h4"/></svg></button>
       <button class="tb-pin" data-act="sources" title="Fontes deste canal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h10"/></svg><span>Fontes</span></button>
       <button class="tb-ico tb-mem" data-act="mem" aria-label="Abrir painel do jogador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.5" cy="9" r="2.4"/><path d="M17.5 14.2c2.3.2 4 2 4 4.3"/></svg></button>
     </header>
@@ -440,6 +605,13 @@ svg{display:block}
   <aside class="members" id="members" aria-label="Painel do jogador"></aside>
 </div>
 <div class="scrim" id="scrim" hidden></div>
+<div class="gate" id="gate" hidden>
+  <div class="gate-card" id="gateCard" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+    <div class="gate-brand"><span class="gate-logo"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#logo"/></svg></span><div><h1 id="gateTitle">Guardiões do Sábado</h1><small>Jogo de fé para adolescentes</small></div></div>
+    <div id="gateBody"></div>
+  </div>
+</div>
+<noscript><p style="position:fixed;inset:0;z-index:99;margin:0;padding:24px;background:#1b1b26;color:#fff;font:16px system-ui">Este jogo precisa do JavaScript ligado no navegador.</p></noscript>
 <div id="layer"></div>
 
 <script>
@@ -569,7 +741,7 @@ const CH_A = [
       { n: '⭐ XP e cargos', v: 'Cada resposta rende XP. Suba de **Visitante** até **Embaixador do Sábado**.' },
       { n: '🧪 Dilemas', v: 'Situações reais de 2026: jogo, prova, rolê, celular, emprego. Você decide — e planeja.' },
       { n: '📚 Fontes', v: 'Tudo vem da Bíblia, da Igreja e do folder do sábado. Toque em **Fontes** (no topo) para ver.' },
-      { n: '🔒 Privacidade', v: 'Seu progresso fica **só neste aparelho**. Nada é enviado a ninguém.' }
+      { n: '🔒 Privacidade', v: '{priv}' }
     ] }),
     say('neemias', `Primeiro: **como quer ser chamado(a)** por aqui? Digite um apelido (até 20 letras).`),
     { t: 'name' },
@@ -1304,6 +1476,13 @@ dilemma({
   ] },
 
 /* ---------- SEMPRE ABERTOS ---------- */
+{ id: 'ranking', cat: 'free', name: 'ranking', title: 'Ranking', kind: 'rank', serverOnly: true,
+  topic: 'Constância vale mais que pressa · só apelido, cargo e XP aparecem',
+  pins: [],
+  steps: [
+    say('neemias', `Aqui está o **ranking** do grupo. 🏆 Ele mostra só **apelido, cargo, XP e sábados guardados**. As suas respostas ficam **só no seu aparelho**: ninguém vê, nem o líder.\nNo ranking de **constância**, quem guarda o sábado toda semana sobe — não precisa ser o mais rápido.`)
+  ] },
+
 { id: 'pergunte', cat: 'free', name: 'pergunte-ao-neemias', title: 'Pergunte ao Neemias', kind: 'qa',
   topic: 'Pergunte qualquer coisa sobre o sábado · respostas só com base nas fontes', pins: ['folder', 'doc', 'cf20'],
   steps: [
@@ -1557,7 +1736,7 @@ const coarse = () => { try { return matchMedia('(pointer: coarse)').matches; } c
 const trunc = (s, n) => { s = String(s || ''); return s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s; };
 
 function md(s) {
-  let t = String(s == null ? '' : s).split('{nick}').join(S.user.name || 'você');
+  let t = String(s == null ? '' : s).split('{nick}').join(S.user.name || 'você').split('{priv}').join(PRIV_TEXT());
   t = esc(t);
   t = t.replace(/\*\*([\s\S]+?)\*\*/g, '<strong>$1</strong>');
   t = t.replace(/(^|[\s(>"“—])\*([^\s*][^*]*?)\*(?=[\s).,!?:;<"”—]|$)/g, '$1<em>$2</em>');
@@ -1579,7 +1758,7 @@ const I = {
 };
 
 /* ---------- estado + persistência (localStorage, com fallback em memória) ---------- */
-const KEY = 'guardioes-do-sabado:v1';
+let KEY = 'guardioes-do-sabado:v1';   // na versão com login vira ...:v2:u<id> (um espaço por conta, no mesmo aparelho)
 const DEF = () => ({
   v: 1, user: { name: '', av: '🙂' }, xp: 0, streak: { n: 0, last: '' },
   ch: {}, ans: {}, badges: {}, dec: {}, pocket: {}, parked: [],
@@ -1604,8 +1783,8 @@ function mergeState(raw) {
 }
 function loadState() { try { const r = localStorage.getItem(KEY); if (r) return JSON.parse(r); } catch (e) { /* sem storage */ } return null; }
 let saveTimer = 0;
-function saveNow() { clearTimeout(saveTimer); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* sem storage */ } }
-function save() { clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 120); }
+function saveNow() { clearTimeout(saveTimer); if (SERVER && !GAME_ON) return; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* sem storage */ } }
+function save() { clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 120); queueSync(); }
 const chs = id => { if (!S.ch[id]) S.ch[id] = { i: 0, done: false, hist: [], sub: {} }; return S.ch[id]; };
 
 /* ---------- cargos, desbloqueio, fases ---------- */
@@ -1614,6 +1793,7 @@ const isDone = id => !!(S.ch[id] && S.ch[id].done);
 function dilemmasDone() { return F4.filter(isDone).length; }
 
 function unlocked(c) {
+  if (c.serverOnly) return canRank();     // ranking: só com login e acesso liberado
   if (c.id === 'boas-vindas') return true;
   if (c.id === 'como-jogar' || c.id === 'pergunte') return isDone('boas-vindas');
   if (c.id === 'missao') return isDone('3-despedida');
@@ -1624,6 +1804,7 @@ function unlocked(c) {
   return i > 0 ? isDone(SEQ[i - 1]) : false;
 }
 function lockHint(c) {
+  if (c.serverOnly) return '🔒 O ranking só existe na versão com login.';
   if (c.id === 'como-jogar' || c.id === 'pergunte') return '🔒 Termine o check-in em #boas-vindas primeiro.';
   if (c.id === 'missao') return '🔒 Conclua a Fase 3 (até #3-despedida) para liberar a missão da semana.';
   if (c.cat === 'f4') return '🔒 Termine o quiz da Fase 3 (#3-quiz) para liberar os dilemas.';
@@ -1643,9 +1824,9 @@ function catComplete(cat) { const l = CH.filter(c => c.cat === cat); return l.le
 
 /* ---------- renderização: lateral, usuário, painel, topo ---------- */
 function renderChannels() {
-  let h = '';
+  let h = quickNavHTML();
   for (const cat of CATS) {
-    const list = CH.filter(c => c.cat === cat.id);
+    const list = CH.filter(c => c.cat === cat.id && (!c.serverOnly || SERVER));
     if (!list.length) continue;
     const done = list.filter(c => isDone(c.id)).length;
     const closed = S.ui.closed[cat.id] ? ' closed' : '';
@@ -1668,6 +1849,7 @@ function renderUser() {
   $('#userbar').innerHTML =
     `<button class="ub-me" data-act="profile" aria-label="Abrir meu perfil"><span class="av sm" style="--h:${hueOf(S.user.name || 'v')}">${esc(S.user.av)}<span class="st"></span></span><span class="ub-t"><b>${esc(S.user.name || 'Visitante')}</b><small>${r.e} ${esc(r.n)} · ${S.xp} XP${S.streak.n > 1 ? ' · 🔥' + S.streak.n : ''}</small></span></button>` +
     `<button class="ub-btn${S.set.sound ? '' : ' off'}" data-act="tog" data-id="sound" aria-label="Som ${S.set.sound ? 'ligado' : 'desligado'}" title="Som">${S.set.sound ? I.sound : I.mute}</button>` +
+    adminBtnHTML() +
     `<button class="ub-btn" data-act="settings" aria-label="Configurações" title="Configurações">${I.gear}</button>`;
   $('#railMe').textContent = S.user.av;
 }
@@ -1691,6 +1873,7 @@ function renderMembers() {
   let h = `<button class="mem-x" data-act="current" aria-label="Fechar painel">${I.x}</button><div class="mh">Seu progresso</div>${xpCardHTML()}`;
   h += `<div class="mh">Online — ${2 + cast.length}</div>` + memRow('neemias', 'Mentor do servidor') + memRow('me', ROLES[roleIdx(S.xp)].n);
   if (cast.length) h += `<div class="mh">Na conversa · personagens fictícios</div>` + cast.map(id => memRow(id, 'NPC')).join('');
+  h += rankMiniHTML();
   const have = Object.keys(S.badges).length;
   h += `<div class="mh">Conquistas · ${have}/${Object.keys(BADGES).length}</div><div class="badges">` +
     Object.entries(BADGES).map(([id, b]) => `<div class="bdg${S.badges[id] ? '' : ' off'}" data-t="${esc(b.n + ' — ' + b.d)}" tabindex="0" role="img" aria-label="${esc(b.n + (S.badges[id] ? ' (conquistada)' : ' (bloqueada)') + ': ' + b.d)}">${b.e}</div>`).join('') + '</div>';
@@ -1775,11 +1958,12 @@ function appendMsg(chId, m) {
 }
 function renderHistory(chId) {
   const box = $('#msgs'), st = chs(chId), c = CHM[chId];
-  let h = c.kind === 'board' ? '<div class="board" id="board"></div>' : '', prev = null;
+  let h = c.kind === 'board' ? '<div class="board" id="board"></div>' : c.kind === 'rank' ? '<div class="board" id="rankboard"></div>' : '', prev = null;
   for (const m of st.hist) { h += msgHTML(m, prev, false); prev = m; }
   box.innerHTML = h;
   if (c.kind === 'board') renderBoard();
-  box.scrollTop = box.scrollHeight;
+  if (c.kind === 'rank') renderRankBoard();
+  box.scrollTop = c.kind === 'rank' ? 0 : box.scrollHeight;
 }
 function post(chId, m) {
   m.ts = Date.now();
@@ -1907,6 +2091,663 @@ function flushLevel() {
 }
 
 /* ============================================================
+   ACESSO · login com liberação do líder, sincronização do progresso, ranking e painel do líder
+   Só age na versão "server" (data-mode do #app). Nas versões "static" e "artifact" nada disto aparece.
+
+   PRIVACIDADE POR DESENHO: do aparelho para o servidor vão SÓ números e ids (XP, canais concluídos,
+   conquistas, sábados guardados, sequência). Respostas, decisões de fé, diário, plano e perguntas
+   ao Neemias NUNCA saem do aparelho (veja progressPayload).
+   ============================================================ */
+
+const MODE = (($('#app') || {}).dataset || {}).mode || 'static';
+const SERVER = MODE === 'server';
+let ME = null;                 // conta logada: { id, apelido, avatar, status, role, mostrarRanking, pendentes? }
+let CFG = { responsavel: '', contato: '', aceiteVersao: '' };
+let GAME_ON = false;           // vira true quando o jogo começa (conta liberada)
+const canRank = () => SERVER && !!ME && ME.status === 'ativo';
+const isLeader = () => SERVER && !!ME && ME.role === 'superadmin' && ME.status === 'ativo';
+const PRIV_TEXT = () => SERVER
+  ? 'Suas **respostas, decisões e diário ficam só neste aparelho** — nem o líder vê. Na sua conta vão apenas **apelido, XP, canais concluídos e conquistas** (para o ranking).'
+  : 'Seu progresso fica **só neste aparelho**. Nada é enviado a ninguém.';
+const fmtNum = n => Number(n || 0).toLocaleString('pt-BR');
+function ago(iso) {
+  if (!iso) return '—';
+  const s = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (s < 60) return 'agora';
+  if (s < 3600) return 'há ' + Math.round(s / 60) + ' min';
+  if (s < 86400) return 'há ' + Math.round(s / 3600) + ' h';
+  const d = Math.round(s / 86400);
+  if (d === 1) return 'ontem';
+  if (d < 30) return 'há ' + d + ' dias';
+  return new Date(iso).toLocaleDateString('pt-BR');
+}
+
+/* ---------- chamadas ao servidor ---------- */
+async function api(method, url, body, o = {}) {
+  const init = { method, credentials: 'same-origin', headers: { 'X-GS': '1' }, keepalive: !!o.keepalive };
+  if (body !== undefined) { init.headers['Content-Type'] = 'application/json'; init.body = JSON.stringify(body); }
+  let r;
+  try { r = await fetch(url, init); } catch (e) { const err = new Error('Sem conexão com o servidor.'); err.offline = true; throw err; }
+  let data = null;
+  try { data = await r.json(); } catch (e) { /* resposta sem corpo */ }
+  if (!r.ok) {
+    const err = new Error((data && data.erro) || 'Algo deu errado (' + r.status + ').');
+    err.status = r.status; err.data = data || {};
+    if (r.status === 401 && !o.quiet) onSessionLost();
+    throw err;
+  }
+  return data;
+}
+
+/* ---------- teclado virtual e barras do celular ---------- */
+function initViewport() {
+  const vv = window.visualViewport, root = document.documentElement;
+  if (vv) {
+    let raf = 0;
+    const upd = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const kb = window.innerHeight - vv.height > 90;           // teclado virtual aberto (iOS não encolhe a janela)
+        if (kb) { root.style.setProperty('--vvh', Math.round(vv.height) + 'px'); window.scrollTo(0, 0); } else root.style.removeProperty('--vvh');
+        const m = $('#msgs');
+        if (kb && m && document.activeElement === $('#inp')) m.scrollTop = m.scrollHeight;
+      });
+    };
+    vv.addEventListener('resize', upd); vv.addEventListener('scroll', upd);
+  }
+  document.addEventListener('focusin', e => {                    // campo focado nunca fica escondido atrás do teclado
+    const t = e.target;
+    if (!t || !t.matches || !t.matches('input,textarea,select') || t.id === 'inp') return;
+    setTimeout(() => { try { t.scrollIntoView({ block: 'center', behavior: reduced() ? 'auto' : 'smooth' }); } catch (er) { /* ok */ } }, 320);
+  });
+}
+
+/* ============================================================
+   PORTÃO DE ACESSO
+   ============================================================ */
+let gateOpts = {}, regAv = '🙂', pendTimer = 0, authWired = false;
+const EYE = svg('<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>');
+const pwField = (id, label, auto, extra = '') => `<div class="fld"><label for="${id}">${label}</label><div class="pw"><input id="${id}" type="password" autocomplete="${auto}" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="72" required>` +
+  `<button type="button" class="eye" data-g="eye" data-id="${id}" aria-label="Mostrar a senha" aria-pressed="false">${EYE}</button></div>${extra}</div>`;
+const textField = (id, label, auto, o = {}) => `<div class="fld"><label for="${id}">${label}</label><input id="${id}" type="text" autocomplete="${auto}" autocapitalize="${o.cap || 'none'}" autocorrect="off" spellcheck="false" maxlength="${o.max || 60}" enterkeyhint="${o.hint || 'next'}"${o.req === false ? '' : ' required'}${o.focus ? ' data-focus' : ''}>${o.small ? `<small>${o.small}</small>` : ''}</div>`;
+
+const GATE = {
+  login: o => `<h2>Entrar</h2><p>Use o apelido e a senha que você criou. Primeira vez por aqui? <button type="button" class="lk" data-g="to-register">Peça seu acesso</button>.</p>` +
+    (o.aviso ? `<div class="note" role="status">${esc(o.aviso)}</div>` : '') +
+    `<form id="fLogin" novalidate>${textField('lgUser', 'Apelido', 'username', { max: 20, focus: true })}${pwField('lgPass', 'Senha', 'current-password')}` +
+    `<div id="gErr" role="alert"></div><button class="btn pri lg" type="submit" id="gSubmit">Entrar</button></form>` +
+    `<div class="gate-foot"><button type="button" class="lk" data-g="privacy">Aviso de privacidade</button></div>`,
+
+  register: () => `<h2>Pedir acesso</h2><p>O líder do grupo confere o seu pedido e libera a sua entrada. Costuma ser rápido.</p>` +
+    `<form id="fReg" novalidate>${textField('rgUser', 'Apelido <small style="display:inline;font-weight:400">(aparece no ranking)</small>', 'username', { max: 20, focus: true, small: '3 a 20 letras ou números. Sem emojis. Não use seu sobrenome.' })}` +
+    pwField('rgPass', 'Senha', 'new-password', '<small>Pelo menos 8 caracteres. Só você deve saber.</small>') +
+    textField('rgName', 'Seu nome completo', 'name', { cap: 'words', small: 'Só o líder vê — para saber quem pediu acesso.' }) +
+    textField('rgGroup', 'Igreja, clube ou turma <small style="display:inline;font-weight:400">(opcional)</small>', 'off', { cap: 'words', req: false, hint: 'done' }) +
+    `<div class="fld"><label>Escolha um avatar</label><div class="avpick" id="rgAv" role="group" aria-label="Avatar">${EMOJIS.map(e => `<button type="button" class="${e === regAv ? 'on' : ''}" data-g="av" data-id="${e}" aria-label="Avatar ${e}">${e}</button>`).join('')}</div></div>` +
+    `<label class="ck" id="ckA"><input type="checkbox" id="rgOk1"><span>Li o <button type="button" class="lk" data-g="privacy">aviso de privacidade</button> e concordo.</span></label>` +
+    `<label class="ck" id="ckB"><input type="checkbox" id="rgOk2"><span>Meu responsável <b>sabe e autoriza</b> a minha participação (obrigatório para menores de 18 anos).</span></label>` +
+    `<div id="gErr" role="alert"></div><button class="btn pri lg" type="submit" id="gSubmit">Pedir acesso</button></form>` +
+    `<div class="gate-foot"><button type="button" class="lk" data-g="to-login">Já tenho conta</button></div>`,
+
+  pending: () => `<div class="big-emoji" aria-hidden="true">⏳</div><h2>Quase lá, ${esc(ME.apelido)}!</h2>` +
+    `<p>Seu pedido foi enviado${CFG.responsavel ? ` para <b>${esc(CFG.responsavel)}</b>` : ' ao líder'}. Assim que ele liberar, você entra <b>sozinho</b> — pode deixar esta página aberta ou voltar depois.</p>` +
+    `<ol class="steps"><li class="ok"><i>✓</i><span>Pedido enviado</span></li><li class="on"><i>2</i><span>O líder confere e libera o seu acesso</span></li><li><i>3</i><span>Você entra e começa a jogar</span></li></ol>` +
+    `<div class="note" id="pdStatus" role="status" aria-live="polite"><span class="spin" aria-hidden="true"></span> Verificando a liberação…</div>` +
+    `<button type="button" class="btn pri lg" data-g="check">Já fui liberado? Verificar agora</button>` +
+    `<div class="gate-foot"><button type="button" class="lk" data-g="logout">Sair</button><button type="button" class="lk" data-g="privacy">Aviso de privacidade</button><button type="button" class="lk" data-g="to-delete">Cancelar meu pedido</button></div>`,
+
+  blocked: () => `<div class="big-emoji" aria-hidden="true">🔒</div><h2>Acesso suspenso</h2>` +
+    `<p>O líder suspendeu o seu acesso. Fale com ${CFG.responsavel ? `<b>${esc(CFG.responsavel)}</b>` : 'o líder do grupo'}${CFG.contato ? ` (${esc(CFG.contato)})` : ''} para entender o motivo e pedir a reativação.</p>` +
+    `<button type="button" class="btn pri lg" data-g="to-login">Voltar</button>`,
+
+  offline: () => `<div class="big-emoji" aria-hidden="true">📡</div><h2>Sem conexão</h2><p>Não consegui falar com o servidor. Confira a sua internet e tente de novo.</p>` +
+    `<button type="button" class="btn pri lg" data-g="retry">Tentar de novo</button>`,
+
+  del: () => `<h2>Excluir minha conta</h2><p>Isso <b>apaga o seu cadastro e o seu progresso</b> do servidor. Não dá para desfazer. Confirme com a sua senha.</p>` +
+    `<form id="fDel" novalidate>${pwField('dlPass', 'Senha', 'current-password')}<div id="gErr" role="alert"></div>` +
+    `<button class="btn bad lg" type="submit" id="gSubmit">Apagar minha conta</button></form>` +
+    `<div class="gate-foot"><button type="button" class="lk" data-g="back">Voltar</button></div>`
+};
+
+function showGate(view, opts = {}) {
+  gateOpts = Object.assign({}, reauthOpen ? { reauth: true } : {}, opts);   // enquanto a sessão está caída, o aviso de "reentrar" vale em todas as telas
+  document.body.classList.add('gated');
+  $('#app').setAttribute('inert', '');
+  const g = $('#gate');
+  g.hidden = false;
+  $('#gateBody').innerHTML = GATE[view](gateOpts);
+  g.scrollTop = 0;
+  g.dataset.view = view;
+  if (!coarse()) { const f = $('#gateBody [data-focus]'); if (f) setTimeout(() => { try { f.focus({ preventScroll: true }); } catch (e) { /* ok */ } }, 40); }
+}
+function hideGate() { $('#gate').hidden = true; $('#gateBody').innerHTML = ''; document.body.classList.remove('gated'); $('#app').removeAttribute('inert'); }
+function setBusy(on, label) {
+  const b = $('#gSubmit');
+  if (!b) return;
+  if (!b.dataset.t) b.dataset.t = b.textContent;
+  b.disabled = !!on; b.textContent = on ? label : b.dataset.t;
+}
+function gateError(msg, fieldId) {
+  const e = $('#gErr');
+  if (e) e.innerHTML = `<div class="note bad">${esc(msg)}</div>`;
+  $$('#gateBody .fld').forEach(f => f.classList.remove('bad'));
+  $$('#gateBody [aria-invalid]').forEach(i => i.removeAttribute('aria-invalid'));
+  const i = fieldId && $('#' + fieldId);
+  if (i) { i.setAttribute('aria-invalid', 'true'); const f = i.closest('.fld'); if (f) f.classList.add('bad'); try { i.focus(); } catch (er) { /* ok */ } }
+}
+const FIELD_OF = { apelido: 'rgUser', senha: 'rgPass', nome: 'rgName', grupo: 'rgGroup' };
+
+function gateClick(e) {
+  const t = e.target.closest('[data-g]');
+  if (!t) return;
+  const g = t.dataset.g, id = t.dataset.id;
+  switch (g) {
+    case 'to-register': showGate('register'); break;
+    case 'to-login': showGate('login'); break;
+    case 'to-delete': showGate('del'); break;
+    case 'back': showGate(ME && ME.status === 'pendente' ? 'pending' : 'login'); break;
+    case 'privacy': openPrivacy(); break;
+    case 'eye': { const i = $('#' + id); if (!i) break; const show = i.type === 'password'; i.type = show ? 'text' : 'password'; t.setAttribute('aria-pressed', String(show)); t.setAttribute('aria-label', show ? 'Esconder a senha' : 'Mostrar a senha'); break; }
+    case 'av': regAv = id; $$('#rgAv button').forEach(b => b.classList.toggle('on', b.dataset.id === id)); break;
+    case 'check': checkApproval(true); break;
+    case 'retry': authBoot(); break;
+    case 'logout': api('POST', '/api/logout', {}, { quiet: true }).catch(() => {}).then(() => { stopPendingPoll(); ME = null; showGate('login'); }); break;
+  }
+}
+async function onFormSubmit(e) {
+  const f = e.target;
+  if (!f || !f.id) return;
+  const known = { fLogin: doLogin, fReg: doRegister, fDel: doDeleteFromGate, fPw: doChangePassword, fDelAcc: doDeleteAccount };
+  if (!known[f.id]) return;
+  e.preventDefault();
+  known[f.id]();
+}
+
+async function doLogin() {
+  const apelido = $('#lgUser').value.trim(), senha = $('#lgPass').value;
+  if (!apelido || !senha) return gateError('Informe o apelido e a senha.', apelido ? 'lgPass' : 'lgUser');
+  setBusy(true, 'Entrando…');
+  try {
+    const r = await api('POST', '/api/login', { apelido, senha }, { quiet: true });
+    afterLogin(r.perfil);
+  } catch (e) {
+    setBusy(false);
+    if (e.offline) return gateError('Sem conexão. Confira a internet e tente de novo.');
+    if (e.status === 403 && e.data.status === 'bloqueado') { ME = { status: 'bloqueado' }; return showGate('blocked'); }
+    gateError(e.message, e.status === 401 ? 'lgPass' : undefined);
+  }
+}
+async function doRegister() {
+  const val = id => ($('#' + id).value || '');
+  const apelido = val('rgUser').trim(), senha = val('rgPass'), nome = val('rgName').trim(), grupo = val('rgGroup').trim();
+  const ok1 = $('#rgOk1').checked, ok2 = $('#rgOk2').checked;
+  $('#ckA').classList.remove('bad'); $('#ckB').classList.remove('bad');
+  if (apelido.length < 3) return gateError('O apelido precisa ter pelo menos 3 caracteres.', 'rgUser');
+  if (senha.length < 8) return gateError('A senha precisa ter pelo menos 8 caracteres.', 'rgPass');
+  if (nome.length < 2) return gateError('Informe o seu nome (só o líder vê).', 'rgName');
+  if (!ok1 || !ok2) { $('#ckA').classList.toggle('bad', !ok1); $('#ckB').classList.toggle('bad', !ok2); return gateError('Marque as duas caixas para continuar.'); }
+  setBusy(true, 'Enviando…');
+  try {
+    const r = await api('POST', '/api/register', { apelido, senha, nome, grupo, avatar: regAv, aceite: true, responsavel: true }, { quiet: true });
+    afterLogin(r.perfil);
+  } catch (e) {
+    setBusy(false);
+    if (e.offline) return gateError('Sem conexão. Confira a internet e tente de novo.');
+    gateError(e.message, FIELD_OF[e.data && e.data.campo]);
+  }
+}
+async function doDeleteFromGate() {
+  const senha = $('#dlPass').value;
+  if (!senha) return gateError('Digite a sua senha para confirmar.', 'dlPass');
+  setBusy(true, 'Apagando…');
+  try { await api('POST', '/api/me/excluir', { senha }, { quiet: true }); stopPendingPoll(); ME = null; showGate('login', { aviso: 'Pronto: sua conta foi apagada.' }); }
+  catch (e) { setBusy(false); gateError(e.message, 'dlPass'); }
+}
+
+/* depois de entrar ou de se cadastrar */
+function afterLogin(perfil) {
+  if (gateOpts.reauth && ME && perfil.id === ME.id && GAME_ON) {   // sessão expirou e a mesma pessoa voltou: segue de onde parou
+    ME = Object.assign(ME, perfil); hideGate(); reauthOpen = false; syncNow(); return;
+  }
+  if (gateOpts.reauth) { location.reload(); return; }              // outra conta no mesmo aparelho: recomeça limpo
+  afterAuth(perfil);
+}
+function afterAuth(perfil) {
+  ME = perfil;
+  if (perfil.status === 'pendente') { showGate('pending'); startPendingPoll(); return; }
+  if (perfil.status === 'bloqueado') { showGate('blocked'); return; }
+  enterGame();
+}
+
+/* ---------- espera pela liberação do líder ---------- */
+function startPendingPoll() {
+  stopPendingPoll();
+  pendTimer = setInterval(() => { if (!document.hidden) checkApproval(false); }, 15000);
+  setTimeout(() => { if (pendTimer) checkApproval(false); }, 1200);
+}
+function stopPendingPoll() { clearInterval(pendTimer); pendTimer = 0; }
+async function checkApproval(manual) {
+  const st = $('#pdStatus');
+  if (manual && st) st.innerHTML = '<span class="spin" aria-hidden="true"></span> Verificando…';
+  try {
+    const me = (await api('GET', '/api/me', undefined, { quiet: true })).perfil;
+    ME = me;
+    if (me.status === 'ativo') { stopPendingPoll(); enterGame(); return; }
+    if (me.status === 'bloqueado') { stopPendingPoll(); showGate('blocked'); return; }
+    const s = $('#pdStatus');
+    if (s) s.innerHTML = `<span class="spin" aria-hidden="true"></span> Ainda aguardando o líder · verificado às ${fmtTime(Date.now())}`;
+  } catch (e) {
+    if (e.status === 401) { stopPendingPoll(); ME = null; showGate('login', { aviso: 'Sua sessão terminou. Entre de novo para ver se já foi liberado.' }); return; }
+    const s = $('#pdStatus');
+    if (s) s.textContent = 'Sem conexão agora. Vou tentar de novo em instantes.';
+  }
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden && pendTimer) checkApproval(false); });
+
+/* ---------- início ---------- */
+async function authBoot() {
+  document.body.classList.add('gated');
+  $('#app').setAttribute('inert', '');
+  if (!authWired) { authWired = true; $('#gate').addEventListener('click', gateClick); document.addEventListener('submit', onFormSubmit); }
+  try { CFG = Object.assign(CFG, await api('GET', '/api/config', undefined, { quiet: true })); } catch (e) { /* segue sem os textos opcionais */ }
+  let me = null;
+  try { me = (await api('GET', '/api/me', undefined, { quiet: true })).perfil; }
+  catch (e) { if (e.status !== 401) { showGate('offline'); return; } }
+  if (!me) { showGate('login'); return; }
+  afterAuth(me);
+}
+
+let entering = false;
+async function enterGame() {
+  if (GAME_ON || entering) return;
+  entering = true;
+  KEY = 'guardioes-do-sabado:v2:u' + ME.id;                       // um espaço por conta, mesmo que o aparelho seja compartilhado
+  S = mergeState(loadState());
+  S.user.name = ME.apelido;
+  if (ME.avatar) S.user.av = ME.avatar;
+  try { mergeServerProgress((await api('GET', '/api/progress', undefined, { quiet: true })).progresso, true); }
+  catch (e) { if (e.status === 401) { entering = false; showGate('login'); return; } /* sem rede: segue com o que há no aparelho */ }
+  hideGate();
+  GAME_ON = true; entering = false;
+  startGame();
+  updateAdminDots();
+  bindSyncEvents();
+  syncNow();
+  refreshMe();
+  setInterval(refreshMe, 45000);
+}
+
+/* traz para este aparelho o que a conta já tem (outro aparelho, ou dados do navegador apagados) */
+function mergeServerProgress(p, silent) {
+  if (!p) return false;
+  let changed = false;
+  if (p.xp > S.xp) { S.xp = p.xp; changed = true; }
+  if (p.semanas > S.weeksKept) { S.weeksKept = p.semanas; changed = true; }
+  (p.badges || []).forEach(id => { if (BADGES[id] && !S.badges[id]) { S.badges[id] = Date.now(); changed = true; } });
+  (p.done || []).forEach(id => {
+    const c = CHM[id];
+    if (!c || c.serverOnly) return;
+    const st = chs(id);
+    if (st.done) return;
+    st.done = true; changed = true;
+    if (!st.hist.length) {
+      fillStatic(c);                                              // só as falas fixas do canal
+      st.hist.push({ w: 'neemias', x: 'Você já concluiu este canal em outro aparelho (ou antes de limpar os dados deste). Seu **progresso** veio junto com a conta; já as **respostas** ficam só no aparelho onde foram escritas.', ts: Date.now() });
+    }
+    st.i = Math.max(st.i, c.steps.length);
+  });
+  if (changed) { if (GAME_ON || !silent) save(); if (!silent) { renderChannels(); renderUser(); renderMembers(); } }
+  return changed;
+}
+
+/* ============================================================
+   SINCRONIZAÇÃO (só números e ids)
+   ============================================================ */
+let syncTimer = 0, lastSig = '', backoff = 0, reauthOpen = false;
+function progressPayload() {
+  return {
+    xp: Math.max(0, S.xp | 0),
+    semanas: Math.max(0, S.weeksKept | 0),
+    streak: clamp(S.streak.n | 0, 0, 3650),
+    done: CH.filter(c => !c.serverOnly && isDone(c.id)).map(c => c.id),
+    badges: Object.keys(S.badges).filter(id => BADGES[id])
+  };
+}
+function queueSync() {
+  if (!SERVER || !GAME_ON) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => syncNow(), 3500);
+}
+async function syncNow(keepalive) {
+  clearTimeout(syncTimer);
+  if (!SERVER || !GAME_ON || !canRank()) return;
+  const body = progressPayload(), sig = JSON.stringify(body);
+  if (sig === lastSig) return;
+  try {
+    const r = await api('PUT', '/api/progress', body, { keepalive: !!keepalive, quiet: !!keepalive });
+    lastSig = sig; backoff = 0;
+    mergeServerProgress(r.progresso, false);
+  } catch (e) {
+    if (e.status === 401 || e.status === 403) return;            // onSessionLost / status tratam
+    backoff = Math.min(60000, (backoff || 4000) * 2);
+    syncTimer = setTimeout(() => syncNow(), backoff);
+  }
+}
+function bindSyncEvents() {
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { saveNow(); syncNow(true); } else refreshMe(); });
+  window.addEventListener('pagehide', () => { saveNow(); syncNow(true); });
+  window.addEventListener('online', () => syncNow());
+}
+function onSessionLost() {
+  if (!SERVER || !GAME_ON || reauthOpen) return;
+  reauthOpen = true; saveNow();
+  showGate('login', { reauth: true, aviso: 'Sua sessão terminou. Entre de novo para continuar — o que você fez neste aparelho continua salvo.' });
+}
+async function refreshMe() {
+  if (!SERVER || !GAME_ON || document.hidden) return;
+  try {
+    const me = (await api('GET', '/api/me', undefined, { quiet: false })).perfil, before = (ME && ME.pendentes) || 0;
+    if (me.status !== 'ativo') { location.reload(); return; }      // bloqueado/rebaixado: volta ao portão
+    ME = Object.assign(ME, me);
+    if (isLeader() && (me.pendentes || 0) > before) toast(`🔔 ${me.pendentes} pedido(s) de acesso esperando você`);
+    updateAdminDots();
+  } catch (e) { /* offline: tenta no próximo ciclo */ }
+}
+function pushProfile(patch) {
+  if (!SERVER || !GAME_ON) return Promise.resolve();
+  return api('PUT', '/api/me', patch, { quiet: false }).then(r => { ME = Object.assign(ME, r.perfil); RK.cache = {}; }).catch(() => {});
+}
+async function resetEverything() {
+  closeModal(true);
+  try { await api('POST', '/api/progress/reset', {}); }
+  catch (e) { toast(e.offline ? 'Sem conexão: não deu para apagar agora. Tente de novo.' : 'Não consegui apagar no servidor. Tente de novo.'); return; }
+  try { localStorage.removeItem(KEY); } catch (e) { /* ok */ }
+  S = DEF(); S.user.name = ME.apelido; S.user.av = ME.avatar || '🙂';
+  lastSig = ''; active = null; RK.cache = {};
+  applyTheme(); renderAll(); openChannel('boas-vindas', { force: true });
+  toast('Progresso apagado. Vamos recomeçar!');
+}
+async function doLogout(wipeDevice) {
+  closeModal(true);
+  try { await syncNow(); } catch (e) { /* ok */ }
+  saveNow();
+  if (wipeDevice) { try { localStorage.removeItem(KEY); } catch (e) { /* ok */ } }
+  GAME_ON = false;
+  try { await api('POST', '/api/logout', {}, { quiet: true }); } catch (e) { /* ok */ }
+  location.reload();
+}
+
+/* ============================================================
+   ATALHOS, RANKING E TOP 5
+   ============================================================ */
+const RK = { tipo: 'geral', cache: {}, busy: {}, timer: 0 };
+const medal = p => (p === 1 ? '🥇' : p === 2 ? '🥈' : p === 3 ? '🥉' : '');
+function quickNavHTML() {
+  if (!SERVER || !GAME_ON) return '';
+  let h = '<div class="quick-nav"><button class="qn" data-act="rank"><span class="ico" aria-hidden="true">🏆</span><span>Ranking<small>Veja quem está sendo constante</small></span></button>';
+  if (isLeader()) h += `<button class="qn" data-act="admin"><span class="ico" aria-hidden="true">🛡️</span><span>Painel do líder<small>Liberar e acompanhar os jovens</small></span>${ME.pendentes ? `<span class="cnt" aria-label="${ME.pendentes} pedidos esperando">${ME.pendentes}</span>` : ''}</button>`;
+  return h + '</div>';
+}
+const adminBtnHTML = () => (isLeader() ? '<button class="ub-btn" data-act="admin" aria-label="Painel do líder" title="Painel do líder"><span aria-hidden="true">🛡️</span></button>' : '');
+let dotKey = '';
+function updateAdminDots() {
+  const lead = isLeader(), n = (ME && ME.pendentes) || 0, key = lead + ':' + n;
+  if (key === dotKey && GAME_ON) return;           // só redesenha quando algo mudou
+  dotKey = key;
+  const b = $('#railAdm'), d = $('#railAdmDot'), menu = $('.tb-menu');
+  if (b) b.hidden = !lead;
+  if (d) { d.hidden = !(lead && n); d.textContent = n; }
+  if (menu) menu.classList.toggle('pip-on', lead && n > 0);
+  if (GAME_ON) { renderChannels(); renderUser(); }
+}
+
+async function fetchRank(tipo, force) {
+  if (!canRank() || RK.busy[tipo]) return false;
+  const c = RK.cache[tipo];
+  if (!force && c && Date.now() - c.at < 30000) return false;
+  RK.busy[tipo] = true;
+  try { RK.cache[tipo] = { data: await api('GET', '/api/ranking?tipo=' + tipo), at: Date.now() }; return true; }
+  catch (e) { RK.cache[tipo] = { data: c && c.data, at: Date.now(), err: true }; return false; }
+  finally { RK.busy[tipo] = false; }
+}
+function rankRow(l, cons) {
+  const m = medal(l.pos);
+  return `<li class="rk-row${l.voce ? ' me' : ''}"><span class="rk-pos${m ? ' m' : ''}" aria-label="${l.pos}º lugar">${m || l.pos + 'º'}</span>` +
+    `<span class="av sm" style="--h:${hueOf(l.apelido)}" aria-hidden="true">${esc(l.avatar)}</span>` +
+    `<span class="rk-who"><b>${esc(l.apelido)}${l.voce ? '<span class="tag">VOCÊ</span>' : ''}</b><small>${esc(l.cargo.e)} ${esc(l.cargo.n)}</small></span>` +
+    `<span class="rk-val"><b>${fmtNum(cons ? l.semanas : l.xp)}</b><small>${cons ? (l.semanas === 1 ? 'sábado' : 'sábados') : 'XP'}</small></span></li>`;
+}
+const rankTabs = tipo => `<div class="seg" role="tablist" aria-label="Tipo de ranking">${[['geral', '⭐ XP'], ['constancia', '🌅 Constância']].map(([k, l]) => `<button role="tab" aria-selected="${tipo === k}" class="${tipo === k ? 'on' : ''}" data-act="rk-tab" data-id="${k}">${l}</button>`).join('')}</div>`;
+const rankFrame = (tipo, body) => `<div class="embed rk"><div class="rk-top"><div class="e-title">🏆 Ranking do grupo</div><button class="btn sm ghost" data-act="rk-refresh" aria-label="Atualizar o ranking">↻ Atualizar</button></div>${rankTabs(tipo)}${body}</div>`;
+function rankHTML(c) {
+  const d = c.data, cons = d.tipo === 'constancia', v = d.voce;
+  let you;
+  if (v.oculto) {
+    you = isLeader()
+      ? '<div class="rk-you"><span class="pos" aria-hidden="true">🛡️</span><span><b>Você é o líder</b><small>O líder vê o ranking, mas não aparece nele.</small></span></div>'
+      : '<div class="rk-you"><span class="pos" aria-hidden="true">🙈</span><span style="flex:1"><b>Seu nome está escondido</b><small>Você vê o ranking, mas os outros não veem você.</small></span><button class="btn sm pri" data-act="rk-show">Mostrar meu nome</button></div>';
+  } else {
+    you = `<div class="rk-you"><span class="pos">${v.pos}º</span><span><b>Sua posição</b><small>de ${d.total} ${d.total === 1 ? 'jovem' : 'jovens'} · ${fmtNum(cons ? v.semanas : v.xp)} ${cons ? 'sábados guardados' : 'XP'}</small></span></div>`;
+  }
+  const list = d.lista.length
+    ? `<ol class="rk-list">${d.lista.map(l => rankRow(l, cons)).join('')}</ol>`
+    : '<div class="rk-empty">Ninguém no ranking ainda. Ganhe XP nos canais e seja o primeiro! 🚀</div>';
+  const foot = `Mostra só <b>apelido, cargo, XP e sábados guardados</b> — suas respostas ficam só no seu aparelho. ${cons ? 'A constância conta os sábados em que você cumpriu a missão da semana.' : ''} ` +
+    `${d.total > d.lista.length ? `Mostrando os ${d.lista.length} primeiros de ${d.total}. ` : ''}Atualizado às ${fmtTime(c.at)}${c.err ? ' · <b>sem conexão agora</b>' : ''}.`;
+  return rankFrame(d.tipo, `${you}${list}<div class="e-foot">${foot}</div>`);
+}
+async function renderRankBoard() {
+  const el = $('#rankboard');
+  if (!el) return;
+  const tipo = RK.tipo, c = RK.cache[tipo];
+  el.innerHTML = c && c.data ? rankHTML(c) : rankFrame(tipo, '<div class="sk"></div><div class="sk"></div><div class="sk"></div>');
+  await fetchRank(tipo, true);
+  const el2 = $('#rankboard'), c2 = RK.cache[tipo];
+  if (!el2) return;
+  el2.innerHTML = c2 && c2.data ? rankHTML(c2) : rankFrame(tipo, '<div class="note bad"><b>Não consegui carregar o ranking.</b> Confira a internet e toque em Atualizar.</div>');
+  clearTimeout(RK.timer);
+  RK.timer = setTimeout(() => { if (active === 'ranking' && !document.hidden) renderRankBoard(); }, 60000);
+}
+function rankMiniHTML() {
+  if (!canRank()) return '';
+  const c = RK.cache.geral;
+  if (!c || Date.now() - c.at > 90000) fetchRank('geral', true).then(ok => { if (ok && GAME_ON) renderMembers(); });
+  let h = '<div class="mh">🏆 Ranking · Top 5</div><div class="rk-mini">';
+  if (!c || !c.data) h += '<div class="sk"></div><div class="sk"></div><div class="sk"></div>';
+  else if (!c.data.lista.length) h += '<div class="rk-empty">Ninguém no ranking ainda.</div>';
+  else h += `<ol class="rk-list">${c.data.lista.slice(0, 5).map(l => rankRow(l, false)).join('')}</ol>`;
+  return h + '<button class="btn sm ghost" style="width:100%;margin-top:8px" data-act="rank">Ver ranking completo</button></div>';
+}
+async function setVisibility(on) {
+  await pushProfile({ mostrarRanking: !!on });
+  RK.cache = {};
+  if (active === 'ranking') renderRankBoard();
+  renderMembers();
+  toast(on ? 'Seu nome voltou ao ranking ✔' : 'Seu nome foi escondido do ranking ✔');
+}
+
+/* ============================================================
+   PAINEL DO LÍDER
+   ============================================================ */
+const ADM = { tab: '', users: [], resumo: null };
+const OPS = {
+  aprovar: { m: 'POST', ok: 'Acesso liberado ✔' }, desbloquear: { m: 'POST', ok: 'Acesso restabelecido ✔' },
+  bloquear: { m: 'POST', ok: 'Acesso bloqueado ✔', ask: 'Bloquear o acesso de' }, remover: { m: 'DELETE', ok: 'Conta removida ✔', ask: 'Apagar a conta e o progresso de' },
+  senha: { m: 'POST', ask: 'Gerar uma senha temporária para' }
+};
+async function openAdmin() {
+  if (!isLeader()) return;
+  closeDrawers();
+  ADM.tab = '';
+  openModal(`<button class="m-x" data-act="close" aria-label="Fechar">${I.x}</button><h2>🛡️ Painel do líder</h2><p style="color:var(--dim);margin-top:2px">Você libera quem entra e acompanha o grupo. As respostas dos jovens ficam só no aparelho deles: <b>nem você as vê</b>.</p><div id="admBody"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>`, { wide: true, label: 'Painel do líder' });
+  await admLoad();
+}
+async function admLoad() {
+  try {
+    const [u, r] = await Promise.all([api('GET', '/api/admin/usuarios'), api('GET', '/api/admin/resumo')]);
+    ADM.users = u.usuarios; ADM.resumo = r; ME.pendentes = r.pendentes;
+    if (!ADM.tab) ADM.tab = r.pendentes ? 'pendente' : 'ativo';
+    updateAdminDots();
+    admRender();
+  } catch (e) {
+    const el = $('#admBody');
+    if (el) el.innerHTML = `<div class="note bad">Não consegui carregar: ${esc(e.message)}</div><button class="btn pri lg" data-act="adm-reload">Tentar de novo</button>`;
+  }
+}
+function admCard(u) {
+  const b = (op, label, cls) => `<button class="btn ${cls || 'ghost'}" data-act="${OPS[op].ask ? 'adm-ask' : 'adm-do'}" data-id="${u.id}" data-op="${op}">${label}</button>`;
+  const acts = u.status === 'pendente' ? `<button class="btn pri" data-act="adm-do" data-id="${u.id}" data-op="aprovar">✅ Liberar acesso</button>` + b('remover', 'Recusar')
+    : u.status === 'ativo' ? b('bloquear', '⛔ Bloquear') + b('senha', '🔑 Nova senha') + b('remover', '🗑 Remover')
+      : `<button class="btn pri" data-act="adm-do" data-id="${u.id}" data-op="desbloquear">Desbloquear</button>` + b('remover', '🗑 Remover');
+  const stats = u.status === 'pendente' ? '' : `<span>Último acesso: <b>${u.ultimoAcesso ? ago(u.ultimoAcesso) : '—'}</b></span><span><b>${fmtNum(u.progresso.xp)}</b> XP</span><span><b>${u.progresso.canais}</b> canais</span><span><b>${u.progresso.semanas}</b> sábados</span>${u.mostrarRanking ? '' : '<span>🙈 oculto no ranking</span>'}`;
+  return `<div class="adm-card" id="adm${u.id}"><div class="adm-top"><span class="av" style="--h:${hueOf(u.apelido)}" aria-hidden="true">${esc(u.avatar)}</span><div class="who"><b>${esc(u.apelido)}</b><span>${esc(u.nome)}${u.grupo ? ' · ' + esc(u.grupo) : ''}</span></div></div>` +
+    `<div class="adm-meta"><span>Pediu acesso: <b>${ago(u.criadoEm)}</b></span>${stats}</div><div class="adm-act" id="act${u.id}">${acts}</div></div>`;
+}
+function admResumoHTML() {
+  const R = ADM.resumo, max = Math.max(1, R.ativos);
+  const top = Object.entries(R.concluidos).filter(([id]) => CHM[id]).sort((a, b) => b[1] - a[1]).slice(0, 12);
+  const tile = (n, l) => `<div class="tile"><b>${fmtNum(n)}</b><span>${l}</span></div>`;
+  return `<div class="kpis">${tile(R.pendentes, 'aguardando liberação')}${tile(R.ativos, 'jovens ativos')}${tile(R.ativos7d, 'ativos nos últimos 7 dias')}${tile(R.xpMedio, 'XP médio')}${tile(R.bloqueados, 'bloqueados')}</div>` +
+    `<h3>Canais concluídos</h3>` + (top.length ? top.map(([id, n]) => `<div class="hbar"><span class="t">#${esc(CHM[id].name)}</span><span class="bar"><i style="width:${Math.round(n / max * 100)}%"></i></span><span>${n}/${R.ativos}</span></div>`).join('') : '<p style="color:var(--dim)">Ninguém concluiu canais ainda.</p>') +
+    `<h3>Cópia de segurança</h3><p style="color:var(--dim);font-size:13.5px;margin:0 0 8px">Baixe o banco com contas e progresso (sem respostas). Guarde em lugar seguro: ele contém dados pessoais.</p><a class="btn ghost" href="/api/admin/backup" download>⬇ Baixar backup (.db)</a>`;
+}
+function admRender() {
+  const el = $('#admBody');
+  if (!el) return;
+  const R = ADM.resumo, tabs = [['pendente', 'Pendentes', R.pendentes, true], ['ativo', 'Ativos', R.ativos], ['bloqueado', 'Bloqueados', R.bloqueados], ['resumo', 'Resumo']];
+  let h = `<div class="adm-tabs" role="tablist" aria-label="Seções do painel">${tabs.map(([k, l, n, hot]) => `<button role="tab" aria-selected="${ADM.tab === k}" class="${ADM.tab === k ? 'on' : ''}" data-act="adm-tab" data-id="${k}">${l}${n != null ? `<span class="n${hot && n ? ' hot' : ''}">${n}</span>` : ''}</button>`).join('')}</div>`;
+  if (ADM.tab === 'resumo') h += admResumoHTML();
+  else {
+    const list = ADM.users.filter(u => u.status === ADM.tab);
+    const empty = { pendente: 'Nenhum pedido esperando. 🎉', ativo: 'Ainda não há jovens liberados.', bloqueado: 'Ninguém bloqueado.' }[ADM.tab];
+    h += list.length ? `<div class="adm-list">${list.map(admCard).join('')}</div>` : `<div class="adm-empty">${empty}</div>`;
+  }
+  el.innerHTML = h;
+}
+function admAsk(id, op) {
+  const u = ADM.users.find(x => x.id === Number(id)), box = $('#act' + id);
+  if (!u || !box) return;
+  box.innerHTML = `<span style="flex:1 1 100%;font-weight:600;color:${op === 'remover' ? 'var(--bad)' : 'var(--fg)'}">${OPS[op].ask} <b>${esc(u.apelido)}</b>?${op === 'remover' ? ' Não dá para desfazer.' : ''}</span>` +
+    `<button class="btn ghost" data-act="adm-cancel">Cancelar</button><button class="btn ${op === 'remover' || op === 'bloquear' ? 'bad' : 'pri'}" data-act="adm-do" data-id="${id}" data-op="${op}">Sim, confirmar</button>`;
+}
+async function admDo(id, op, btn) {
+  const o = OPS[op];
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  try {
+    const r = await api(o.m, '/api/admin/usuarios/' + id + (op === 'remover' ? '' : '/' + op), o.m === 'DELETE' ? undefined : {});
+    if (op === 'senha') {
+      const u = ADM.users.find(x => x.id === Number(id)), box = $('#act' + id);
+      if (box) box.innerHTML = `<div style="flex:1 1 100%;font-size:13.5px">Senha temporária de <b>${esc(u ? u.apelido : '')}</b> — aparece só agora. Passe para a pessoa e peça para trocar em Configurações:</div>` +
+        `<div class="tmp" style="flex:1 1 100%"><code id="tmpPw">${esc(r.senhaTemporaria)}</code><button class="btn sm" data-act="adm-copy" data-pw="${esc(r.senhaTemporaria)}">Copiar</button></div>`;
+      return;
+    }
+    toast(o.ok);
+    await admLoad();
+  } catch (e) { toast(e.message); await admLoad(); }
+}
+
+/* ============================================================
+   CONFIGURAÇÕES (versão com conta), PRIVACIDADE, INSTALAÇÃO
+   ============================================================ */
+let deferredInstall = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; });
+const standalone = () => { try { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch (e) { return false; } };
+function installHTML() {
+  if (!SERVER || standalone()) return '';
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  return '<h3>📱 Colocar na tela inicial</h3><p style="color:var(--dim);font-size:13.5px;margin:0">' + (deferredInstall
+    ? 'Instale como um app, com ícone na tela do celular.</p><div class="btns"><button class="btn pri" data-act="install">Instalar o app</button></div>'
+    : ios ? 'No iPhone: toque em <b>Compartilhar</b> (o quadrado com a seta) e depois em <b>Adicionar à Tela de Início</b>.</p>'
+      : 'No Android: abra o menu <b>⋮</b> do navegador e toque em <b>Instalar app</b> (ou <b>Adicionar à tela inicial</b>).</p>');
+}
+function openSettingsServer() {
+  const t = S.set.theme;
+  openModal(`<button class="m-x" data-act="close" aria-label="Fechar">${I.x}</button><h2>Configurações</h2>` +
+    `<div class="note" style="margin-top:12px"><b>${esc(ME.apelido)}</b> · ${isLeader() ? '🛡️ líder' : 'jogador'}<br><span style="color:var(--dim)">O apelido não muda depois do cadastro (ele aparece no ranking). Para trocar, fale com o líder.</span></div>` +
+    `<div class="fld"><label>Avatar</label><div class="avpick">${EMOJIS.map(e => `<button class="${S.user.av === e ? 'on' : ''}" data-act="avatar" data-id="${e}" aria-label="Avatar ${e}">${e}</button>`).join('')}</div></div>` +
+    (isLeader() ? '' : `<h3>Ranking</h3><div class="sw"><span>Aparecer no ranking<small>Desligado: você vê o ranking, mas os outros não veem você.</small></span><button class="tog${ME.mostrarRanking ? ' on' : ''}" data-act="srv-vis" role="switch" aria-checked="${!!ME.mostrarRanking}" aria-label="Aparecer no ranking"></button></div>`) +
+    `<h3>Preferências</h3>` + sw('sound', 'Efeitos sonoros', 'Sons curtos ao ganhar XP e conquistas.') + sw('timer', 'Cronômetro nos quizzes', 'Desligue para responder sem pressa (sem bônus de tempo).') + sw('fast', 'Mensagens instantâneas', 'Pula a animação de “digitando…”.') +
+    `<div class="sw"><span>Tema<small>“Auto” segue o seu aparelho.</small></span><span class="seg" role="group" aria-label="Tema">${[['auto', 'Auto'], ['dark', 'Escuro'], ['light', 'Claro']].map(([k, l]) => `<button class="${t === k ? 'on' : ''}" data-act="theme" data-id="${k}">${l}</button>`).join('')}</span></div>` +
+    `<h3>Senha</h3><div id="pwBox"><button class="btn ghost" data-act="srv-pw">Trocar minha senha…</button></div>` +
+    installHTML() +
+    `<h3>Privacidade e dados</h3><p style="color:var(--dim);font-size:13.5px;margin:0">${md(PRIV_TEXT())}</p>` +
+    `<div class="btns"><button class="btn ghost" data-act="privacy">Ler o aviso de privacidade</button></div>` +
+    `<div class="mfoot" id="resetRow"><button class="btn ghost" data-act="reset1">Apagar meu progresso…</button><button class="btn ghost" data-act="srv-logout">Sair da conta</button></div>` +
+    (isLeader() ? '' : `<div id="delBox" style="margin-top:6px"><button class="btn ghost" style="color:var(--bad)" data-act="srv-del">Excluir minha conta…</button></div>`),
+  { label: 'Configurações' });
+}
+function pwFormHTML() {
+  return `<form id="fPw" novalidate>${pwField('pwOld', 'Senha atual', 'current-password')}${pwField('pwNew', 'Nova senha', 'new-password', '<small>Pelo menos 8 caracteres.</small>')}<div id="gErr" role="alert"></div>` +
+    `<div class="mfoot" style="margin-top:12px"><button type="button" class="btn ghost" data-act="srv-pw-x">Cancelar</button><button type="submit" class="btn pri" id="gSubmit">Trocar senha</button></div></form>`;
+}
+async function doChangePassword() {
+  const atual = $('#pwOld').value, nova = $('#pwNew').value;
+  if (!atual) return gateError('Digite a senha atual.', 'pwOld');
+  if (nova.length < 8) return gateError('A nova senha precisa ter pelo menos 8 caracteres.', 'pwNew');
+  setBusy(true, 'Trocando…');
+  try {
+    await api('POST', '/api/me/senha', { atual, nova });
+    const box = $('#pwBox'); if (box) box.innerHTML = '<div class="note ok">Senha trocada ✔ Os outros aparelhos precisarão entrar de novo.</div>';
+  } catch (e) { setBusy(false); gateError(e.message, e.data && e.data.campo === 'atual' ? 'pwOld' : 'pwNew'); }
+}
+function delFormHTML() {
+  return `<form id="fDelAcc" novalidate><div class="note bad"><b>Excluir a conta apaga seu cadastro e seu progresso do servidor.</b> Não dá para desfazer. Suas respostas neste aparelho também serão apagadas.</div>${pwField('dlPass', 'Confirme com a sua senha', 'current-password')}<div id="gErr" role="alert"></div>` +
+    `<div class="mfoot" style="margin-top:12px"><button type="button" class="btn ghost" data-act="srv-del-x">Cancelar</button><button type="submit" class="btn bad" id="gSubmit">Apagar minha conta</button></div></form>`;
+}
+async function doDeleteAccount() {
+  const senha = $('#dlPass').value;
+  if (!senha) return gateError('Digite a sua senha para confirmar.', 'dlPass');
+  setBusy(true, 'Apagando…');
+  try {
+    await api('POST', '/api/me/excluir', { senha });
+    try { localStorage.removeItem(KEY); } catch (e) { /* ok */ }
+    GAME_ON = false; location.reload();
+  } catch (e) { setBusy(false); gateError(e.message, 'dlPass'); }
+}
+function openPrivacy() {
+  const quem = CFG.responsavel ? `<b>${esc(CFG.responsavel)}</b>` : 'o líder do grupo';
+  const pv = (t, h) => `<h3>${t}</h3><p style="font-size:14.5px;line-height:1.5">${h}</p>`;
+  openModal(`<button class="m-x" data-act="close" aria-label="Fechar">${I.x}</button><h2>🔒 Aviso de privacidade</h2><p style="color:var(--dim)">Em palavras simples — para você e para o seu responsável.</p>` +
+    pv('Quem cuida dos dados', `${quem} é quem responde por este grupo e decide como os dados são usados.${CFG.contato ? ` Contato: <b>${esc(CFG.contato)}</b>.` : ''}`) +
+    pv('O que fica guardado na sua conta', 'Seu <b>apelido</b> (aparece no ranking), sua <b>senha</b> (guardada de forma embaralhada, nunca em texto aberto), seu <b>nome</b> e sua <b>igreja/clube/turma</b> (só o líder vê), seu <b>avatar</b> e o seu <b>progresso</b>: XP, canais concluídos, conquistas, sábados guardados e dias seguidos. Também a data do cadastro, do último acesso e do seu aceite deste aviso.') +
+    pv('O que NUNCA sai do seu aparelho', 'Tudo o que você <b>escreve</b>: respostas, decisões de fé, diário, plano de sábado e perguntas ao Neemias. Ninguém vê — nem o líder, nem o servidor. Não pedimos e-mail, telefone, CPF, data de nascimento nem localização. Não há anúncios nem rastreadores.') +
+    pv('Quem vê o quê', 'Todos os jovens liberados veem, no ranking: <b>apelido, avatar, cargo, XP e sábados guardados</b>. Você pode se esconder do ranking em Configurações. O líder vê também o seu nome, grupo, último acesso e progresso — para liberar acessos e cuidar do grupo.') +
+    pv('Para quê', 'Só para confirmar quem pode entrar, guardar o seu progresso e montar o ranking. Não vendemos nem repassamos seus dados a terceiros.') +
+    pv('Por quanto tempo e como apagar', 'Enquanto a sua conta existir. Em <b>Configurações → Excluir minha conta</b>, ou pedindo ao líder, tudo o que está no servidor é apagado.') +
+    pv('Seus direitos (LGPD)', 'Você ou o seu responsável podem pedir para ver quais dados existem, corrigir, apagar e retirar a autorização a qualquer momento.') +
+    pv('Menores de 18 anos', 'O cadastro exige a autorização de um responsável, que pode pedir para ver ou apagar tudo.') +
+    pv('Segurança', 'A conexão é protegida (HTTPS) e as senhas são embaralhadas. Mesmo assim nenhum sistema é 100% seguro: use uma senha que só você conhece.') +
+    pv('Uma ressalva honesta', 'O ranking usa o progresso informado pelo seu aparelho. É uma brincadeira de constância, não uma prova.') +
+    `<p style="color:var(--faint);font-size:12.5px">Versão do aviso: ${esc(CFG.aceiteVersao || '—')}</p>`, { wide: true, label: 'Aviso de privacidade' });
+}
+
+/* ---------- cliques das funções da conta (chamado pelo onClick do motor) ---------- */
+function authClick(act, id, t) {
+  switch (act) {
+    case 'rank': openChannel('ranking'); return true;
+    case 'admin': openAdmin(); return true;
+    case 'rk-refresh': renderRankBoard(); return true;
+    case 'rk-tab': RK.tipo = id; renderRankBoard(); return true;
+    case 'rk-show': setVisibility(true); return true;
+    case 'adm-tab': ADM.tab = id; admRender(); return true;
+    case 'adm-reload': admLoad(); return true;
+    case 'adm-ask': admAsk(id, t.dataset.op); return true;
+    case 'adm-cancel': admRender(); return true;
+    case 'adm-do': admDo(id, t.dataset.op, t); return true;
+    case 'adm-copy': copyText(t.dataset.pw).then(ok => toast(ok ? '📋 Senha copiada' : 'Não consegui copiar; anote a senha.')); return true;
+    case 'privacy': openPrivacy(); return true;
+    case 'srv-vis': { const on = !ME.mostrarRanking; t.classList.toggle('on', on); t.setAttribute('aria-checked', String(on)); setVisibility(on); return true; }
+    case 'srv-pw': { const b = $('#pwBox'); if (b) { b.innerHTML = pwFormHTML(); const f = $('#pwOld'); if (f && !coarse()) f.focus(); } return true; }
+    case 'srv-pw-x': { const b = $('#pwBox'); if (b) b.innerHTML = '<button class="btn ghost" data-act="srv-pw">Trocar minha senha…</button>'; return true; }
+    case 'srv-del': { const b = $('#delBox'); if (b) { b.innerHTML = delFormHTML(); const f = $('#dlPass'); if (f && !coarse()) f.focus(); } return true; }
+    case 'srv-del-x': { const b = $('#delBox'); if (b) b.innerHTML = '<button class="btn ghost" style="color:var(--bad)" data-act="srv-del">Excluir minha conta…</button>'; return true; }
+    case 'srv-logout': doLogout(false); return true;
+    case 'install': if (deferredInstall) { deferredInstall.prompt(); deferredInstall = null; } return true;
+  }
+  return false;
+}
+
+/* ============================================================
    ENGINE · parte 2 — fluxo dos canais, avaliação das respostas, dilemas, Q&A, missão, modais e boot
    ============================================================ */
 
@@ -2019,6 +2860,11 @@ function startChannel(c) {
   if (c.kind === 'static') {
     if (!st.i) { fillStatic(c); renderHistory(c.id); }
     setAW(null, 'Somente leitura · toque no +');
+    return;
+  }
+  if (c.kind === 'rank') {
+    if (!st.i) { fillStatic(c); renderHistory(c.id); }
+    setAW(null, 'Ranking · atualiza sozinho a cada minuto');
     return;
   }
   if (c.kind === 'qa' || c.kind === 'board') {
@@ -2319,7 +3165,7 @@ function onTimeout() {
 const CMDS = [
   ['/dica', 'pista para a pergunta atual (−5 XP)'], ['/resposta', 'mostra a resposta-modelo'], ['/pular', 'pula a pergunta atual'],
   ['/perfil', 'seu perfil, conquistas e caderno'], ['/mapa', 'mapa das fases'], ['/fontes', 'fontes deste canal'],
-  ['/cartao', 'seu cartão de compromisso'], ['/ajuda', 'lista de comandos']
+  ['/cartao', 'seu cartão de compromisso'], ...(SERVER ? [['/ranking', 'abre o ranking do grupo']] : []), ['/ajuda', 'lista de comandos']
 ];
 function runCommand(raw) {
   const cmd = raw.trim().split(/\s+/)[0].toLowerCase();
@@ -2331,6 +3177,7 @@ function runCommand(raw) {
     case '/mapa': return openMap();
     case '/fontes': return openSources();
     case '/cartao': return openPledge();
+    case '/ranking': return SERVER ? openChannel('ranking') : toast('O ranking só existe na versão com login.');
     case '/ajuda': case '/help': return cmdHelp();
     default: toast('Comando não encontrado. Digite /ajuda.');
   }
@@ -2563,7 +3410,7 @@ function openProfile() {
 function openMap() {
   const real = c => isDone(c.id) && c.kind !== 'qa' && c.kind !== 'board';
   const h = CATS.map(cat => {
-    const list = CH.filter(c => c.cat === cat.id), done = list.filter(real).length, pct = Math.round(done / list.length * 100);
+    const list = CH.filter(c => c.cat === cat.id && (!c.serverOnly || SERVER)), done = list.filter(real).length, pct = Math.round(done / list.length * 100);
     return `<div class="mp${list.some(c => c.id === active) ? ' cur' : ''}"><div class="mp-h"><b>${esc(cat.t)}</b><span>${done}/${list.length}</span></div><div class="bar"><i style="width:${pct}%"></i></div><div class="mp-c">${list.map(c => `<button class="${real(c) ? 'done' : ''}${unlocked(c) ? '' : ' lock'}" data-act="open" data-id="${c.id}">${real(c) ? '✔ ' : unlocked(c) ? '# ' : '🔒 '}${esc(c.name)}</button>`).join('')}</div></div>`;
   }).join('');
   openModal(`<button class="m-x" data-act="close" aria-label="Fechar">${I.x}</button><h2>Mapa das fases</h2><p style="color:var(--dim)">Siga a ordem das fases. Nos dilemas, você escolhe por onde começar.</p><div class="map">${h}</div>`, { wide: true, label: 'Mapa das fases' });
@@ -2576,6 +3423,7 @@ function openSources() {
 }
 const sw = (id, t, d) => `<div class="sw"><span>${t}<small>${d}</small></span><button class="tog${S.set[id] ? ' on' : ''}" data-act="tog" data-id="${id}" role="switch" aria-checked="${!!S.set[id]}" aria-label="${t}"></button></div>`;
 function openSettings() {
+  if (SERVER) return openSettingsServer();
   const t = S.set.theme;
   openModal(`<button class="m-x" data-act="close" aria-label="Fechar">${I.x}</button><h2>Configurações</h2>` +
     `<div class="fld"><label for="setName">Apelido</label><input type="text" id="setName" maxlength="20" value="${esc(S.user.name)}"><small>Aparece nas suas mensagens.</small></div>` +
@@ -2591,8 +3439,10 @@ async function copyText(t) {
   }
 }
 function invite() {
-  const url = /^https?:/.test(location.href) ? location.href : '';
-  const txt = `Bora jogar o servidor “Guardiões do Sábado”? É um jogo com fases, XP e dilemas reais sobre o sábado. ${url}`.trim();
+  const url = /^https?:/.test(location.href) ? location.origin + location.pathname : '';
+  const txt = (SERVER
+    ? `Bora jogar o “Guardiões do Sábado”? É um jogo com fases, XP e dilemas reais sobre o sábado. Peça seu acesso aqui e o líder libera: ${url}`
+    : `Bora jogar o servidor “Guardiões do Sábado”? É um jogo com fases, XP e dilemas reais sobre o sábado. ${url}`).trim();
   copyText(txt).then(ok => toast(ok ? '📋 Convite copiado! Cole no seu grupo.' : 'Não consegui copiar. Compartilhe o link desta página com seus amigos.'));
 }
 
@@ -2639,10 +3489,17 @@ function pledgeBlob() {
 async function savePledgePNG() {
   let dl = null;
   try { dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { dl = null; }
-  if (!dl) { toast('Salvar imagem não está disponível aqui. Tire um print do cartão 📸'); return; }
+  if (!dl && MODE === 'artifact') { toast('Salvar imagem não está disponível aqui. Tire um print do cartão 📸'); return; }
   try {
     const blob = await pledgeBlob();
-    await dl.save({ filename: 'compromisso-de-fe.jpg', data: blob });
+    if (dl) { await dl.save({ filename: 'compromisso-de-fe.jpg', data: blob }); toast('Cartão salvo ✅'); return; }
+    const file = new File([blob], 'compromisso-de-fe.jpg', { type: 'image/jpeg' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {            // celular: abre "Salvar imagem / Compartilhar"
+      try { await navigator.share({ files: [file], title: 'Meu compromisso de fé' }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    const url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = 'compromisso-de-fe.jpg'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
     toast('Cartão salvo ✅');
   } catch (e) { if (!e || e.code !== 'declined') toast('Não consegui salvar. Tire um print do cartão 📸'); }
 }
@@ -2685,7 +3542,7 @@ function onClick(e) {
     case 'pledgecopy': copyPledge(); break;
     case 'pledgepng': savePledgePNG(); break;
     case 'avatar':
-      S.user.av = id; save(); renderUser(); renderMembers();
+      S.user.av = id; save(); renderUser(); renderMembers(); pushProfile({ avatar: id });
       $$('.avpick button').forEach(b => b.classList.toggle('on', b.dataset.id === id));
       break;
     case 'tog':
@@ -2706,9 +3563,11 @@ function onClick(e) {
     }
     case 'reset1': $('#resetRow').innerHTML = `<span style="flex:1;color:var(--bad);font-weight:600">Apagar XP, respostas e decisões? Não dá para desfazer.</span><button class="btn ghost" data-act="close">Cancelar</button><button class="btn" style="background:var(--bad);color:#fff" data-act="reset2">Sim, apagar tudo</button>`; break;
     case 'reset2':
+      if (SERVER) { resetEverything(); break; }
       try { localStorage.removeItem(KEY); } catch (er) { /* ok */ }
       S = DEF(); active = null; applyTheme(); closeModal(); renderAll(); openChannel('boas-vindas', { force: true });
       break;
+    default: authClick(act, id, t);
   }
 }
 function wire() {
@@ -2740,12 +3599,17 @@ function pickStart() {
   const first = CH.find(c => c.cat !== 'free' && unlocked(c) && !isDone(c.id));
   return first ? first.id : 'pergunte';
 }
+function startGame() {
+  applyTheme(); renderAll();
+  openChannel(pickStart(), { force: true });
+}
 function boot(hot) {
+  initViewport();
+  if (SERVER) { wire(); authBoot(); return; }          // versão com login: o jogo só começa depois do acesso liberado
   const loaded = (hot && hot.S) ? hot.S : loadState();
   S = mergeState(loaded);
   try { if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(() => ({ S })); } catch (e) { /* ok */ }
-  applyTheme(); wire(); renderAll();
-  openChannel(pickStart(), { force: true });
+  wire(); startGame();
 }
 (function init() {
   const h = window.claude && window.claude.hot;

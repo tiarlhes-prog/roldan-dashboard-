@@ -18,7 +18,7 @@ const coarse = () => { try { return matchMedia('(pointer: coarse)').matches; } c
 const trunc = (s, n) => { s = String(s || ''); return s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s; };
 
 function md(s) {
-  let t = String(s == null ? '' : s).split('{nick}').join(S.user.name || 'você');
+  let t = String(s == null ? '' : s).split('{nick}').join(S.user.name || 'você').split('{priv}').join(PRIV_TEXT());
   t = esc(t);
   t = t.replace(/\*\*([\s\S]+?)\*\*/g, '<strong>$1</strong>');
   t = t.replace(/(^|[\s(>"“—])\*([^\s*][^*]*?)\*(?=[\s).,!?:;<"”—]|$)/g, '$1<em>$2</em>');
@@ -40,7 +40,7 @@ const I = {
 };
 
 /* ---------- estado + persistência (localStorage, com fallback em memória) ---------- */
-const KEY = 'guardioes-do-sabado:v1';
+let KEY = 'guardioes-do-sabado:v1';   // na versão com login vira ...:v2:u<id> (um espaço por conta, no mesmo aparelho)
 const DEF = () => ({
   v: 1, user: { name: '', av: '🙂' }, xp: 0, streak: { n: 0, last: '' },
   ch: {}, ans: {}, badges: {}, dec: {}, pocket: {}, parked: [],
@@ -65,8 +65,8 @@ function mergeState(raw) {
 }
 function loadState() { try { const r = localStorage.getItem(KEY); if (r) return JSON.parse(r); } catch (e) { /* sem storage */ } return null; }
 let saveTimer = 0;
-function saveNow() { clearTimeout(saveTimer); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* sem storage */ } }
-function save() { clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 120); }
+function saveNow() { clearTimeout(saveTimer); if (SERVER && !GAME_ON) return; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* sem storage */ } }
+function save() { clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 120); queueSync(); }
 const chs = id => { if (!S.ch[id]) S.ch[id] = { i: 0, done: false, hist: [], sub: {} }; return S.ch[id]; };
 
 /* ---------- cargos, desbloqueio, fases ---------- */
@@ -75,6 +75,7 @@ const isDone = id => !!(S.ch[id] && S.ch[id].done);
 function dilemmasDone() { return F4.filter(isDone).length; }
 
 function unlocked(c) {
+  if (c.serverOnly) return canRank();     // ranking: só com login e acesso liberado
   if (c.id === 'boas-vindas') return true;
   if (c.id === 'como-jogar' || c.id === 'pergunte') return isDone('boas-vindas');
   if (c.id === 'missao') return isDone('3-despedida');
@@ -85,6 +86,7 @@ function unlocked(c) {
   return i > 0 ? isDone(SEQ[i - 1]) : false;
 }
 function lockHint(c) {
+  if (c.serverOnly) return '🔒 O ranking só existe na versão com login.';
   if (c.id === 'como-jogar' || c.id === 'pergunte') return '🔒 Termine o check-in em #boas-vindas primeiro.';
   if (c.id === 'missao') return '🔒 Conclua a Fase 3 (até #3-despedida) para liberar a missão da semana.';
   if (c.cat === 'f4') return '🔒 Termine o quiz da Fase 3 (#3-quiz) para liberar os dilemas.';
@@ -104,9 +106,9 @@ function catComplete(cat) { const l = CH.filter(c => c.cat === cat); return l.le
 
 /* ---------- renderização: lateral, usuário, painel, topo ---------- */
 function renderChannels() {
-  let h = '';
+  let h = quickNavHTML();
   for (const cat of CATS) {
-    const list = CH.filter(c => c.cat === cat.id);
+    const list = CH.filter(c => c.cat === cat.id && (!c.serverOnly || SERVER));
     if (!list.length) continue;
     const done = list.filter(c => isDone(c.id)).length;
     const closed = S.ui.closed[cat.id] ? ' closed' : '';
@@ -129,6 +131,7 @@ function renderUser() {
   $('#userbar').innerHTML =
     `<button class="ub-me" data-act="profile" aria-label="Abrir meu perfil"><span class="av sm" style="--h:${hueOf(S.user.name || 'v')}">${esc(S.user.av)}<span class="st"></span></span><span class="ub-t"><b>${esc(S.user.name || 'Visitante')}</b><small>${r.e} ${esc(r.n)} · ${S.xp} XP${S.streak.n > 1 ? ' · 🔥' + S.streak.n : ''}</small></span></button>` +
     `<button class="ub-btn${S.set.sound ? '' : ' off'}" data-act="tog" data-id="sound" aria-label="Som ${S.set.sound ? 'ligado' : 'desligado'}" title="Som">${S.set.sound ? I.sound : I.mute}</button>` +
+    adminBtnHTML() +
     `<button class="ub-btn" data-act="settings" aria-label="Configurações" title="Configurações">${I.gear}</button>`;
   $('#railMe').textContent = S.user.av;
 }
@@ -152,6 +155,7 @@ function renderMembers() {
   let h = `<button class="mem-x" data-act="current" aria-label="Fechar painel">${I.x}</button><div class="mh">Seu progresso</div>${xpCardHTML()}`;
   h += `<div class="mh">Online — ${2 + cast.length}</div>` + memRow('neemias', 'Mentor do servidor') + memRow('me', ROLES[roleIdx(S.xp)].n);
   if (cast.length) h += `<div class="mh">Na conversa · personagens fictícios</div>` + cast.map(id => memRow(id, 'NPC')).join('');
+  h += rankMiniHTML();
   const have = Object.keys(S.badges).length;
   h += `<div class="mh">Conquistas · ${have}/${Object.keys(BADGES).length}</div><div class="badges">` +
     Object.entries(BADGES).map(([id, b]) => `<div class="bdg${S.badges[id] ? '' : ' off'}" data-t="${esc(b.n + ' — ' + b.d)}" tabindex="0" role="img" aria-label="${esc(b.n + (S.badges[id] ? ' (conquistada)' : ' (bloqueada)') + ': ' + b.d)}">${b.e}</div>`).join('') + '</div>';
@@ -236,11 +240,12 @@ function appendMsg(chId, m) {
 }
 function renderHistory(chId) {
   const box = $('#msgs'), st = chs(chId), c = CHM[chId];
-  let h = c.kind === 'board' ? '<div class="board" id="board"></div>' : '', prev = null;
+  let h = c.kind === 'board' ? '<div class="board" id="board"></div>' : c.kind === 'rank' ? '<div class="board" id="rankboard"></div>' : '', prev = null;
   for (const m of st.hist) { h += msgHTML(m, prev, false); prev = m; }
   box.innerHTML = h;
   if (c.kind === 'board') renderBoard();
-  box.scrollTop = box.scrollHeight;
+  if (c.kind === 'rank') renderRankBoard();
+  box.scrollTop = c.kind === 'rank' ? 0 : box.scrollHeight;
 }
 function post(chId, m) {
   m.ts = Date.now();

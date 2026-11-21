@@ -1,0 +1,5 @@
+/* Só nas versões de página (servidor e arquivo único): respeita barras/entalhes do aparelho e o teclado virtual.
+   Fica de fora da versão Artifact, que já trata isso no esqueleto. */
+:root{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px)}
+.app{height:100%;height:100dvh;height:var(--vvh,100dvh)}
+body{overscroll-behavior:none}

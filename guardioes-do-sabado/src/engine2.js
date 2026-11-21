@@ -113,6 +113,11 @@ function startChannel(c) {
     setAW(null, 'Somente leitura · toque no +');
     return;
   }
+  if (c.kind === 'rank') {
+    if (!st.i) { fillStatic(c); renderHistory(c.id); }
+    setAW(null, 'Ranking · atualiza sozinho a cada minuto');
+    return;
+  }
   if (c.kind === 'qa' || c.kind === 'board') {
     if (!st.i) { fillStatic(c); renderHistory(c.id); }
     setAW(c.kind === 'qa'
@@ -411,7 +416,7 @@ function onTimeout() {
 const CMDS = [
   ['/dica', 'pista para a pergunta atual (−5 XP)'], ['/resposta', 'mostra a resposta-modelo'], ['/pular', 'pula a pergunta atual'],
   ['/perfil', 'seu perfil, conquistas e caderno'], ['/mapa', 'mapa das fases'], ['/fontes', 'fontes deste canal'],
-  ['/cartao', 'seu cartão de compromisso'], ['/ajuda', 'lista de comandos']
+  ['/cartao', 'seu cartão de compromisso'], ...(SERVER ? [['/ranking', 'abre o ranking do grupo']] : []), ['/ajuda', 'lista de comandos']
 ];
 function runCommand(raw) {
   const cmd = raw.trim().split(/\s+/)[0].toLowerCase();
@@ -423,6 +428,7 @@ function runCommand(raw) {
     case '/mapa': return openMap();
     case '/fontes': return openSources();
     case '/cartao': return openPledge();
+    case '/ranking': return SERVER ? openChannel('ranking') : toast('O ranking só existe na versão com login.');
     case '/ajuda': case '/help': return cmdHelp();
     default: toast('Comando não encontrado. Digite /ajuda.');
   }
@@ -655,7 +661,7 @@ function openProfile() {
 function openMap() {
   const real = c => isDone(c.id) && c.kind !== 'qa' && c.kind !== 'board';
   const h = CATS.map(cat => {
-    const list = CH.filter(c => c.cat === cat.id), done = list.filter(real).length, pct = Math.round(done / list.length * 100);
+    const list = CH.filter(c => c.cat === cat.id && (!c.serverOnly || SERVER)), done = list.filter(real).length, pct = Math.round(done / list.length * 100);
     return `<div class="mp${list.some(c => c.id === active) ? ' cur' : ''}"><div class="mp-h"><b>${esc(cat.t)}</b><span>${done}/${list.length}</span></div><div class="bar"><i style="width:${pct}%"></i></div><div class="mp-c">${list.map(c => `<button class="${real(c) ? 'done' : ''}${unlocked(c) ? '' : ' lock'}" data-act="open" data-id="${c.id}">${real(c) ? '✔ ' : unlocked(c) ? '# ' : '🔒 '}${esc(c.name)}</button>`).join('')}</div></div>`;
   }).join('');
   openModal(`<button class="m-x" data-act="close" aria-label="Fechar">${I.x}</button><h2>Mapa das fases</h2><p style="color:var(--dim)">Siga a ordem das fases. Nos dilemas, você escolhe por onde começar.</p><div class="map">${h}</div>`, { wide: true, label: 'Mapa das fases' });
@@ -668,6 +674,7 @@ function openSources() {
 }
 const sw = (id, t, d) => `<div class="sw"><span>${t}<small>${d}</small></span><button class="tog${S.set[id] ? ' on' : ''}" data-act="tog" data-id="${id}" role="switch" aria-checked="${!!S.set[id]}" aria-label="${t}"></button></div>`;
 function openSettings() {
+  if (SERVER) return openSettingsServer();
   const t = S.set.theme;
   openModal(`<button class="m-x" data-act="close" aria-label="Fechar">${I.x}</button><h2>Configurações</h2>` +
     `<div class="fld"><label for="setName">Apelido</label><input type="text" id="setName" maxlength="20" value="${esc(S.user.name)}"><small>Aparece nas suas mensagens.</small></div>` +
@@ -683,8 +690,10 @@ async function copyText(t) {
   }
 }
 function invite() {
-  const url = /^https?:/.test(location.href) ? location.href : '';
-  const txt = `Bora jogar o servidor “Guardiões do Sábado”? É um jogo com fases, XP e dilemas reais sobre o sábado. ${url}`.trim();
+  const url = /^https?:/.test(location.href) ? location.origin + location.pathname : '';
+  const txt = (SERVER
+    ? `Bora jogar o “Guardiões do Sábado”? É um jogo com fases, XP e dilemas reais sobre o sábado. Peça seu acesso aqui e o líder libera: ${url}`
+    : `Bora jogar o servidor “Guardiões do Sábado”? É um jogo com fases, XP e dilemas reais sobre o sábado. ${url}`).trim();
   copyText(txt).then(ok => toast(ok ? '📋 Convite copiado! Cole no seu grupo.' : 'Não consegui copiar. Compartilhe o link desta página com seus amigos.'));
 }
 
@@ -731,10 +740,17 @@ function pledgeBlob() {
 async function savePledgePNG() {
   let dl = null;
   try { dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { dl = null; }
-  if (!dl) { toast('Salvar imagem não está disponível aqui. Tire um print do cartão 📸'); return; }
+  if (!dl && MODE === 'artifact') { toast('Salvar imagem não está disponível aqui. Tire um print do cartão 📸'); return; }
   try {
     const blob = await pledgeBlob();
-    await dl.save({ filename: 'compromisso-de-fe.jpg', data: blob });
+    if (dl) { await dl.save({ filename: 'compromisso-de-fe.jpg', data: blob }); toast('Cartão salvo ✅'); return; }
+    const file = new File([blob], 'compromisso-de-fe.jpg', { type: 'image/jpeg' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {            // celular: abre "Salvar imagem / Compartilhar"
+      try { await navigator.share({ files: [file], title: 'Meu compromisso de fé' }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    const url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = 'compromisso-de-fe.jpg'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
     toast('Cartão salvo ✅');
   } catch (e) { if (!e || e.code !== 'declined') toast('Não consegui salvar. Tire um print do cartão 📸'); }
 }
@@ -777,7 +793,7 @@ function onClick(e) {
     case 'pledgecopy': copyPledge(); break;
     case 'pledgepng': savePledgePNG(); break;
     case 'avatar':
-      S.user.av = id; save(); renderUser(); renderMembers();
+      S.user.av = id; save(); renderUser(); renderMembers(); pushProfile({ avatar: id });
       $$('.avpick button').forEach(b => b.classList.toggle('on', b.dataset.id === id));
       break;
     case 'tog':
@@ -798,9 +814,11 @@ function onClick(e) {
     }
     case 'reset1': $('#resetRow').innerHTML = `<span style="flex:1;color:var(--bad);font-weight:600">Apagar XP, respostas e decisões? Não dá para desfazer.</span><button class="btn ghost" data-act="close">Cancelar</button><button class="btn" style="background:var(--bad);color:#fff" data-act="reset2">Sim, apagar tudo</button>`; break;
     case 'reset2':
+      if (SERVER) { resetEverything(); break; }
       try { localStorage.removeItem(KEY); } catch (er) { /* ok */ }
       S = DEF(); active = null; applyTheme(); closeModal(); renderAll(); openChannel('boas-vindas', { force: true });
       break;
+    default: authClick(act, id, t);
   }
 }
 function wire() {
@@ -832,12 +850,17 @@ function pickStart() {
   const first = CH.find(c => c.cat !== 'free' && unlocked(c) && !isDone(c.id));
   return first ? first.id : 'pergunte';
 }
+function startGame() {
+  applyTheme(); renderAll();
+  openChannel(pickStart(), { force: true });
+}
 function boot(hot) {
+  initViewport();
+  if (SERVER) { wire(); authBoot(); return; }          // versão com login: o jogo só começa depois do acesso liberado
   const loaded = (hot && hot.S) ? hot.S : loadState();
   S = mergeState(loaded);
   try { if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(() => ({ S })); } catch (e) { /* ok */ }
-  applyTheme(); wire(); renderAll();
-  openChannel(pickStart(), { force: true });
+  wire(); startGame();
 }
 (function init() {
   const h = window.claude && window.claude.hot;

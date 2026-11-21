@@ -289,6 +289,13 @@ dilemma({
   ] },
 
 /* ---------- SEMPRE ABERTOS ---------- */
+{ id: 'ranking', cat: 'free', name: 'ranking', title: 'Ranking', kind: 'rank', serverOnly: true,
+  topic: 'Constância vale mais que pressa · só apelido, cargo e XP aparecem',
+  pins: [],
+  steps: [
+    say('neemias', `Aqui está o **ranking** do grupo. 🏆 Ele mostra só **apelido, cargo, XP e sábados guardados**. As suas respostas ficam **só no seu aparelho**: ninguém vê, nem o líder.\nNo ranking de **constância**, quem guarda o sábado toda semana sobe — não precisa ser o mais rápido.`)
+  ] },
+
 { id: 'pergunte', cat: 'free', name: 'pergunte-ao-neemias', title: 'Pergunte ao Neemias', kind: 'qa',
   topic: 'Pergunte qualquer coisa sobre o sábado · respostas só com base nas fontes', pins: ['folder', 'doc', 'cf20'],
   steps: [

@@ -122,7 +122,7 @@ const CH_A = [
       { n: '⭐ XP e cargos', v: 'Cada resposta rende XP. Suba de **Visitante** até **Embaixador do Sábado**.' },
       { n: '🧪 Dilemas', v: 'Situações reais de 2026: jogo, prova, rolê, celular, emprego. Você decide — e planeja.' },
       { n: '📚 Fontes', v: 'Tudo vem da Bíblia, da Igreja e do folder do sábado. Toque em **Fontes** (no topo) para ver.' },
-      { n: '🔒 Privacidade', v: 'Seu progresso fica **só neste aparelho**. Nada é enviado a ninguém.' }
+      { n: '🔒 Privacidade', v: '{priv}' }
     ] }),
     say('neemias', `Primeiro: **como quer ser chamado(a)** por aqui? Digite um apelido (até 20 letras).`),
     { t: 'name' },

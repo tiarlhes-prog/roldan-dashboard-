@@ -269,7 +269,7 @@ const CH_A = [
     ask({ id: 'q3_3', kind: 'reflect', xp: 35, minWords: 8,
       bonus: /(visita|hospital|idos|asilo|orfanato|presid|enfermo|viuva|orfao|encarcer|ajud|mensagem|ligar|conversar|ouvir|consol|compart|refeic|comida|alimento|cesta|vizinh|amigo|estudo|biblia|oracao|orar)/,
       text: `Dê um exemplo **de 2026** de uma “obra de misericórdia” que você poderia fazer num sábado — de verdade, no seu mundo.`,
-      ph: 'Ex.: visitar… / mandar mensagem…',
+      ph: 'Ex.: visitar, mandar msg…',
       react: `Boa! Misericórdia não precisa ser gigante: uma visita, uma mensagem, uma carona, um ouvido. O documento oficial diz que é lícito, nas horas sagradas do sábado, “visitar enfermos, viúvas e órfãos, encarcerados e compartilhar uma refeição”. E dá o critério: “ações sociais que podem ser realizadas em outro dia não devem tomar as sagradas horas do sábado”. Na prática: campanhas e mutirões que podem ser agendados ficam para outro dia.`, src: ['bs_77', 'doc_assist'] }),
     ask({ id: 'q3_4', kind: 'reflect', xp: 25, minWords: 10,
       bonus: /(presente|beneficio|bem|descans|dadiva|cuidado|amor|liberd|paz)/,
@@ -294,7 +294,7 @@ const CH_A = [
     quote(`Os pais poderão fazer do sábado o que em realidade deve ser, isto é, o dia mais alegre da semana, induzindo assim os filhos a considerá-lo um dia deleitoso, o dia por excelência, santo ao Senhor e digno de honra.`, `E. G. White, Testemunhos Para a Igreja, vol. 6, págs. 356-359`, ['tpi6_356']),
     ask({ id: 'q4_2', kind: 'list', xp: 30, need: 3,
       text: `Crie a sua **lista de deleite**: **3 coisas** que tornariam o seu sábado o dia mais esperado da semana (comida, gente, lugar, música, atividade…).`,
-      ph: 'Ex.: almoço, trilha, jogos…',
+      ph: 'Ex.: almoço, trilha…',
       react: `Essa lista é ouro. Guarde-a: ela vai virar o seu plano lá no Chefão. 👑`,
       model: `Não existe lista certa — o ponto é que o sábado tenha **coisas que você realmente espera com alegria**: pessoas queridas, comida boa, natureza, música, serviço, descanso de verdade.`,
       src: ['is58', 'tpi2_585'] })
@@ -424,7 +424,7 @@ const CH_A = [
     ask({ id: 'q7_2', kind: 'list', xp: 40, need: 3,
       bonus: /(natureza|trilha|parque|praca|passeio|caminh|ar livre|campo|praia)/,
       text: `Monte a sua **tarde de sábado ideal**: cite **3 atividades** (com gente, na natureza ou servindo alguém) que você realmente curtiria.`,
-      ph: 'Ex.: trilha, visita, jogo bíblico…',
+      ph: 'Ex.: trilha, visita, jogo…',
       react: `Boa! O folder reforça: visitas, estudo bíblico com um amigo, passeios na natureza e jogos bíblicos. O documento acrescenta visitar enfermos, viúvas e órfãos, encarcerados. Quanto mais **gente e propósito**, menos tédio. 🌿`,
       model: `Exemplos do folder: **visitas** de cortesia e estudo bíblico com um amigo; **passeio na natureza** com família e amigos; **jogos bíblicos** ou DVD cristão; visitar a **igreja de um amigo**. O documento oficial cita visitar “enfermos, viúvas e órfãos, encarcerados” e “compartilhar uma refeição” — e lembra que ações sociais que podem ser feitas em outro dia não devem tomar as horas do sábado.`,
       src: ['folder', 'csa_165', 'doc_assist'] }),
@@ -537,7 +537,7 @@ const CH_A = [
     ask({ id: 'q9_2', kind: 'reflect', xp: 30, minWords: 10,
       bonus: /(primeira hora|oracao|biblia|palavra|gesto|ajudar|respeit|honest|mentira|colar|pais|conversa|culto familiar|musica|celular|bondade|paciencia)/,
       text: `Diga **uma atitude concreta**, de **segunda a sexta**, que mostra que o sábado mudou o seu jeito de viver.`,
-      ph: 'Ex.: na primeira hora do dia eu…',
+      ph: 'Ex.: logo cedo, eu…',
       react: `É isso: o sábado é o **ensaio semanal** de uma vida inteira com Deus. Um dia que contagia os outros seis.` }),
     ask({ id: 'q9_3', kind: 'concept', xp: 25, minWords: 6,
       text: `Dê **uma ideia** para deixar o **culto familiar** da semana menos monótono. (O folder tem várias.)`,
@@ -579,9 +579,9 @@ function dilemma(o) {
   const s = [];
   s.push(say('neemias', `**Dilema ${o.num} · ${o.title}** ${o.emoji}\n${o.setup}\n\nResponda **como na vida real**. Não existe resposta certa para o que você faria — aqui é lugar seguro para ensaiar.`));
   o.scene.forEach(([w, t]) => s.push(w === 'narr' ? sys(t) : say(w, t)));
-  s.push(ask({ id: o.id + '_a', kind: 'reply', xp: 25, minWords: 4, text: o.q1, ph: 'Responda como na vida real…' }));
+  s.push(ask({ id: o.id + '_a', kind: 'reply', xp: 25, minWords: 4, text: o.q1, ph: 'Responda como na vida…' }));
   o.mid.forEach(([w, t]) => s.push(w === 'narr' ? sys(t) : say(w, t)));
-  s.push(ask({ id: o.id + '_b', kind: 'reply', xp: 30, minWords: 4, text: o.q2, ph: 'Mantém ou cede? Seja sincero(a)…' }));
+  s.push(ask({ id: o.id + '_b', kind: 'reply', xp: 30, minWords: 4, text: o.q2, ph: 'Mantém ou cede? Explique…' }));
   s.push(say('neemias', o.after || DEF_AFTER));
   s.push(emb({
     title: '🔎 Teoria × Prática', c: 'var(--violet)',
@@ -809,7 +809,7 @@ dilemma({
     say('neemias', `**Fase 5 · Chefão** 👑\nChegou a hora de montar o **seu** sábado — do pôr do sol de sexta ao pôr do sol de sábado. São **quatro blocos curtos**. Seja específico(a): **horário, gente, lugar**.`),
     ask({ id: 'p1', kind: 'list', xp: 50, need: 3, minWords: 8, bonus: /(\d{1,2}\s*(h|hr|:)|hora|por do sol)/,
       text: `🌅 **Bloco 1 · Sexta.** Liste **3 coisas** que você deixa prontas e **a que horas** você “fecha os portões” (para atividades seculares e celular).`,
-      ph: 'Ex.: roupa, comida; portões 17h…',
+      ph: 'Ex.: roupa, comida, 17h…',
       react: `Ótimo. Quem chega na sexta com tudo pronto entra no sábado **descansado(a)** — e sem correria.` }),
     ask({ id: 'p2', kind: 'concept', xp: 50, minWords: 8,
       text: `🕯️ **Bloco 2 · Culto de pôr do sol.** Quem participa e quais **3 elementos** ele terá (música, leitura, oração, dinâmica, convidado…)?`,
@@ -833,7 +833,7 @@ dilemma({
       src: ['folder', 'bs_77'] }),
     ask({ id: 'p4', kind: 'reflect', xp: 50, minWords: 15,
       text: `📱 **Bloco 4 · Modo Sábado e dilemas.** Resuma as regras do seu Modo Sábado e diga **qual dilema da Fase 4 foi o mais difícil** para você — e o que fará de diferente.`,
-      ph: 'Meu Modo Sábado: … Dilema: …',
+      ph: 'Modo Sábado: … Dilema: …',
       react: `Isso é maturidade: saber onde você é mais frágil **antes** de o teste chegar.` }),
     { t: 'plan' }
   ] },
@@ -1559,6 +1559,7 @@ const GATE = {
     (o.aviso ? `<div class="note" role="status">${esc(o.aviso)}</div>` : '') +
     `<form id="fLogin" novalidate>${textField('lgUser', 'Apelido', 'username', { max: 20, focus: true })}${pwField('lgPass', 'Senha', 'current-password')}` +
     `<div id="gErr" role="alert"></div><button class="btn pri lg" type="submit" id="gSubmit">Entrar</button></form>` +
+    `<p style="margin-top:12px;font-size:13px">Esqueceu a senha? Peça ao líder uma <b>senha temporária</b> e troque depois em Configurações.</p>` +
     `<div class="gate-foot"><button type="button" class="lk" data-g="privacy">Aviso de privacidade</button></div>`,
 
   register: () => `<h2>Pedir acesso</h2><p>O líder do grupo confere o seu pedido e libera a sua entrada. Costuma ser rápido.</p>` +
@@ -1604,18 +1605,19 @@ function showGate(view, opts = {}) {
   if (!coarse()) { const f = $('#gateBody [data-focus]'); if (f) setTimeout(() => { try { f.focus({ preventScroll: true }); } catch (e) { /* ok */ } }, 40); }
 }
 function hideGate() { $('#gate').hidden = true; $('#gateBody').innerHTML = ''; document.body.classList.remove('gated'); $('#app').removeAttribute('inert'); }
-function setBusy(on, label) {
-  const b = $('#gSubmit');
+function setBusy(on, label, root) {
+  const b = (root || $('#gateBody')).querySelector('#gSubmit');
   if (!b) return;
   if (!b.dataset.t) b.dataset.t = b.textContent;
   b.disabled = !!on; b.textContent = on ? label : b.dataset.t;
 }
-function gateError(msg, fieldId) {
-  const e = $('#gErr');
+function gateError(msg, fieldId, root) {
+  root = root || $('#gateBody');                       // a tela de acesso e as janelas de Configurações usam os mesmos ids: sempre busca dentro do formulário certo
+  const e = root.querySelector('#gErr');
   if (e) e.innerHTML = `<div class="note bad">${esc(msg)}</div>`;
-  $$('#gateBody .fld').forEach(f => f.classList.remove('bad'));
-  $$('#gateBody [aria-invalid]').forEach(i => i.removeAttribute('aria-invalid'));
-  const i = fieldId && $('#' + fieldId);
+  root.querySelectorAll('.fld').forEach(f => f.classList.remove('bad'));
+  root.querySelectorAll('[aria-invalid]').forEach(i => i.removeAttribute('aria-invalid'));
+  const i = fieldId && root.querySelector('#' + fieldId);
   if (i) { i.setAttribute('aria-invalid', 'true'); const f = i.closest('.fld'); if (f) f.classList.add('bad'); try { i.focus(); } catch (er) { /* ok */ } }
 }
 const FIELD_OF = { apelido: 'rgUser', senha: 'rgPass', nome: 'rgName', grupo: 'rgGroup' };
@@ -2064,28 +2066,34 @@ function pwFormHTML() {
     `<div class="mfoot" style="margin-top:12px"><button type="button" class="btn ghost" data-act="srv-pw-x">Cancelar</button><button type="submit" class="btn pri" id="gSubmit">Trocar senha</button></div></form>`;
 }
 async function doChangePassword() {
-  const atual = $('#pwOld').value, nova = $('#pwNew').value;
-  if (!atual) return gateError('Digite a senha atual.', 'pwOld');
-  if (nova.length < 8) return gateError('A nova senha precisa ter pelo menos 8 caracteres.', 'pwNew');
-  setBusy(true, 'Trocando…');
+  const f = $('#fPw'), atual = $('#pwOld').value, nova = $('#pwNew').value;
+  if (!atual) return gateError('Digite a senha atual.', 'pwOld', f);
+  if (nova.length < 8) return gateError('A nova senha precisa ter pelo menos 8 caracteres.', 'pwNew', f);
+  setBusy(true, 'Trocando…', f);
   try {
-    await api('POST', '/api/me/senha', { atual, nova });
+    await api('POST', '/api/me/senha', { atual, nova }, { quiet: true });
     const box = $('#pwBox'); if (box) box.innerHTML = '<div class="note ok">Senha trocada ✔ Os outros aparelhos precisarão entrar de novo.</div>';
-  } catch (e) { setBusy(false); gateError(e.message, e.data && e.data.campo === 'atual' ? 'pwOld' : 'pwNew'); }
+  } catch (e) {
+    if (e.status === 401) { onSessionLost(); return; }       // aqui sim: a sessão caiu de verdade
+    setBusy(false, '', f); gateError(e.message, e.data && e.data.campo === 'atual' ? 'pwOld' : 'pwNew', f);
+  }
 }
 function delFormHTML() {
   return `<form id="fDelAcc" novalidate><div class="note bad"><b>Excluir a conta apaga seu cadastro e seu progresso do servidor.</b> Não dá para desfazer. Suas respostas neste aparelho também serão apagadas.</div>${pwField('dlPass', 'Confirme com a sua senha', 'current-password')}<div id="gErr" role="alert"></div>` +
     `<div class="mfoot" style="margin-top:12px"><button type="button" class="btn ghost" data-act="srv-del-x">Cancelar</button><button type="submit" class="btn bad" id="gSubmit">Apagar minha conta</button></div></form>`;
 }
 async function doDeleteAccount() {
-  const senha = $('#dlPass').value;
-  if (!senha) return gateError('Digite a sua senha para confirmar.', 'dlPass');
-  setBusy(true, 'Apagando…');
+  const f = $('#fDelAcc'), senha = $('#dlPass').value;
+  if (!senha) return gateError('Digite a sua senha para confirmar.', 'dlPass', f);
+  setBusy(true, 'Apagando…', f);
   try {
-    await api('POST', '/api/me/excluir', { senha });
+    await api('POST', '/api/me/excluir', { senha }, { quiet: true });
     try { localStorage.removeItem(KEY); } catch (e) { /* ok */ }
     GAME_ON = false; location.reload();
-  } catch (e) { setBusy(false); gateError(e.message, 'dlPass'); }
+  } catch (e) {
+    if (e.status === 401) { onSessionLost(); return; }
+    setBusy(false, '', f); gateError(e.message, 'dlPass', f);
+  }
 }
 function openPrivacy() {
   const quem = CFG.responsavel ? `<b>${esc(CFG.responsavel)}</b>` : 'o líder do grupo';
@@ -2242,19 +2250,19 @@ function startChannel(c) {
   const st = chs(c.id);
   if (c.kind === 'static') {
     if (!st.i) { fillStatic(c); renderHistory(c.id); }
-    setAW(null, 'Somente leitura · toque no +');
+    setAW(null, 'Somente leitura');
     return;
   }
   if (c.kind === 'rank') {
     if (!st.i) { fillStatic(c); renderHistory(c.id); }
-    setAW(null, 'Ranking · atualiza sozinho a cada minuto');
+    setAW(null, 'Ranking do grupo');
     return;
   }
   if (c.kind === 'qa' || c.kind === 'board') {
     if (!st.i) { fillStatic(c); renderHistory(c.id); }
     setAW(c.kind === 'qa'
-      ? { type: 'qa', chId: c.id, ph: 'Pergunte algo sobre o sábado…' }
-      : { type: 'diary', chId: c.id, ph: 'Diário: como foi seu sábado?' });
+      ? { type: 'qa', chId: c.id, ph: 'Pergunte sobre o sábado…' }
+      : { type: 'diary', chId: c.id, ph: 'Diário: como foi o sábado?' });
     return;
   }
   if (st.done) { setAW(null, 'Canal concluído ✔'); return; }
@@ -2293,7 +2301,7 @@ async function runStep(c, st, s, tok) {
     }
     case 'name': {
       if (S.user.name) { st.i++; save(); return 'next'; }
-      setAW({ type: 'name', c, st, step: s, ph: 'Seu apelido (2 a 20 letras)…' });
+      setAW({ type: 'name', c, st, step: s, ph: 'Seu apelido (2–20 letras)…' });
       return 'wait';
     }
     case 'avatar': {
@@ -2309,7 +2317,7 @@ async function runStep(c, st, s, tok) {
         post(c.id, { w: 'neemias', x: `📝 **${s.title}**\n${s.intro}`, b: [{ l: '📝 Abrir formulário de decisão', a: 'dec', id: s.id, cls: 'pri' }] });
         st.sub.asked = st.i; save();
       }
-      setAW({ type: 'dec', c, st, step: s, ph: 'Abra o formulário de decisão ↑' });
+      setAW({ type: 'dec', c, st, step: s, ph: 'Abra o formulário ↑' });
       return 'wait';
     }
     case 'pocket': {

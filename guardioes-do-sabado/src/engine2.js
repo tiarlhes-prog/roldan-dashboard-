@@ -110,19 +110,19 @@ function startChannel(c) {
   const st = chs(c.id);
   if (c.kind === 'static') {
     if (!st.i) { fillStatic(c); renderHistory(c.id); }
-    setAW(null, 'Somente leitura · toque no +');
+    setAW(null, 'Somente leitura');
     return;
   }
   if (c.kind === 'rank') {
     if (!st.i) { fillStatic(c); renderHistory(c.id); }
-    setAW(null, 'Ranking · atualiza sozinho a cada minuto');
+    setAW(null, 'Ranking do grupo');
     return;
   }
   if (c.kind === 'qa' || c.kind === 'board') {
     if (!st.i) { fillStatic(c); renderHistory(c.id); }
     setAW(c.kind === 'qa'
-      ? { type: 'qa', chId: c.id, ph: 'Pergunte algo sobre o sábado…' }
-      : { type: 'diary', chId: c.id, ph: 'Diário: como foi seu sábado?' });
+      ? { type: 'qa', chId: c.id, ph: 'Pergunte sobre o sábado…' }
+      : { type: 'diary', chId: c.id, ph: 'Diário: como foi o sábado?' });
     return;
   }
   if (st.done) { setAW(null, 'Canal concluído ✔'); return; }
@@ -161,7 +161,7 @@ async function runStep(c, st, s, tok) {
     }
     case 'name': {
       if (S.user.name) { st.i++; save(); return 'next'; }
-      setAW({ type: 'name', c, st, step: s, ph: 'Seu apelido (2 a 20 letras)…' });
+      setAW({ type: 'name', c, st, step: s, ph: 'Seu apelido (2–20 letras)…' });
       return 'wait';
     }
     case 'avatar': {
@@ -177,7 +177,7 @@ async function runStep(c, st, s, tok) {
         post(c.id, { w: 'neemias', x: `📝 **${s.title}**\n${s.intro}`, b: [{ l: '📝 Abrir formulário de decisão', a: 'dec', id: s.id, cls: 'pri' }] });
         st.sub.asked = st.i; save();
       }
-      setAW({ type: 'dec', c, st, step: s, ph: 'Abra o formulário de decisão ↑' });
+      setAW({ type: 'dec', c, st, step: s, ph: 'Abra o formulário ↑' });
       return 'wait';
     }
     case 'pocket': {

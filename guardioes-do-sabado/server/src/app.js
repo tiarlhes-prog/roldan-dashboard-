@@ -9,6 +9,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const express = require('express');
 const helmet = require('helmet');
+const compression = require('compression');
 const bcrypt = require('bcryptjs');
 const { abrirBanco } = require('./db');
 const S = require('./security');
@@ -24,6 +25,7 @@ function criarApp(cfg = {}) {
     dbPath: cfg.dbPath || path.join(__dirname, '..', 'data', 'guardioes.db'),
     adminUser: cfg.adminUser || 'Líder',
     adminPassword: cfg.adminPassword || '',
+    adminReset: !!cfg.adminReset,
     cookieSecure: cfg.cookieSecure !== false,
     trustProxy: cfg.trustProxy == null ? 1 : cfg.trustProxy,
     publicDir: path.resolve(cfg.publicDir || path.join(__dirname, '..', 'public')),
@@ -31,7 +33,8 @@ function criarApp(cfg = {}) {
     contato: cfg.contato || '',
     aceiteVersao: cfg.aceiteVersao || '2026-11-21',
     sessaoDias: cfg.sessaoDias || 30,
-    limites: Object.assign({ loginIp: 40, loginApelido: 8, cadastroIp: 8, senha: 10, progresso: 120, geral: 600 }, cfg.limites)
+    /* Limites generosos de propósito: uma igreja inteira pode usar o mesmo Wi-Fi (um único IP) e a rede do celular (CGNAT) também junta muita gente no mesmo IP. */
+    limites: Object.assign({ loginIp: 150, loginPar: 8, loginApelido: 40, cadastroIp: 40, senha: 10, progresso: 120, geral: 1500 }, cfg.limites)
   };
 
   const db = abrirBanco(c.dbPath);
@@ -50,13 +53,25 @@ function criarApp(cfg = {}) {
       .run(c.adminUser.trim(), adminChave, bcrypt.hashSync(c.adminPassword, 12), 'Líder do grupo', t, c.aceiteVersao, t, t);
     db.prepare('INSERT INTO gs_progress (user_id, atualizado_em) VALUES (?, ?)').run(r.lastInsertRowid, t);
   }
+  /* Esqueceu a senha do líder? Defina GS_ADMIN_RESET=1 junto com a nova GS_ADMIN_PASSWORD e reinicie: a senha é trocada
+   * uma vez por início. Depois REMOVA GS_ADMIN_RESET. (Alternativa por terminal: npm run admin:reset.) */
+  if (c.adminReset) {
+    if (!c.adminPassword || c.adminPassword.length < 10) throw new Error('GS_ADMIN_RESET=1 exige GS_ADMIN_PASSWORD com 10 ou mais caracteres.');
+    const adm = db.prepare("SELECT id, apelido FROM gs_users WHERE role = 'superadmin' LIMIT 1").get();
+    if (adm) {
+      db.prepare('UPDATE gs_users SET senha_hash = ? WHERE id = ?').run(bcrypt.hashSync(c.adminPassword, 12), adm.id);
+      db.prepare('DELETE FROM gs_sessions WHERE user_id = ?').run(adm.id);
+      console.log(`✓ Senha do líder "${adm.apelido}" redefinida (GS_ADMIN_RESET). Agora remova a variável GS_ADMIN_RESET.`);
+    }
+  }
   const reservadosExtra = new Set([adminChave]);
 
   /* ---------- limitadores ---------- */
   const lim = {
     geral: S.criarLimitador({ janelaMs: 60e3, max: c.limites.geral }),
     loginIp: S.criarLimitador({ janelaMs: 15 * 60e3, max: c.limites.loginIp }),
-    loginApelido: S.criarLimitador({ janelaMs: 15 * 60e3, max: c.limites.loginApelido }),
+    loginPar: S.criarLimitador({ janelaMs: 15 * 60e3, max: c.limites.loginPar }),            // apelido + IP: quem erra trava só a si mesmo
+    loginApelido: S.criarLimitador({ janelaMs: 15 * 60e3, max: c.limites.loginApelido }),    // teto global por apelido: freia ataque vindo de muitos IPs
     cadastroIp: S.criarLimitador({ janelaMs: 60 * 60e3, max: c.limites.cadastroIp }),
     senha: S.criarLimitador({ janelaMs: 15 * 60e3, max: c.limites.senha }),
     progresso: S.criarLimitador({ janelaMs: 60e3, max: c.limites.progresso })
@@ -99,6 +114,7 @@ function criarApp(cfg = {}) {
     referrerPolicy: { policy: 'no-referrer' },
     crossOriginEmbedderPolicy: false
   }));
+  app.use(compression({ threshold: 1024 }));      // o JS do jogo tem ~245 KB: comprimido vira ~60 KB (importa em rede móvel)
   app.use((req, res, next) => { res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()'); next(); });
 
   /* arquivos do jogo */
@@ -198,6 +214,7 @@ function criarApp(cfg = {}) {
       if (String(e.message).includes('UNIQUE')) return falha(res, 409, 'Esse apelido já está em uso. Escolha outro.', { campo: 'apelido' });
       throw e;
     }
+    console.log(`[cadastro] novo pedido de acesso: #${id} (${ap.valor}) — aguardando o líder`);   // aparece nos logs do Railway
     darCookie(res, criarSessao(id));
     res.status(201).json({ perfil: perfil(db.prepare('SELECT * FROM gs_users WHERE id = ?').get(id)) });
   });
@@ -208,16 +225,17 @@ function criarApp(cfg = {}) {
     const chave = S.chaveApelido(b.apelido || '');
     const senha = typeof b.senha === 'string' ? b.senha : '';
     if (!chave || !senha) return falha(res, 400, 'Informe apelido e senha.');
-    if (lim.loginIp.bloqueado(req.ip) || lim.loginApelido.bloqueado(chave)) {
+    const par = chave + '|' + req.ip;
+    if (lim.loginIp.bloqueado(req.ip) || lim.loginPar.bloqueado(par) || lim.loginApelido.bloqueado(chave)) {
       return falha(res, 429, 'Muitas tentativas. Espere uns 15 minutos e tente de novo.');
     }
     const u = db.prepare('SELECT * FROM gs_users WHERE chave = ?').get(chave);
     const certo = await bcrypt.compare(senha, u ? u.senha_hash : dummyHash);
     if (!u || !certo) {
-      lim.loginIp.tentar(req.ip); lim.loginApelido.tentar(chave);
+      lim.loginIp.tentar(req.ip); lim.loginPar.tentar(par); lim.loginApelido.tentar(chave);
       return falha(res, 401, 'Apelido ou senha incorretos.');
     }
-    lim.loginApelido.zerar(chave);
+    lim.loginPar.zerar(par); lim.loginApelido.zerar(chave);
     if (u.status === 'bloqueado') return falha(res, 403, 'Seu acesso está bloqueado. Fale com o líder.', { status: 'bloqueado' });
     db.prepare('UPDATE gs_users SET ultimo_acesso = ? WHERE id = ?').run(agora(), u.id);
     darCookie(res, criarSessao(u.id));
@@ -246,7 +264,7 @@ function criarApp(cfg = {}) {
   api.post('/me/senha', exigirAtivo, async (req, res) => {
     if (!lim.senha.tentar('u' + req.user.id)) return falha(res, 429, 'Muitas tentativas. Tente mais tarde.');
     const b = req.body || {};
-    if (!(await bcrypt.compare(String(b.atual || ''), req.user.senha_hash))) return falha(res, 401, 'A senha atual está incorreta.', { campo: 'atual' });
+    if (!(await bcrypt.compare(String(b.atual || ''), req.user.senha_hash))) return falha(res, 403, 'A senha atual está incorreta.', { campo: 'atual' });   // 403, não 401: a sessão está boa, só a confirmação falhou
     const sv = S.validarSenha(b.nova, req.user.chave);
     if (sv.erro) return falha(res, 400, sv.erro, { campo: 'nova' });
     db.prepare('UPDATE gs_users SET senha_hash = ? WHERE id = ?').run(await bcrypt.hash(b.nova, bcryptCusto), req.user.id);
@@ -259,7 +277,7 @@ function criarApp(cfg = {}) {
     if (req.user.role === 'superadmin') return falha(res, 403, 'A conta do líder não pode ser excluída por aqui.');
     if (!lim.senha.tentar('u' + req.user.id)) return falha(res, 429, 'Muitas tentativas. Tente mais tarde.');
     const senha = (req.body && typeof req.body.senha === 'string') ? req.body.senha : '';
-    if (!(await bcrypt.compare(senha, req.user.senha_hash))) return falha(res, 401, 'Senha incorreta.', { campo: 'senha' });
+    if (!(await bcrypt.compare(senha, req.user.senha_hash))) return falha(res, 403, 'Senha incorreta.', { campo: 'senha' });
     db.prepare('DELETE FROM gs_users WHERE id = ?').run(req.user.id);   // apaga conta, sessões e progresso (cascata)
     tirarCookie(res);
     console.log(`[conta] #${req.user.id} (${req.user.apelido}) excluiu a própria conta`);
@@ -356,7 +374,7 @@ function criarApp(cfg = {}) {
     res.json({ usuarios: linhas.map(linhaAdmin) });
   });
   const alvo = (req, res) => {
-    const id = Number.parseInt(req.params.id, 10);
+    const id = /^\d{1,9}$/.test(req.params.id) ? Number(req.params.id) : NaN;      // só dígitos: "12abc" não vale como 12
     const u = Number.isInteger(id) ? db.prepare("SELECT * FROM gs_users WHERE id = ? AND role = 'jogador'").get(id) : null;
     if (!u) falha(res, 404, 'Jovem não encontrado.');
     return u;

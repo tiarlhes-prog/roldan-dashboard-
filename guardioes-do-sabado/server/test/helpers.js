@@ -15,7 +15,7 @@ async function iniciar(cfg = {}) {
   const inst = criarApp(Object.assign({
     dbPath: ':memory:', adminUser: 'Líder', adminPassword: SENHA_LIDER, cookieSecure: false,
     bcryptCusto: 4, publicDir: pub, responsavel: 'Pr. Teste', contato: 'teste@exemplo.com',
-    limites: { loginIp: 1000, loginApelido: 1000, cadastroIp: 1000, senha: 1000, progresso: 10000, geral: 100000 }
+    limites: { loginIp: 1000, loginPar: 1000, loginApelido: 1000, cadastroIp: 1000, senha: 1000, progresso: 10000, geral: 100000 }
   }, cfg));
   const servidor = await new Promise(ok => { const s = inst.app.listen(0, '127.0.0.1', () => ok(s)); });
   const base = `http://127.0.0.1:${servidor.address().port}`;

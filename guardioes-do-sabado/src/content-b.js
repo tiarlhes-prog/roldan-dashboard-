@@ -9,9 +9,9 @@ function dilemma(o) {
   const s = [];
   s.push(say('neemias', `**Dilema ${o.num} · ${o.title}** ${o.emoji}\n${o.setup}\n\nResponda **como na vida real**. Não existe resposta certa para o que você faria — aqui é lugar seguro para ensaiar.`));
   o.scene.forEach(([w, t]) => s.push(w === 'narr' ? sys(t) : say(w, t)));
-  s.push(ask({ id: o.id + '_a', kind: 'reply', xp: 25, minWords: 4, text: o.q1, ph: 'Responda como na vida real…' }));
+  s.push(ask({ id: o.id + '_a', kind: 'reply', xp: 25, minWords: 4, text: o.q1, ph: 'Responda como na vida…' }));
   o.mid.forEach(([w, t]) => s.push(w === 'narr' ? sys(t) : say(w, t)));
-  s.push(ask({ id: o.id + '_b', kind: 'reply', xp: 30, minWords: 4, text: o.q2, ph: 'Mantém ou cede? Seja sincero(a)…' }));
+  s.push(ask({ id: o.id + '_b', kind: 'reply', xp: 30, minWords: 4, text: o.q2, ph: 'Mantém ou cede? Explique…' }));
   s.push(say('neemias', o.after || DEF_AFTER));
   s.push(emb({
     title: '🔎 Teoria × Prática', c: 'var(--violet)',
@@ -239,7 +239,7 @@ dilemma({
     say('neemias', `**Fase 5 · Chefão** 👑\nChegou a hora de montar o **seu** sábado — do pôr do sol de sexta ao pôr do sol de sábado. São **quatro blocos curtos**. Seja específico(a): **horário, gente, lugar**.`),
     ask({ id: 'p1', kind: 'list', xp: 50, need: 3, minWords: 8, bonus: /(\d{1,2}\s*(h|hr|:)|hora|por do sol)/,
       text: `🌅 **Bloco 1 · Sexta.** Liste **3 coisas** que você deixa prontas e **a que horas** você “fecha os portões” (para atividades seculares e celular).`,
-      ph: 'Ex.: roupa, comida; portões 17h…',
+      ph: 'Ex.: roupa, comida, 17h…',
       react: `Ótimo. Quem chega na sexta com tudo pronto entra no sábado **descansado(a)** — e sem correria.` }),
     ask({ id: 'p2', kind: 'concept', xp: 50, minWords: 8,
       text: `🕯️ **Bloco 2 · Culto de pôr do sol.** Quem participa e quais **3 elementos** ele terá (música, leitura, oração, dinâmica, convidado…)?`,
@@ -263,7 +263,7 @@ dilemma({
       src: ['folder', 'bs_77'] }),
     ask({ id: 'p4', kind: 'reflect', xp: 50, minWords: 15,
       text: `📱 **Bloco 4 · Modo Sábado e dilemas.** Resuma as regras do seu Modo Sábado e diga **qual dilema da Fase 4 foi o mais difícil** para você — e o que fará de diferente.`,
-      ph: 'Meu Modo Sábado: … Dilema: …',
+      ph: 'Modo Sábado: … Dilema: …',
       react: `Isso é maturidade: saber onde você é mais frágil **antes** de o teste chegar.` }),
     { t: 'plan' }
   ] },

@@ -6,6 +6,7 @@
   python3 build.py --artifact CAMINHO     -> fragmento para o Artifact do claude.ai (sem login)
   python3 build.py --debug CAMINHO        -> arquivo único de teste que expõe internos em window.__GS
   python3 build.py --server PASTA --debug -> versão do servidor com window.__GS (só para testes automatizados)
+  python3 build.py --check                -> confere se server/public e index.html estão em dia com src/ (sai com erro se não)
 """
 import hashlib, json, pathlib, shutil, sys
 
@@ -21,7 +22,7 @@ js_body = '\n'.join(read(p) for p in PARTS)
 
 DEBUG_HOOK = ("\nwindow.__GS = { get S(){return S}, set S(v){S=v}, get ME(){return ME}, get GAME_ON(){return GAME_ON}, get RK(){return RK}, MODE, SERVER, "
               "norm, wc, evalConcepts, listItems, findFAQ, CH, CHM, FAQ, F4, SEQ, ROLES, unlocked, isDone, openChannel, runCommand, addXP, roleIdx, "
-              "WEEK_ITEMS, weekState, toggleWeek, CRISIS, md, pledgeData, pledgeBlob, get AW(){return AW}, dilemmasDone, progressPayload, syncNow, fetchRank };\n")
+              "WEEK_ITEMS, weekState, toggleWeek, CRISIS, md, pledgeData, pledgeBlob, openPledge, savePledgePNG, get AW(){return AW}, dilemmasDone, progressPayload, syncNow, fetchRank };\n")
 
 def wrap(debug=False):
     return "(function(){\n'use strict';\n" + js_body + (DEBUG_HOOK if debug else '') + "\n})();"
@@ -86,7 +87,19 @@ def build_server(out, debug=False):
 args = sys.argv[1:]
 arg_after = lambda flag: pathlib.Path(args[args.index(flag) + 1]) if flag in args and args.index(flag) + 1 < len(args) and not args[args.index(flag) + 1].startswith('--') else None
 
-if '--server' in args:
+if '--check' in args:
+    # confere se o que está commitado (server/public e index.html) é exatamente o que o código-fonte gera
+    import tempfile
+    tmp = pathlib.Path(tempfile.mkdtemp())
+    build_server(tmp / 'public')
+    arq = lambda d: {f.name: f.read_bytes() for f in d.iterdir() if f.is_file()}
+    pub_ok = arq(root / 'server' / 'public') == arq(tmp / 'public')
+    idx_ok = (root / 'index.html').read_text(encoding='utf-8') == single_file()
+    print('server/public em dia com src/:', 'sim' if pub_ok else 'NÃO — rode: python3 build.py --server')
+    print('index.html em dia com src/:   ', 'sim' if idx_ok else 'NÃO — rode: python3 build.py')
+    shutil.rmtree(tmp, ignore_errors=True)
+    sys.exit(0 if pub_ok and idx_ok else 1)
+elif '--server' in args:
     build_server(arg_after('--server') or (root / 'server' / 'public'), debug='--debug' in args)
 elif '--debug' in args:
     out = arg_after('--debug')

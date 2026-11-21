@@ -102,6 +102,8 @@ describe('cadastro e aprovação', () => {
     assert.equal((await j.get('/api/progress')).status, 200);
     assert.equal((await j.get('/api/ranking')).status, 200);
     assert.equal((await adm.post('/api/admin/usuarios/99999/aprovar')).status, 404);
+    assert.equal((await adm.post(`/api/admin/usuarios/${u.id}abc/aprovar`)).status, 404, 'id com letras não vale como número');
+    assert.equal((await adm.post('/api/admin/usuarios/-1/aprovar')).status, 404);
   });
 
   test('o líder não aparece na lista de jovens nem pode ser bloqueado/removido pelo painel', async () => {
@@ -165,7 +167,7 @@ describe('login, sessão e senha', () => {
   test('trocar a senha exige a atual, valida a nova e derruba as OUTRAS sessões', async () => {
     const a = await criarJovem(srv, 'TrocaSenha');
     const b = srv.cliente(); await b.post('/api/login', { apelido: 'TrocaSenha', senha: 'Senha-forte-1' });
-    assert.equal((await a.post('/api/me/senha', { atual: 'errada-errada', nova: 'Nova-senha-9' })).status, 401);
+    assert.equal((await a.post('/api/me/senha', { atual: 'errada-errada', nova: 'Nova-senha-9' })).status, 403, 'senha atual errada não derruba a sessão (403, não 401)');
     assert.equal((await a.post('/api/me/senha', { atual: 'Senha-forte-1', nova: '123' })).status, 400);
     assert.equal((await a.post('/api/me/senha', { atual: 'Senha-forte-1', nova: 'Nova-senha-9' })).status, 200);
     assert.equal((await a.get('/api/me')).status, 200, 'a sessão atual continua');
@@ -385,7 +387,7 @@ describe('avatar no cadastro e exclusão da própria conta', () => {
   test('o jovem apaga a própria conta com a senha: some tudo e o apelido volta a ficar livre', async () => {
     const c = await criarJovem(srv, 'SaiSozinho');
     await c.put('/api/progress', { xp: 40, semanas: 0, streak: 0, done: ['boas-vindas'], badges: [] });
-    assert.equal((await c.post('/api/me/excluir', { senha: 'errada-errada' })).status, 401);
+    assert.equal((await c.post('/api/me/excluir', { senha: 'errada-errada' })).status, 403);
     assert.equal((await c.get('/api/me')).status, 200, 'senha errada não derruba a conta');
     assert.equal((await c.post('/api/me/excluir', { senha: 'Senha-forte-1' })).status, 200);
     assert.equal(srv.db.prepare("SELECT COUNT(*) n FROM gs_users WHERE apelido = 'SaiSozinho'").get().n, 0);
@@ -526,6 +528,14 @@ describe('proteções: CSRF, limites, cabeçalhos, erros', () => {
     assert.equal((await c.get('/%2e%2e/%2e%2e/etc/passwd')).status, 404);
   });
 
+  test('arquivos grandes saem comprimidos (gzip) quando o navegador aceita', async () => {
+    const grande = 'console.log("x");\n'.repeat(5000);
+    require('node:fs').writeFileSync(require('node:path').join(srv.publicDir, 'app.0123456789.js'), grande);
+    const r = await fetch(srv.base + '/app.0123456789.js', { headers: { 'Accept-Encoding': 'gzip' } });
+    assert.equal(r.headers.get('content-encoding'), 'gzip');
+    assert.equal((await r.text()).length, grande.length, 'descomprime de volta ao original');
+  });
+
   test('o servidor não coloca o banco, o código ou o .env na pasta pública', async () => {
     const c = srv.cliente();
     for (const rota of ['/guardioes.db', '/data/guardioes.db', '/.env', '/package.json', '/src/app.js', '/server.js']) {
@@ -535,19 +545,40 @@ describe('proteções: CSRF, limites, cabeçalhos, erros', () => {
 });
 
 describe('limites de tentativas', () => {
-  test('força bruta no login: depois de N erros o apelido trava, até com a senha certa', async () => {
-    const srv = await iniciar({ limites: { loginIp: 1000, loginApelido: 4, cadastroIp: 1000, senha: 1000, progresso: 1000, geral: 100000 } });
+  const base = { loginIp: 1000, loginPar: 1000, loginApelido: 1000, cadastroIp: 1000, senha: 1000, progresso: 1000, geral: 100000 };
+  const xff = n => ({ headers: { 'X-Forwarded-For': '10.0.0.' + n } });      // simula aparelhos diferentes atrás do proxy
+
+  test('força bruta: depois de N erros, aquele aparelho trava para aquele apelido, até com a senha certa', async () => {
+    const srv = await iniciar({ limites: Object.assign({}, base, { loginPar: 4 }) });
     try {
       await criarJovem(srv, 'AlvoForca');
-      for (let i = 0; i < 4; i++) assert.equal((await srv.cliente().post('/api/login', { apelido: 'AlvoForca', senha: 'chute-' + i + '-xx' })).status, 401);
-      const r = await srv.cliente().post('/api/login', { apelido: 'AlvoForca', senha: 'Senha-forte-1' });
-      assert.equal(r.status, 429);
-      assert.equal((await srv.cliente().post('/api/login', { apelido: 'outroqualquer', senha: 'qualquer-coisa' })).status, 401, 'outros apelidos não são afetados');
+      for (let i = 0; i < 4; i++) assert.equal((await srv.cliente().post('/api/login', { apelido: 'AlvoForca', senha: 'chute-' + i + '-xx' }, xff(1))).status, 401);
+      assert.equal((await srv.cliente().post('/api/login', { apelido: 'AlvoForca', senha: 'Senha-forte-1' }, xff(1))).status, 429);
+      assert.equal((await srv.cliente().post('/api/login', { apelido: 'outroqualquer', senha: 'qualquer-coisa' }, xff(1))).status, 401, 'outros apelidos não são afetados');
+    } finally { await srv.parar(); }
+  });
+
+  test('um colega NÃO consegue trancar a conta do outro: o travamento é por apelido+aparelho', async () => {
+    const srv = await iniciar({ limites: Object.assign({}, base, { loginPar: 4 }) });
+    try {
+      await criarJovem(srv, 'Vitima1');
+      for (let i = 0; i < 6; i++) await srv.cliente().post('/api/login', { apelido: 'Vitima1', senha: 'palpite-' + i + '-xx' }, xff(66));   // o engraçadinho
+      assert.equal((await srv.cliente().post('/api/login', { apelido: 'Vitima1', senha: 'palpite-9-xx' }, xff(66))).status, 429);
+      assert.equal((await srv.cliente().post('/api/login', { apelido: 'Vitima1', senha: 'Senha-forte-1' }, xff(7))).status, 200, 'a vítima, de outro aparelho, entra normalmente');
+    } finally { await srv.parar(); }
+  });
+
+  test('ataque vindo de muitos aparelhos esbarra no teto global por apelido', async () => {
+    const srv = await iniciar({ limites: Object.assign({}, base, { loginApelido: 6 }) });
+    try {
+      await criarJovem(srv, 'AlvoDistribuido');
+      for (let i = 0; i < 6; i++) assert.equal((await srv.cliente().post('/api/login', { apelido: 'AlvoDistribuido', senha: 'chute-' + i + '-xx' }, xff(100 + i))).status, 401);
+      assert.equal((await srv.cliente().post('/api/login', { apelido: 'AlvoDistribuido', senha: 'chute-outro-xx' }, xff(200))).status, 429);
     } finally { await srv.parar(); }
   });
 
   test('limite por IP no login e nos cadastros', async () => {
-    const srv = await iniciar({ limites: { loginIp: 3, loginApelido: 1000, cadastroIp: 2, senha: 1000, progresso: 1000, geral: 100000 } });
+    const srv = await iniciar({ limites: Object.assign({}, base, { loginIp: 3, cadastroIp: 2 }) });
     try {
       for (let i = 0; i < 3; i++) await srv.cliente().post('/api/login', { apelido: 'x' + i + 'abc', senha: 'errada-errada' });
       assert.equal((await srv.cliente().post('/api/login', { apelido: 'novoapelido', senha: 'errada-errada' })).status, 429);
@@ -557,8 +588,16 @@ describe('limites de tentativas', () => {
     } finally { await srv.parar(); }
   });
 
+  test('os padrões aguentam um grupo grande no mesmo Wi-Fi: 30 cadastros e 60 logins do mesmo IP', async () => {
+    const srv = await iniciar({ limites: {} });    // limites reais de produção
+    try {
+      for (let i = 0; i < 30; i++) assert.equal((await srv.cliente().post('/api/register', dadosCadastro('Grupo' + String(i).padStart(2, '0')))).status, 201, 'cadastro ' + i);
+      for (let i = 0; i < 60; i++) assert.equal((await srv.cliente().post('/api/login', { apelido: 'Grupo' + String(i % 30).padStart(2, '0'), senha: 'Senha-forte-1' })).status, 200, 'login ' + i);
+    } finally { await srv.parar(); }
+  });
+
   test('limite geral de requisições por minuto', async () => {
-    const srv = await iniciar({ limites: { loginIp: 1000, loginApelido: 1000, cadastroIp: 1000, senha: 1000, progresso: 1000, geral: 5 } });
+    const srv = await iniciar({ limites: Object.assign({}, base, { geral: 5 }) });
     try {
       const c = srv.cliente(); let ultimo;
       for (let i = 0; i < 8; i++) ultimo = await c.get('/api/config');
@@ -567,7 +606,7 @@ describe('limites de tentativas', () => {
   });
 
   test('limite de atualizações de progresso', async () => {
-    const srv = await iniciar({ limites: { loginIp: 1000, loginApelido: 1000, cadastroIp: 1000, senha: 1000, progresso: 3, geral: 100000 } });
+    const srv = await iniciar({ limites: Object.assign({}, base, { progresso: 3 }) });
     try {
       const c = await criarJovem(srv, 'Spammer');
       const p = { xp: 1, semanas: 0, streak: 0, done: [], badges: [] };
@@ -607,6 +646,23 @@ describe('conta do líder (superadmin)', () => {
     assert.equal(rows.length, 1);
     assert.equal(rows[0].senha_hash, hash1, 'a senha do banco não pode ser trocada só por mudar a variável');
     b.fechar();
+    fs.rmSync(path.dirname(arq), { recursive: true, force: true });
+  });
+
+  test('GS_ADMIN_RESET=1 redefine a senha do líder e derruba as sessões; sem a flag, nada muda', async () => {
+    const arq = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'gs-db-')), 'g.db');
+    const a = criarApp({ dbPath: arq, adminPassword: SENHA_LIDER, cookieSecure: false, bcryptCusto: 4 });
+    a.db.prepare("INSERT INTO gs_sessions (token_hash, user_id, criado_em, expira_em) SELECT 'x', id, '2026-01-01', '2999-01-01' FROM gs_users WHERE role = 'superadmin'").run();
+    a.fechar();
+    assert.throws(() => criarApp({ dbPath: arq, adminPassword: 'curta', adminReset: true, cookieSecure: false }), /GS_ADMIN_RESET/);
+    const b = criarApp({ dbPath: arq, adminPassword: 'senha-nova-do-lider-9', adminReset: true, cookieSecure: false, bcryptCusto: 4 });
+    assert.equal(b.db.prepare('SELECT COUNT(*) n FROM gs_sessions').get().n, 0, 'sessões antigas do líder foram derrubadas');
+    const srv = await new Promise(ok => { const s2 = b.app.listen(0, '127.0.0.1', () => ok(s2)); });
+    const base = `http://127.0.0.1:${srv.address().port}`;
+    const tenta = async senha => (await fetch(base + '/api/login', { method: 'POST', headers: { 'X-GS': '1', 'Content-Type': 'application/json' }, body: JSON.stringify({ apelido: 'Líder', senha }) })).status;
+    assert.equal(await tenta(SENHA_LIDER), 401, 'a senha antiga deixou de valer');
+    assert.equal(await tenta('senha-nova-do-lider-9'), 200, 'a nova senha vale');
+    await new Promise(ok => srv.close(ok)); b.fechar();
     fs.rmSync(path.dirname(arq), { recursive: true, force: true });
   });
 

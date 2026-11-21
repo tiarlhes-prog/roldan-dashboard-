@@ -1,6 +1,7 @@
 'use strict';
 /* Ponto de entrada. Variáveis de ambiente (veja .env.example):
  *   GS_ADMIN_USER / GS_ADMIN_PASSWORD   conta do líder (superadmin), criada no primeiro início
+ *   GS_ADMIN_RESET=1                    redefine a senha do líder para GS_ADMIN_PASSWORD neste início (depois remova)
  *   GS_DB_PATH                          caminho do banco (em produção: dentro do volume, ex.: /data/guardioes.db)
  *   GS_COOKIE_SECURE=0                  só para testar em http local; em produção deixe ligado (HTTPS)
  *   GS_TRUST_PROXY                      quantos proxies existem na frente (Railway/Nginx = 1)
@@ -13,6 +14,7 @@ try {
     dbPath: process.env.GS_DB_PATH,
     adminUser: process.env.GS_ADMIN_USER,
     adminPassword: process.env.GS_ADMIN_PASSWORD,
+    adminReset: process.env.GS_ADMIN_RESET === '1',
     cookieSecure: process.env.GS_COOKIE_SECURE !== '0',
     trustProxy: process.env.GS_TRUST_PROXY === undefined || process.env.GS_TRUST_PROXY === '' ? 1 : Number(process.env.GS_TRUST_PROXY),
     responsavel: process.env.GS_RESPONSAVEL,

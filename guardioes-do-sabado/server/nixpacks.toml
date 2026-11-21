@@ -1,0 +1,10 @@
+# Segundo serviço do mesmo repositório: pasta raiz = guardioes-do-sabado/server
+# Node 22 é exigido pelo better-sqlite3 13; as ferramentas de compilação ficam de reserva caso não exista binário pronto.
+[phases.setup]
+nixPkgs = ["nodejs_22", "python3", "gcc", "gnumake"]
+
+[phases.install]
+cmds = ["npm ci --omit=dev"]
+
+[start]
+cmd = "node src/server.js"

@@ -84,6 +84,7 @@ const GATE = {
     (o.aviso ? `<div class="note" role="status">${esc(o.aviso)}</div>` : '') +
     `<form id="fLogin" novalidate>${textField('lgUser', 'Apelido', 'username', { max: 20, focus: true })}${pwField('lgPass', 'Senha', 'current-password')}` +
     `<div id="gErr" role="alert"></div><button class="btn pri lg" type="submit" id="gSubmit">Entrar</button></form>` +
+    `<p style="margin-top:12px;font-size:13px">Esqueceu a senha? Peça ao líder uma <b>senha temporária</b> e troque depois em Configurações.</p>` +
     `<div class="gate-foot"><button type="button" class="lk" data-g="privacy">Aviso de privacidade</button></div>`,
 
   register: () => `<h2>Pedir acesso</h2><p>O líder do grupo confere o seu pedido e libera a sua entrada. Costuma ser rápido.</p>` +
@@ -129,18 +130,19 @@ function showGate(view, opts = {}) {
   if (!coarse()) { const f = $('#gateBody [data-focus]'); if (f) setTimeout(() => { try { f.focus({ preventScroll: true }); } catch (e) { /* ok */ } }, 40); }
 }
 function hideGate() { $('#gate').hidden = true; $('#gateBody').innerHTML = ''; document.body.classList.remove('gated'); $('#app').removeAttribute('inert'); }
-function setBusy(on, label) {
-  const b = $('#gSubmit');
+function setBusy(on, label, root) {
+  const b = (root || $('#gateBody')).querySelector('#gSubmit');
   if (!b) return;
   if (!b.dataset.t) b.dataset.t = b.textContent;
   b.disabled = !!on; b.textContent = on ? label : b.dataset.t;
 }
-function gateError(msg, fieldId) {
-  const e = $('#gErr');
+function gateError(msg, fieldId, root) {
+  root = root || $('#gateBody');                       // a tela de acesso e as janelas de Configurações usam os mesmos ids: sempre busca dentro do formulário certo
+  const e = root.querySelector('#gErr');
   if (e) e.innerHTML = `<div class="note bad">${esc(msg)}</div>`;
-  $$('#gateBody .fld').forEach(f => f.classList.remove('bad'));
-  $$('#gateBody [aria-invalid]').forEach(i => i.removeAttribute('aria-invalid'));
-  const i = fieldId && $('#' + fieldId);
+  root.querySelectorAll('.fld').forEach(f => f.classList.remove('bad'));
+  root.querySelectorAll('[aria-invalid]').forEach(i => i.removeAttribute('aria-invalid'));
+  const i = fieldId && root.querySelector('#' + fieldId);
   if (i) { i.setAttribute('aria-invalid', 'true'); const f = i.closest('.fld'); if (f) f.classList.add('bad'); try { i.focus(); } catch (er) { /* ok */ } }
 }
 const FIELD_OF = { apelido: 'rgUser', senha: 'rgPass', nome: 'rgName', grupo: 'rgGroup' };
@@ -589,28 +591,34 @@ function pwFormHTML() {
     `<div class="mfoot" style="margin-top:12px"><button type="button" class="btn ghost" data-act="srv-pw-x">Cancelar</button><button type="submit" class="btn pri" id="gSubmit">Trocar senha</button></div></form>`;
 }
 async function doChangePassword() {
-  const atual = $('#pwOld').value, nova = $('#pwNew').value;
-  if (!atual) return gateError('Digite a senha atual.', 'pwOld');
-  if (nova.length < 8) return gateError('A nova senha precisa ter pelo menos 8 caracteres.', 'pwNew');
-  setBusy(true, 'Trocando…');
+  const f = $('#fPw'), atual = $('#pwOld').value, nova = $('#pwNew').value;
+  if (!atual) return gateError('Digite a senha atual.', 'pwOld', f);
+  if (nova.length < 8) return gateError('A nova senha precisa ter pelo menos 8 caracteres.', 'pwNew', f);
+  setBusy(true, 'Trocando…', f);
   try {
-    await api('POST', '/api/me/senha', { atual, nova });
+    await api('POST', '/api/me/senha', { atual, nova }, { quiet: true });
     const box = $('#pwBox'); if (box) box.innerHTML = '<div class="note ok">Senha trocada ✔ Os outros aparelhos precisarão entrar de novo.</div>';
-  } catch (e) { setBusy(false); gateError(e.message, e.data && e.data.campo === 'atual' ? 'pwOld' : 'pwNew'); }
+  } catch (e) {
+    if (e.status === 401) { onSessionLost(); return; }       // aqui sim: a sessão caiu de verdade
+    setBusy(false, '', f); gateError(e.message, e.data && e.data.campo === 'atual' ? 'pwOld' : 'pwNew', f);
+  }
 }
 function delFormHTML() {
   return `<form id="fDelAcc" novalidate><div class="note bad"><b>Excluir a conta apaga seu cadastro e seu progresso do servidor.</b> Não dá para desfazer. Suas respostas neste aparelho também serão apagadas.</div>${pwField('dlPass', 'Confirme com a sua senha', 'current-password')}<div id="gErr" role="alert"></div>` +
     `<div class="mfoot" style="margin-top:12px"><button type="button" class="btn ghost" data-act="srv-del-x">Cancelar</button><button type="submit" class="btn bad" id="gSubmit">Apagar minha conta</button></div></form>`;
 }
 async function doDeleteAccount() {
-  const senha = $('#dlPass').value;
-  if (!senha) return gateError('Digite a sua senha para confirmar.', 'dlPass');
-  setBusy(true, 'Apagando…');
+  const f = $('#fDelAcc'), senha = $('#dlPass').value;
+  if (!senha) return gateError('Digite a sua senha para confirmar.', 'dlPass', f);
+  setBusy(true, 'Apagando…', f);
   try {
-    await api('POST', '/api/me/excluir', { senha });
+    await api('POST', '/api/me/excluir', { senha }, { quiet: true });
     try { localStorage.removeItem(KEY); } catch (e) { /* ok */ }
     GAME_ON = false; location.reload();
-  } catch (e) { setBusy(false); gateError(e.message, 'dlPass'); }
+  } catch (e) {
+    if (e.status === 401) { onSessionLost(); return; }
+    setBusy(false, '', f); gateError(e.message, 'dlPass', f);
+  }
 }
 function openPrivacy() {
   const quem = CFG.responsavel ? `<b>${esc(CFG.responsavel)}</b>` : 'o líder do grupo';
